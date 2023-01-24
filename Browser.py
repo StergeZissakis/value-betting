@@ -21,17 +21,18 @@ class Browser:
         self.driver = webdriver.Chrome(chrome_options=self.chrome_options)
 
         # Load cookies from previous session
-        #'''
+        '''
         self.cookies_file = "./config/chrome.cookies.pkl"
         if(os.path.isfile(self.cookies_file)):
             cookies = pickle.load(open(self.cookies_file, "rb"))
             for cookie in cookies:
                 self.driver.add_cookie(cookie)
-        #'''
+        '''
 
     def __del__(self):
         # Save cookies for next session
-        pickle.dump(self.driver.get_cookies(), open(self.cookies_file, "wb"))
+        #pickle.dump(self.driver.get_cookies(), open(self.cookies_file, "wb"))
+        pass
 
     def get(self, url):
         self.page = self.driver.get(url)

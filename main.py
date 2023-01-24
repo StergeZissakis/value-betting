@@ -35,23 +35,15 @@ def main():
     scroll_to_visible(page, greece_link)
     greece_link.click()
 
+    # find Greece parent li
+    greece_parent = page.find_element(By.XPATH, "//h2[text()='Greece']/ancestor::li[@class='country']")
+    greece_li_html = greece_parent.get_attribute('innerHTML')
+    data_start_index = greece_li_html.find('data-v-')
+    data_end_index = greece_li_html.find('=', data_start_index)
+
+    print(greece_li_html[data_start_index:data_end_index]) 
+
     #Visit all links under Greece
-    ## Get all the attributes
-    dataElement = None
-    attribs = greece_link.get_property('attributes')[0].keys()
-    for attrib in attribs:
-        if attrib.startswith('data-v-'):
-            dataElement=attrib
-            break
-
-    if dataElement:
-        print(dataElement)
-
-        top_href = greece_link.find_element_by_xpath('..').find_element_by_xpath('..') #find the top <a href
-        print(top_href)
-
-        ul = top_href.find_element_by_xpath('//a[@href]/ul[@' + dataElement + ']')
-        print(ul)
 
 
 if __name__ == "__main__":
