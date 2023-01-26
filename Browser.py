@@ -2,7 +2,9 @@ import pickle
 import time
 import os
 from selenium import webdriver
+from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.action_chains import ActionChains
 
 class Browser:
 
@@ -44,4 +46,56 @@ class Browser:
     def scrollToVisible():
         pass
 
+    def element_completely_visible(self, elem):
+        elem_left_bound = elem.location.get('x')
+        elem_top_bound = elem.location.get('y')
+        elem_width = elem.size.get('width')
+        elem_height = elem.size.get('height')
+        elem_right_bound = elem_left_bound + elem_width
+        elem_lower_bound = elem_top_bound + elem_height
+
+        win_upper_bound = self.driver.execute_script('return window.pageYOffset')
+        win_left_bound = self.driver.execute_script('return window.pageXOffset')
+        win_width = self.driver.execute_script('return document.documentElement.clientWidth')
+        win_height = self.driver.execute_script('return document.documentElement.clientHeight')
+        win_right_bound = win_left_bound + win_width
+        win_lower_bound = win_upper_bound + win_height
+
+        return all(
+                   (    win_left_bound <= elem_left_bound,
+                        win_right_bound >= elem_right_bound,
+                        win_upper_bound <= elem_top_bound,
+                        win_lower_bound >= elem_lower_bound
+                   )
+                  )
+
+    def sleep_for_millis(self, millis):
+        time.sleep(millis / 1000)
+
+    def scroll_to_visible(self, page, element):
+        page.execute_script("arguments[0].scrollIntoView(true);", element)
+        self.sleep_for_millis(300)
+
+    def move_to_element(self, element):
+        if(self.element_completely_visible(element)):
+            ActionChains(self.driver).move_to_element(element).perform()
+        self.sleep_for_millis(250)
+
+    def move_to_element_and_left_click(self, element):
+        self.move_to_element(element)
+        element.click()
+        self.sleep_for_millis(150)
+
+    def middle_click(self, element):
+        self.driver.execute_script('var mouseWheelClick = new MouseEvent( "click", { "button": 2, "which": 2 }); document.getElementById("' + element.get_attribute('id') + '").dispatchEvent(mouseWheelClick)');
+        self.sleep_for_millis(200)
+
+    def move_to_element_and_middle_click(self, element):
+        self.move_to_element(element)
+        self.middle_click(element)
+
+    def accept_cookies(self, page, button_text):
+        button = page.find_element(By.XPATH, "//button[text()='" + button_text + "']")
+        self.sleep_for_millis(200)
+        self.move_to_element_and_left_click(button)
 
