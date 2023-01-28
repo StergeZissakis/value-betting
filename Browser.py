@@ -3,6 +3,7 @@ import time
 import os
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.action_chains import ActionChains
 
@@ -69,6 +70,16 @@ class Browser:
                    )
                   )
 
+    def getInteractibleChild(self, element):
+        while not (element or element.is_displayed() or element.is_enabled()):
+            for child in element.find_elements_by_xpath("./*"):
+                tmp = self.getInteractibleChild(child)
+                if tmp and tmp.is_displayed() and tmp.is_enabled():
+                    element = tmp
+                    break
+
+        return element
+
     def sleep_for_millis(self, millis):
         time.sleep(millis / 1000)
 
@@ -77,25 +88,30 @@ class Browser:
         self.sleep_for_millis(300)
 
     def move_to_element(self, element):
-        if(self.element_completely_visible(element)):
+        if(self.element_completely_visible(element) and element.is_displayed()):
             ActionChains(self.driver).move_to_element(element).perform()
         self.sleep_for_millis(250)
 
     def move_to_element_and_left_click(self, element):
         self.move_to_element(element)
-        element.click()
+        clickable = self.getInteractibleChild(element)
+        clickable.click()
         self.sleep_for_millis(150)
 
     def middle_click(self, element):
-        self.driver.execute_script('var mouseWheelClick = new MouseEvent( "click", { "button": 2, "which": 2 }); document.getElementById("' + element.get_attribute('id') + '").dispatchEvent(mouseWheelClick)');
+        self.move_to_element(element)
+        clickable = self.getInteractibleChild(element)
+        ActionChains(self.driver).key_down(Keys.CONTROL).click(clickable).key_up(Keys.CONTROL).perform()
         self.sleep_for_millis(200)
 
     def move_to_element_and_middle_click(self, element):
         self.move_to_element(element)
-        self.middle_click(element)
+        clickable = self.getInteractibleChild(element)
+        self.middle_click(clickable)
 
     def accept_cookies(self, page, button_text):
         button = page.find_element(By.XPATH, "//button[text()='" + button_text + "']")
         self.sleep_for_millis(200)
         self.move_to_element_and_left_click(button)
+
 

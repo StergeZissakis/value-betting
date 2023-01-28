@@ -6,6 +6,7 @@ def process_odds_page(browser, link):
     browser.move_to_element_and_middle_click(link);
     browser.sleep_for_millis(1000)
 
+
 def main():
     browser = Browser()
     page = browser.get("https://www.oddsportal.com/")
@@ -37,15 +38,32 @@ def main():
     greece_country_code = greece_parent_li.get_attribute('id')
 
     # get Greece li children links (h3)
-    greece_li_children_links = greece_parent_li.find_elements(By.CSS_SELECTOR, 'h3[' + data_v_str + ']')
+    greece_li_children_links = greece_parent_li.find_elements(By.CSS_SELECTOR, 'li a')
 
-    print(greece_li_children_links)
+    #Visit all 'Super League' links under Greece
+    total_tabs = 0
+    for link in greece_li_children_links:
+        if link.text.startswith('Super League'):
+            process_odds_page(browser, link)
+            total_tabs += 1
 
-    #Visit all links under Greece
-    for p in greece_li_children_links:
-        print(p)
-        process_odds_page(browser, p)
+    #Process tabs
+    for tab in range(1, total_tabs + 1):
+        print('Processing tab [' + str(tab) + ']')
+        browser.driver.switch_to.window(browser.driver.window_handles[tab])
+        page = browser.driver
+        rows = page.find_element(By.XPATH, "//a/ancestor::div[contains(@class,'hover:bg-[#')]")
+        for row in rows:
+            browser.move_to_element_and_left_click(row)
+            
+            browser.back()
 
+        
+
+
+        
+
+    
 
 if __name__ == "__main__":
     main()
