@@ -1,13 +1,11 @@
+import re
 import time
 from Browser import Browser
 from selenium.webdriver.common.by import By
 
-def process_odds_page(browser, link):
-    browser.move_to_element_and_middle_click(link);
-    browser.sleep_for_millis(1000)
 
 
-def main():
+if __name__ == "__main__":
     browser = Browser()
     page = browser.get("https://www.oddsportal.com/")
     
@@ -25,45 +23,31 @@ def main():
     browser.scroll_to_visible(page, greece_link)
     browser.move_to_element_and_left_click(greece_link)
 
-    # find Greece parent li
-    greece_parent_li = page.find_element(By.XPATH, "//h2[text()='Greece']/ancestor::li[@class='country']")
-
-    # get the datum data-v-xyz=""
-    greece_li_html = greece_parent_li.get_attribute('innerHTML')
-    data_start_index = greece_li_html.find('data-v-')
-    data_end_index = greece_li_html.find('=', data_start_index)
-    data_v_str = greece_li_html[data_start_index:data_end_index] 
-
-    # get parent li id (contry code)
-    greece_country_code = greece_parent_li.get_attribute('id')
-
     # get Greece li children links (h3)
-    greece_li_children_links = greece_parent_li.find_elements(By.CSS_SELECTOR, 'li a')
+    greece_ul = greece_link.find_element(By.XPATH, "//ul[@class='sub_1_83']")
+
+    greece_super_league = greece_ul.find_elements(By.XPATH, "//h3[contains(text(),'Super League')]")
+
+    # Variable to store the id by which elems will be sought within the tab, based on div's set= attrib
+    set_ids = []
 
     #Visit all 'Super League' links under Greece
     total_tabs = 0
-    for link in greece_li_children_links:
-        if link.text.startswith('Super League'):
-            process_odds_page(browser, link)
-            total_tabs += 1
+    for link in greece_super_league:
+        set_ids.append(re.findall(r'^\d+', link.get_attribute("id"))[0])
+        total_tabs += 1
+        browser.move_to_element_and_middle_click(link);
+        browser.sleep_for_millis_random(1000)
 
     #Process tabs
-    for tab in range(1, total_tabs + 1):
-        print('Processing tab [' + str(tab) + ']')
-        browser.driver.switch_to.window(browser.driver.window_handles[tab])
+    for tab in range(0, total_tabs):
+        print('Processing tab [' + str(set_ids[tab]) + ']')
+        browser.driver.switch_to.window(browser.driver.window_handles[tab + 1])
         page = browser.driver
-        rows = page.find_element(By.XPATH, "//a/ancestor::div[contains(@class,'hover:bg-[#')]")
-        for row in rows:
-            browser.move_to_element_and_left_click(row)
-            
-            browser.back()
+        events = page.find_elements(By.XPATH, '//div[@set="' + str(set_ids[tab]) + '"]//a[last()]')
+        for event in events:
+            if event.get_attribute('innerHTML').strip().startswith("<"):
+                browser.move_to_element_and_left_click(event)
+                break
+        #browser.back()
 
-        
-
-
-        
-
-    
-
-if __name__ == "__main__":
-    main()

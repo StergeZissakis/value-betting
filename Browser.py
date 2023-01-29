@@ -1,6 +1,7 @@
-import pickle
-import time
 import os
+import time
+import pickle
+import random
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -83,35 +84,54 @@ class Browser:
     def sleep_for_millis(self, millis):
         time.sleep(millis / 1000)
 
+    def sleep_for_millis_random(self, limit):
+        if limit > 100:
+            self.sleep_for_millis(random.randint(100, limit))
+        else:
+            self.sleep_for_millis(random.randint(100, 1000))
+
+    def sleep_for_seconds(self, seconds):
+        time.sleep(seconds)
+        
+    def sleep_for_seconds_random(self, limit):
+        if limit > 1:
+            self.sleep_for_seconds(random.randint(1, limit))
+        else:
+            self.sleep_for_seconds(random.randint(1, 3))
+
     def scroll_to_visible(self, page, element):
         page.execute_script("arguments[0].scrollIntoView(true);", element)
-        self.sleep_for_millis(300)
+        self.sleep_for_millis_random(400)
 
     def move_to_element(self, element):
         if(self.element_completely_visible(element) and element.is_displayed()):
             ActionChains(self.driver).move_to_element(element).perform()
-        self.sleep_for_millis(250)
+        self.sleep_for_millis_random(300)
 
     def move_to_element_and_left_click(self, element):
         self.move_to_element(element)
         clickable = self.getInteractibleChild(element)
-        clickable.click()
-        self.sleep_for_millis(150)
+        if clickable:
+            clickable.click()
+            self.sleep_for_millis_random(150)
 
     def middle_click(self, element):
         self.move_to_element(element)
         clickable = self.getInteractibleChild(element)
-        ActionChains(self.driver).key_down(Keys.CONTROL).click(clickable).key_up(Keys.CONTROL).perform()
-        self.sleep_for_millis(200)
+        if clickable:
+            ActionChains(self.driver).key_down(Keys.CONTROL).click(clickable).key_up(Keys.CONTROL).perform()
+            self.sleep_for_millis_random(200)
 
     def move_to_element_and_middle_click(self, element):
         self.move_to_element(element)
         clickable = self.getInteractibleChild(element)
-        self.middle_click(clickable)
+        if clickable:
+            self.middle_click(clickable)
 
     def accept_cookies(self, page, button_text):
         button = page.find_element(By.XPATH, "//button[text()='" + button_text + "']")
-        self.sleep_for_millis(200)
-        self.move_to_element_and_left_click(button)
+        if button:
+            self.sleep_for_millis_random(200)
+            self.move_to_element_and_left_click(button)
 
 
