@@ -42,11 +42,8 @@ class Browser:
         self.page = self.driver.get(url)
         return self.driver
 
-    def moveMouseTo(self, x, y):
-        pass
-
-    def scrollToVisible():
-        pass
+    def resetPageToCurrent(self):
+        self.page = self.driver
 
     def element_completely_visible(self, elem):
         elem_left_bound = elem.location.get('x')
@@ -99,8 +96,8 @@ class Browser:
         else:
             self.sleep_for_seconds(random.randint(1, 3))
 
-    def scroll_to_visible(self, page, element):
-        page.execute_script("arguments[0].scrollIntoView(true);", element)
+    def scroll_to_visible(self, element):
+        self.driver.execute_script("arguments[0].scrollIntoView(true);", element)
         self.sleep_for_millis_random(400)
 
     def move_to_element(self, element):
@@ -128,10 +125,15 @@ class Browser:
         if clickable:
             self.middle_click(clickable)
 
-    def accept_cookies(self, page, button_text):
-        button = page.find_element(By.XPATH, "//button[text()='" + button_text + "']")
+    def accept_cookies(self, button_text):
+        button = self.driver.find_element(By.XPATH, "//button[text()='" + button_text + "']")
         if button:
             self.sleep_for_millis_random(200)
             self.move_to_element_and_left_click(button)
 
+
+    def switch_to_tab(self, tab_index):
+        self.driver.switch_to.window(self.driver.window_handles[tab_index])
+        self.page = self.driver
+        return self.page
 

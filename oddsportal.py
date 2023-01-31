@@ -10,17 +10,17 @@ if __name__ == "__main__":
     page = browser.get("https://www.oddsportal.com/")
     
     # Click I Accept
-    browser.accept_cookies(page, "I Accept")
+    browser.accept_cookies("I Accept")
 
     #Find soccer
     soccer_link = page.find_element(By.XPATH, "//p[text()='soccer']")
-    browser.scroll_to_visible(page, soccer_link)
+    browser.scroll_to_visible(soccer_link)
     browser.move_to_element_and_left_click(soccer_link)
 
     #Find Greece
     browser.sleep_for_millis(400)
     greece_link = page.find_element(By.XPATH, "//h2[text()='Greece']")
-    browser.scroll_to_visible(page, greece_link)
+    browser.scroll_to_visible(greece_link)
     browser.move_to_element_and_left_click(greece_link)
 
     # get Greece li children links (h3)
@@ -42,12 +42,15 @@ if __name__ == "__main__":
     #Process tabs
     for tab in range(0, total_tabs):
         print('Processing tab [' + str(set_ids[tab]) + ']')
-        browser.driver.switch_to.window(browser.driver.window_handles[tab + 1])
-        page = browser.driver
+        page = browser.switch_to_tab(tab + 1)
         events = page.find_elements(By.XPATH, '//div[@set="' + str(set_ids[tab]) + '"]//a[last()]')
         for event in events:
             if event.get_attribute('innerHTML').strip().startswith("<"):
                 browser.move_to_element_and_left_click(event)
+                event_page = browser.driver
+                over_under = event_page.find_element(By.XPATH, "//div[conatins(text(), 'Over/Under']");
+                browser.move_to_element_and_left_click(event)
+                
                 break
-        #browser.back()
+                browser.back()
 
