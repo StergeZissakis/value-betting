@@ -48,9 +48,22 @@ if __name__ == "__main__":
             if event.get_attribute('innerHTML').strip().startswith("<"):
                 browser.move_to_element_and_left_click(event)
                 event_page = browser.driver
-                over_under = event_page.find_element(By.XPATH, "//div[conatins(text(), 'Over/Under']");
-                browser.move_to_element_and_left_click(event)
-                
+                over_under = event_page.find_element(By.XPATH, "//li//span//div[contains(text(), 'Over/Under')]");
+                handicap = browser.move_to_element_and_left_click(over_under, 
+                                                                  wait_sync_element_xpath="//p[contains(text(), 'Handicap')]", 
+                                                                  parent_limit_xpath="li[contains(@class, 'odds-item')]"
+                        );
+
+                over_under_page = browser.driver
+                ou_full_time = over_under_page.find_element(By.XPATH, "//div//div[contains(text(), 'Full Time')]")
+                handicap = browser.move_to_element_and_left_click(ou_full_time, wait_sync_element_xpath="//p[contains(text(), 'Handicap')]")
+
+                ou_1st_half = over_under_page.find_element(By.XPATH, "//div[contains(text(), '1st Half')]")
+                handicap = browser.move_to_element_and_left_click(ou_1st_half, wait_sync_element_xpath="//p[contains(text(), 'Handicap')]")
+                    
+                ou_2nd_half = over_under_page.find_element(By.XPATH, "//div[contains(text(), '2nd Half')]")
+                handicap = browser.move_to_element_and_left_click(ou_2nd_half, wait_sync_element_xpath="//p[contains(text(), 'Handicap')]")
+                    
                 break
-                browser.back()
+                #browser.back()
 

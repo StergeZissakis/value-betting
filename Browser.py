@@ -6,7 +6,9 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.support import expected_conditions as ExpectedCondition
 
 class Browser:
 
@@ -42,7 +44,7 @@ class Browser:
         self.page = self.driver.get(url)
         return self.driver
 
-    def resetPageToCurrent(self):
+    def reset_page_to_current(self):
         self.page = self.driver
 
     def element_completely_visible(self, elem):
@@ -68,15 +70,53 @@ class Browser:
                    )
                   )
 
-    def getInteractibleChild(self, element):
-        while not (element or element.is_displayed() or element.is_enabled()):
-            for child in element.find_elements_by_xpath("./*"):
-                tmp = self.getInteractibleChild(child)
-                if tmp and tmp.is_displayed() and tmp.is_enabled():
-                    element = tmp
-                    break
 
-        return element
+    def get_interactible_child(self, element):
+        if element and element.is_displayed() and element.is_enabled():
+            return element
+
+        ret = None
+        for child in element.find_elements(By.XPATH, "./*"):
+            if child and child.is_displayed() and child.is_enabled():
+                ret = child
+                break
+
+        return ret
+
+
+    def get_interactible_parent(self, element, parent_limit_xpath = ""):
+        if element and element.is_displayed() and element.is_enabled():
+            return element
+
+        parent_limit = None
+        if len(parent_limit_xpath):
+            parent_limit = element.find_element(By.XPATH, ".//ancestor::" + parent_limit_xpath)
+
+        parent = element.find_element(By.XPATH, "..")
+        if parent_limit and parent == parent_limit:
+            return parent
+
+        while parent and not (parent.is_displayed() and parent.is_enabled()):
+            parent = parent.find_element(By.XPATH, "..")
+            if parent_limit and parent == parent_limit:
+                return parent
+
+        if parent and parent.is_displayed() and parent.is_enabled():
+            return parent
+        elif parent_limit:
+            return parent_limit
+        else:
+            return None
+
+    def get_interactible(self, element, parent_limit_xpath = ""):
+        if element and element.is_displayed() and element.is_enabled():
+            return element
+
+        ret = self.get_interactible_child(element)
+        if ret is None:
+            ret = self.get_interactible_parent(element, parent_limit_xpath)
+
+        return ret
 
     def sleep_for_millis(self, millis):
         time.sleep(millis / 1000)
@@ -105,23 +145,36 @@ class Browser:
             ActionChains(self.driver).move_to_element(element).perform()
         self.sleep_for_millis_random(300)
 
-    def move_to_element_and_left_click(self, element):
+    def move_to_element_and_left_click(self, element, wait_sync_element_xpath = "", parent_limit_xpath = ""):
         self.move_to_element(element)
-        clickable = self.getInteractibleChild(element)
+        clickable = self.get_interactible(element, parent_limit_xpath)
         if clickable:
-            clickable.click()
+            try:
+                clickable.click()
+            except :
+                ActionChains(self.driver).move_to_element(clickable).click(clickable).perform()
+
             self.sleep_for_millis_random(150)
+            if len(wait_sync_element_xpath):
+                try:
+                    element = WebDriverWait(self.driver, 5).until(ExpectedCondition.presence_of_element_located((By.XPATH, wait_sync_element_xpath)))
+                except:
+                    element = None
+                return element
+
+        return clickable
+
 
     def middle_click(self, element):
         self.move_to_element(element)
-        clickable = self.getInteractibleChild(element)
+        clickable = self.get_interactible(element)
         if clickable:
             ActionChains(self.driver).key_down(Keys.CONTROL).click(clickable).key_up(Keys.CONTROL).perform()
             self.sleep_for_millis_random(200)
 
     def move_to_element_and_middle_click(self, element):
         self.move_to_element(element)
-        clickable = self.getInteractibleChild(element)
+        clickable = self.get_interactible(element)
         if clickable:
             self.middle_click(clickable)
 
