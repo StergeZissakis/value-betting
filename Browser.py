@@ -6,6 +6,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support import expected_conditions as ExpectedCondition
@@ -185,7 +186,7 @@ class Browser:
             self.move_to_element_and_left_click(button)
 
 
-    def switch_to_tab(self, tab_index):
+    def switch_to_tab(self, tab_index, expectedXPath, timeout = 10):
         self.driver.switch_to.window(self.driver.window_handles[tab_index])
         self.page = self.driver
         return self.page
