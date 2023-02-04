@@ -157,27 +157,16 @@ class Browser:
 
             self.sleep_for_millis_random(150)
             if len(wait_sync_element_xpath):
-                try:
-                    element = WebDriverWait(self.driver, 5).until(ExpectedCondition.presence_of_element_located((By.XPATH, wait_sync_element_xpath)))
-                except:
-                    element = None
-                return element
-
+                return self.wait_for_element_to_appear(wait_sync_element_xpath)
         return clickable
 
-
-    def middle_click(self, element):
-        self.move_to_element(element)
-        clickable = self.get_interactible(element)
-        if clickable:
-            ActionChains(self.driver).key_down(Keys.CONTROL).click(clickable).key_up(Keys.CONTROL).perform()
-            self.sleep_for_millis_random(200)
 
     def move_to_element_and_middle_click(self, element):
         self.move_to_element(element)
         clickable = self.get_interactible(element)
         if clickable:
-            self.middle_click(clickable)
+            ActionChains(self.driver).key_down(Keys.CONTROL).click(clickable).key_up(Keys.CONTROL).perform()
+            self.sleep_for_millis_random(300)
 
     def accept_cookies(self, button_text):
         button = self.driver.find_element(By.XPATH, "//button[text()='" + button_text + "']")
@@ -185,9 +174,20 @@ class Browser:
             self.sleep_for_millis_random(200)
             self.move_to_element_and_left_click(button)
 
+    def wait_for_element_to_appear(self, element_xpath, timeout = 10):
+        if len(element_xpath):
+            try:
+                return WebDriverWait(self.driver, timeout).until(ExpectedCondition.presence_of_element_located((By.XPATH, element_xpath)))
+            except:
+                pass
+        return None
 
-    def switch_to_tab(self, tab_index, expectedXPath, timeout = 10):
+    def switch_to_tab(self, tab_index, wait_for_elelemt_xpath = ""):
         self.driver.switch_to.window(self.driver.window_handles[tab_index])
         self.page = self.driver
+        if len(wait_for_elelemt_xpath):
+            self.wait_for_element_to_appear(wait_for_elelemt_xpath)
         return self.page
 
+    def go_back(self):
+        self.driver.back()

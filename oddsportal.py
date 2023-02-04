@@ -1,10 +1,44 @@
 import re
 import time
+import pprint
 from Browser import Browser
+from datetime import datetime
+from collections import OrderedDict
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as ExpectedCondition
 
+def extract_common_event_details(browser):
+    tab = browser.driver
+
+    event = OrderedDict()
+
+    event['home_team']  = tab.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[5]/div[1]/div[1]/div/div[1]/p').text
+    event['guest_team'] = tab.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[5]/div[1]/div[3]/div[1]/p').text
+    event_date_time = tab.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[5]/div[2]/div[1]/div[2]').text
+
+    (str_dat, str_date, str_time) = [part.strip() for part in event_date_time.split(',')]
+    event['date_time'] = datetime.strptime(str_date + " " + str_time, "%d %b %Y %H:%M")
+
+    return event
+
+def process_over_under_tab(browser, half):
+    tab = browser.driver
+    event = extract_common_event_details(browser)
+    event['half'] = half
+    event['values'] = []
+
+    rows = tab.find_elements(By.XPATH,     '//*[@id="app"]/div/div[1]/div/main/div[2]/div[6]/div[@set="0"]')
+    for row in rows:
+        print(row.text)
+        str_value = row.find_element(By.XPATH, './div/div[2]/p[1]').text
+        value = float(str_value.split(' ')[-1])
+        over = row.find_element(By.XPATH,  './div/div[3]/div[1]/button/p').text
+        under = row.find_element(By.XPATH, './div/div[3]/div[2]/button/p').text
+        event['values'].append([value, over, under])
+
+    pp = pprint.PrettyPrinter(indent=2)
+    pp.pprint(event)
 
 
 if __name__ == "__main__":
@@ -43,12 +77,12 @@ if __name__ == "__main__":
     #Process tabs
     for tab in range(0, total_tabs):
         print('Processing tab [' + str(set_ids[tab]) + ']')
-
         #Ensure the tab has been loaded
-        page = browser.switch_to_tab(tab + 1, '//div[@set="' + str(set_ids[tab]) + '"]') 
+        div_set_xpath = '//div/div/div[@set="' + str(set_ids[tab]) + '"]'
+        page = browser.switch_to_tab(tab + 1, div_set_xpath)
         # Get all the matches
-        browser.sleep_for_seconds_random(3)
-        div_sets = page.find_elements(By.XPATH, '//div[@set="' + str(set_ids[tab]) + '"]')
+        div_sets = page.find_elements(By.XPATH, div_set_xpath)
+        print(len(div_sets))
         for div_set in div_sets: 
             event_div = div_set.find_elements(By.XPATH, './div')[-1]
             event_inner_div = event_div.find_elements(By.XPATH, './div')[0]
@@ -63,15 +97,14 @@ if __name__ == "__main__":
             ou_1st_half = page.find_element(By.XPATH,  '//*[@id="app"]/div/div[1]/div/main/div[2]/div[5]/div[5]/div[2]')
             ou_2nd_half = page.find_element(By.XPATH,  '//*[@id="app"]/div/div[1]/div/main/div[2]/div[5]/div[5]/div[3]')
 
-            browser.sleep_for_seconds_random(5)
+            browser.sleep_for_seconds_random(2)
 
             browser.move_to_element_and_left_click(ou_full_time) #, wait_sync_element_xpath="//div//div[@set='0']")
-            # Process Full Time
-            browser.move_to_element_and_left_click(ou_1st_half) #, wait_sync_element_xpath="//div//div[@set='0']")
-            # Process 1st Half
-            browser.move_to_element_and_left_click(ou_2nd_half) #, wait_sync_element_xpath="//div//div[@set='0']")
-            # Process 2nd Half
-
+            process_over_under_tab(browser, 0)
+            #browser.move_to_element_and_left_click(ou_1st_half) #, wait_sync_element_xpath="//div//div[@set='0']")
+            #process_over_under_tab(browser, 1)
+            #browser.move_to_element_and_left_click(ou_2nd_half) #, wait_sync_element_xpath="//div//div[@set='0']")
+            #process_over_under_tab(browser, 2)
             break
-            #browser.back()
+            browser.go_back()
 
