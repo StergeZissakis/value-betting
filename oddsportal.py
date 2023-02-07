@@ -8,6 +8,14 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as ExpectedCondition
 
+def odds_to_decimal(odds):
+    if odds.find('/') == -1:
+        return None
+
+    (nom, denom) = odds.split('/')
+    decimal = (int(nom) / int(denom) + 1)
+    return decimal
+
 def extract_common_event_details(browser):
     tab = browser.driver
 
@@ -18,7 +26,8 @@ def extract_common_event_details(browser):
     event_date_time = tab.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[5]/div[2]/div[1]/div[2]').text
 
     (str_dat, str_date, str_time) = [part.strip() for part in event_date_time.split(',')]
-    event['date_time'] = datetime.strptime(str_date + " " + str_time, "%d %b %Y %H:%M")
+    date_time = datetime.strptime(str_date + " " + str_time, "%d %b %Y %H:%M")
+    event['date_time'] = str(date_time)
 
     return event
 
@@ -30,12 +39,12 @@ def process_over_under_tab(browser, half):
 
     rows = tab.find_elements(By.XPATH,     '//*[@id="app"]/div/div[1]/div/main/div[2]/div[6]/div[@set="0"]')
     for row in rows:
-        print(row.text)
         str_value = row.find_element(By.XPATH, './div/div[2]/p[1]').text
-        value = float(str_value.split(' ')[-1])
-        over = row.find_element(By.XPATH,  './div/div[3]/div[1]/button/p').text
-        under = row.find_element(By.XPATH, './div/div[3]/div[2]/button/p').text
-        event['values'].append([value, over, under])
+        over_under_value = float(str_value.split(' ')[-1])
+        over = odds_to_decimal(row.find_element(By.XPATH,  './div/div[3]/div[1]/button/p').text)
+        under = odds_to_decimal(row.find_element(By.XPATH, './div/div[3]/div[2]/button/p').text)
+        probability = row.find_element(By.XPATH, './div/div[3]/div[3]/button/p').text
+        event['values'].append([over_under_value, over, under, probability])
 
     pp = pprint.PrettyPrinter(indent=2)
     pp.pprint(event)
@@ -99,12 +108,13 @@ if __name__ == "__main__":
 
             browser.sleep_for_seconds_random(2)
 
-            browser.move_to_element_and_left_click(ou_full_time) #, wait_sync_element_xpath="//div//div[@set='0']")
+            browser.move_to_element_and_left_click(ou_full_time, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[6]/div[@set="0"]')
             process_over_under_tab(browser, 0)
+            break
             #browser.move_to_element_and_left_click(ou_1st_half) #, wait_sync_element_xpath="//div//div[@set='0']")
             #process_over_under_tab(browser, 1)
             #browser.move_to_element_and_left_click(ou_2nd_half) #, wait_sync_element_xpath="//div//div[@set='0']")
             #process_over_under_tab(browser, 2)
-            break
-            browser.go_back()
+        break
+        browser.go_back()
 
