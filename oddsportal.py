@@ -1,6 +1,7 @@
 import re
 import time
 import pprint
+from  PGConnector import PGConnector
 from Browser import Browser
 from datetime import datetime
 from collections import OrderedDict
@@ -31,9 +32,17 @@ def extract_common_event_details(browser):
 
     return event
 
-def process_over_under_tab(browser, half):
+def process_over_under_tab(browser, half, db):
     tab = browser.driver
     event = extract_common_event_details(browser)
+    
+    match_id = db.insert_or_update_oddsportal_match(event['home_team'], event['guest_team'], event['date_time'])
+    if match_id is None:
+        print("Failed to insert match data: ")
+        print(match_id)
+        return
+
+    print(match_id)
     event['half'] = half
     event['values'] = []
 
@@ -46,11 +55,18 @@ def process_over_under_tab(browser, half):
         probability = row.find_element(By.XPATH, './div/div[3]/div[3]/button/p').text
         event['values'].append([over_under_value, over, under, probability])
 
-    pp = pprint.PrettyPrinter(indent=2)
-    pp.pprint(event)
+    status = db.insert_or_update_oddsportal_over_under(match_id, half, event['values'])
+    if not status:
+        print("Failed to insert over under data: ")
+        pp = pprint.PrettyPrinter(indent=2)
+        pp.pprint(event)
 
 
 if __name__ == "__main__":
+    db = PGConnector("postgres", "localhost")
+    if not db.is_connected():
+        exit(-1)
+
     browser = Browser()
     page = browser.get("https://www.oddsportal.com/")
     
@@ -109,12 +125,12 @@ if __name__ == "__main__":
             browser.sleep_for_seconds_random(2)
 
             browser.move_to_element_and_left_click(ou_full_time, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[6]/div[@set="0"]')
-            process_over_under_tab(browser, 0)
+            process_over_under_tab(browser, 0, db)
             break
-            #browser.move_to_element_and_left_click(ou_1st_half) #, wait_sync_element_xpath="//div//div[@set='0']")
-            #process_over_under_tab(browser, 1)
-            #browser.move_to_element_and_left_click(ou_2nd_half) #, wait_sync_element_xpath="//div//div[@set='0']")
-            #process_over_under_tab(browser, 2)
+            browser.move_to_element_and_left_click(ou_1st_half, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[6]/div[@set="0"]')
+            process_over_under_tab(browser, 1, db)
+            browser.move_to_element_and_left_click(ou_2nd_half, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[6]/div[@set="0"]')
+            process_over_under_tab(browser, 2, db)
         break
         browser.go_back()
 

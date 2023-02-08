@@ -1,4 +1,5 @@
 #!/bin/bash
 
 apt-get install openvpn openssl openresolv
-pip3 install psycopg2 
+pip3 install --no-binary :all: psycopg2 
+pip3 install sqlparse
