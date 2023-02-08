@@ -78,8 +78,7 @@ class PGConnector(PGBase):
             self.pg.commit()
             cursor.close()
         else:
-            cursor.execute( "SELECT \"id\" FROm \"Match\" where home_team, guest_team, date_time) VALUES (%s, %s, %s) " + 
-            
+            cursor.execute( "SELECT \"id\" FROm \"Match\" where home_team=\"%s\" and guest_team = \"%\" and date_time = \"%s\"; ", (home_team, guest_team, date_time))
 
         return ret
 
