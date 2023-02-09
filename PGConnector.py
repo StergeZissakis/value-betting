@@ -102,14 +102,14 @@ class PGConnector(PGBase):
 
         cursor = self.pg.cursor()
         for row in data_array:
-            (value, over, under, payout) = row
-            if not self.validate_non_sql((str(value), str(over), str(under), str(payout))):
+            (goal, over, under, payout) = row
+            if not self.validate_non_sql((str(goal), str(over), str(under), str(payout))):
                 return False
 
             cursor.execute( 
-                    "INSERT INTO \"OverUnder\" (match_id, half, value, over, under, payout) VALUES (%s, %s, %s, %s, %s, %s) " +
-                    "On CONFLICT (match_id, half, value) DO UPDATE SET over = EXCLUDED.over, under = EXCLUDED.under, payout = EXCLUDED.payout;",
-                    (str(match_id), str(half), value, over, under, str(payout))
+                    "INSERT INTO \"OverUnder\" (match_id, half, goals, over, under, payout) VALUES (%s, %s, %s, %s, %s, %s) " +
+                    "On CONFLICT (match_id, half, goals) DO UPDATE SET over = EXCLUDED.over, under = EXCLUDED.under, payout = EXCLUDED.payout;",
+                    (str(match_id), str(half), goal, over, under, str(payout))
                     )
 
         self.pg.commit()

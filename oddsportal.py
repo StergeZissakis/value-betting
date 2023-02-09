@@ -42,18 +42,18 @@ def process_over_under_tab(browser, half, db):
         return
 
     event['half'] = half
-    event['values'] = []
+    event['goals'] = []
 
     rows = tab.find_elements(By.XPATH,     '//*[@id="app"]/div/div[1]/div/main/div[2]/div[6]/div[@set="0"]')
     for row in rows:
-        str_value = row.find_element(By.XPATH, './div/div[2]/p[1]').text
-        over_under_value = float(str_value.split(' ')[-1])
+        str_goals = row.find_element(By.XPATH, './div/div[2]/p[1]').text
+        over_under_goal = float(str_goals.split(' ')[-1])
         over = odds_to_decimal(row.find_element(By.XPATH,  './div/div[3]/div[1]/button/p').text)
         under = odds_to_decimal(row.find_element(By.XPATH, './div/div[3]/div[2]/button/p').text)
         probability = row.find_element(By.XPATH, './div/div[3]/div[3]/button/p').text
-        event['values'].append([over_under_value, over, under, probability])
+        event['goals'].append([over_under_goal, over, under, probability])
 
-    status = db.insert_or_update_oddsportal_over_under(match_id, half, event['values'])
+    status = db.insert_or_update_oddsportal_over_under(match_id, half, event['goals'])
     if not status:
         print("Failed to insert over under data: ")
         pp = pprint.PrettyPrinter(indent=2)
