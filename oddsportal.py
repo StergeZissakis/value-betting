@@ -59,6 +59,28 @@ def process_over_under_tab(browser, half, db):
         pp = pprint.PrettyPrinter(indent=2)
         pp.pprint(event)
 
+def process_over_under_values(browser, page, div_set):
+    event_div = div_set.find_elements(By.XPATH, './div')[-1]
+    event_inner_div = event_div.find_elements(By.XPATH, './div')[0]
+            
+    event_a = event_inner_div.find_elements(By.XPATH, './a')[0]
+    browser.move_to_element_and_left_click(event_a)
+    
+    over_under = page.find_element(By.XPATH, "//li[contains(@class, 'odds-item')]//span[@class='flex']//div[contains(text(), 'Over/Under')]")
+    browser.move_to_element_and_left_click(over_under, '//div[@set="0"]')
+
+    ou_full_time = page.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[5]/div[5]/div[1]')
+    ou_1st_half = page.find_element(By.XPATH,  '//*[@id="app"]/div/div[1]/div/main/div[2]/div[5]/div[5]/div[2]')
+    ou_2nd_half = page.find_element(By.XPATH,  '//*[@id="app"]/div/div[1]/div/main/div[2]/div[5]/div[5]/div[3]')
+
+    browser.sleep_for_seconds_random(2)
+
+    browser.move_to_element_and_left_click(ou_full_time, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[6]/div[@set="0"]')
+    process_over_under_tab(browser,ou_full_time.text, db) 
+    browser.move_to_element_and_left_click(ou_1st_half, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[6]/div[@set="0"]')
+    process_over_under_tab(browser, ou_1st_half.text, db)
+    browser.move_to_element_and_left_click(ou_2nd_half, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[6]/div[@set="0"]')
+    process_over_under_tab(browser, ou_2nd_half.text, db)
 
 if __name__ == "__main__":
     db = PGConnector("postgres", "localhost")
@@ -105,30 +127,14 @@ if __name__ == "__main__":
         page = browser.switch_to_tab(tab + 1, div_set_xpath)
         # Get all the matches
         div_sets = page.find_elements(By.XPATH, div_set_xpath)
-        #print(len(div_sets))
-        for div_set in div_sets: 
-            event_div = div_set.find_elements(By.XPATH, './div')[-1]
-            event_inner_div = event_div.find_elements(By.XPATH, './div')[0]
-            
-            event_a = event_inner_div.find_elements(By.XPATH, './a')[0]
-            browser.move_to_element_and_left_click(event_a)
-
-            over_under = page.find_element(By.XPATH, "//li[contains(@class, 'odds-item')]//span[@class='flex']//div[contains(text(), 'Over/Under')]")
-            browser.move_to_element_and_left_click(over_under, '//div[@set="0"]')
-
-            ou_full_time = page.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[5]/div[5]/div[1]')
-            ou_1st_half = page.find_element(By.XPATH,  '//*[@id="app"]/div/div[1]/div/main/div[2]/div[5]/div[5]/div[2]')
-            ou_2nd_half = page.find_element(By.XPATH,  '//*[@id="app"]/div/div[1]/div/main/div[2]/div[5]/div[5]/div[3]')
-
+        num_div_sets = len(div_sets)
+        for counter in range(0, num_div_sets):
+            div_set = div_sets[counter]
+            process_over_under_values(browser, page, div_set)
+            browser.go_back(4)
             browser.sleep_for_seconds_random(2)
+            page = browser.page
+            div_sets = page.find_elements(By.XPATH, div_set_xpath)
 
-            browser.move_to_element_and_left_click(ou_full_time, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[6]/div[@set="0"]')
-            process_over_under_tab(browser,ou_full_time.text, db) 
-            break
-            browser.move_to_element_and_left_click(ou_1st_half, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[6]/div[@set="0"]')
-            process_over_under_tab(browser, ou_1st_half.text, db)
-            browser.move_to_element_and_left_click(ou_2nd_half, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[6]/div[@set="0"]')
-            process_over_under_tab(browser, ou_2nd_half.text, db)
-        break
-        browser.go_back()
+
 

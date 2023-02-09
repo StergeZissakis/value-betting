@@ -189,5 +189,12 @@ class Browser:
             self.wait_for_element_to_appear(wait_for_elelemt_xpath)
         return self.page
 
-    def go_back(self):
-        self.driver.back()
+    def go_back(self, times):
+        #self.driver.back()
+        for t in range(0, times):
+            self.driver.execute_script('window.history.go(-1)')
+
+            self.sleep_for_millis_random(150)
+        self.reset_page_to_current()
+
+
