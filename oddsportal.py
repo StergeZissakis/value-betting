@@ -38,11 +38,9 @@ def process_over_under_tab(browser, half, db):
     
     match_id = db.insert_or_update_oddsportal_match(event['home_team'], event['guest_team'], event['date_time'])
     if match_id is None:
-        print("Failed to insert match data: ")
-        print(match_id)
+        print("Failed to insert match data.")
         return
 
-    print(match_id)
     event['half'] = half
     event['values'] = []
 
@@ -101,13 +99,13 @@ if __name__ == "__main__":
 
     #Process tabs
     for tab in range(0, total_tabs):
-        print('Processing tab [' + str(set_ids[tab]) + ']')
+        #print('Processing tab [' + str(set_ids[tab]) + ']')
         #Ensure the tab has been loaded
         div_set_xpath = '//div/div/div[@set="' + str(set_ids[tab]) + '"]'
         page = browser.switch_to_tab(tab + 1, div_set_xpath)
         # Get all the matches
         div_sets = page.find_elements(By.XPATH, div_set_xpath)
-        print(len(div_sets))
+        #print(len(div_sets))
         for div_set in div_sets: 
             event_div = div_set.find_elements(By.XPATH, './div')[-1]
             event_inner_div = event_div.find_elements(By.XPATH, './div')[0]
@@ -125,12 +123,12 @@ if __name__ == "__main__":
             browser.sleep_for_seconds_random(2)
 
             browser.move_to_element_and_left_click(ou_full_time, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[6]/div[@set="0"]')
-            process_over_under_tab(browser, 0, db)
+            process_over_under_tab(browser,ou_full_time.text, db) 
             break
             browser.move_to_element_and_left_click(ou_1st_half, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[6]/div[@set="0"]')
-            process_over_under_tab(browser, 1, db)
+            process_over_under_tab(browser, ou_1st_half.text, db)
             browser.move_to_element_and_left_click(ou_2nd_half, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[6]/div[@set="0"]')
-            process_over_under_tab(browser, 2, db)
+            process_over_under_tab(browser, ou_2nd_half.text, db)
         break
         browser.go_back()
 

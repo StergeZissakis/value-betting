@@ -18,8 +18,10 @@ class PGBase:
             tp = sqlparse.parse(string)
             for t in tp:
                 if t.get_type() != "UNKNOWN":
+                    print(t + " is passed for sql")
                     return False
         except:
+            print("sql.parse exception")
             pass
 
         return True
@@ -31,6 +33,7 @@ class PGBase:
         else:
             for s in strings:
                 if not self.validate_non_sql_string(s):
+                    print(s + " is passed for sql")
                     return False
         return True
 
@@ -46,20 +49,22 @@ class PGConnector(PGBase):
         if name is None:
             cursor.execute( "INSERT INTO \"Team\" (english_name) VALUES (%s) " + 
                             "ON CONFLICT (\"team_pk\") DO UPDATE SET english_name = EXCLUDED.english_name " + 
-                            "RETURNING id; ", (english_name))
+                            "RETURNING id; ", (english_name)
+                            )
 
         elif english_name is None:
             cursor.execute( "INSERT INTO \"Team\" (name) VALUES (%s) " + 
                             "ON CONFLICT (\"team_pk\") DO UPDATE SET name = EXCLUDED.name " +
-                            "RETURNING id; ", (name))
+                            "RETURNING id; ", (name)
+                            )
 
         else:
             cursor.execute( "INSERT INTO \"Team\" (name, english_name) VALUES (%s, %s) " +
                             "ON CONFLICT (\"team_pk\") DO UPDATE SET name = EXCLUDED.name, english_name = EXCLUDED.english_name " + 
-                            "RETURNING id; ", (name, english_name))
+                            "RETURNING id; ", (name, english_name)
+                            )
 
         ret = cursor.fetchone()[0]
-
         self.pg.commit()
         cursor.close()
         return ret
@@ -71,16 +76,25 @@ class PGConnector(PGBase):
         cursor = self.pg.cursor()
 
         cursor.execute( "INSERT INTO \"Match\" (home_team, guest_team, date_time) VALUES (%s, %s, %s) " + 
-                        "ON CONFLICT (home_team, guest_team, date_time) DO NOTHING RETURNING id;", (home_team, guest_team, date_time) )
+                        "ON CONFLICT (home_team, guest_team, date_time) DO NOTHING RETURNING id;", (home_team, guest_team, date_time) 
+                        )
 
-        if cursor.fetchone() is not None:
-            ret = cursor.fetchone()[0];
+        ret = cursor.fetchone();
+        if ret is not None:
+            ret = ret[0]
             self.pg.commit()
             cursor.close()
+            return ret
         else:
-            cursor.execute( "SELECT \"id\" FROm \"Match\" where home_team=\"%s\" and guest_team = \"%\" and date_time = \"%s\"; ", (home_team, guest_team, date_time))
+            cursor = self.pg.cursor()
+            cursor.execute( "SELECT id FROM \"Match\" where home_team=%s and guest_team=%s and date_time=%s;", (home_team, guest_team, date_time))
+            ret = cursor.fetchone()
+            if ret is not None:
+                ret = ret[0]
+            cursor.close()
+            return ret
 
-        return ret
+        return None
 
     def insert_or_update_oddsportal_over_under(self, match_id, half, data_array):
         if not self.validate_non_sql((str(match_id), str(half))):
@@ -89,13 +103,13 @@ class PGConnector(PGBase):
         cursor = self.pg.cursor()
         for row in data_array:
             (value, over, under, payout) = row
-            if self.validate_non_sql((str(value), str(over), str(under), str(payout))):
+            if not self.validate_non_sql((str(value), str(over), str(under), str(payout))):
                 return False
 
             cursor.execute( 
-                    "INSERT INtO \"OverUnder\" (match_id, half, value, over, under, payout) VALUES " +
-                    "(" + str(match_id) + ", " + half + ", " + str(value) + ", " + over, ", " + under + ", " + str(payout) + ") " +
-                    "On CONFLICT (\"over_under_pk\") DO SET over = EXCLUDED.over, under = EXCLUDED.under, payout = EXCLUDED.payout;"
+                    "INSERT INTO \"OverUnder\" (match_id, half, value, over, under, payout) VALUES (%s, %s, %s, %s, %s, %s) " +
+                    "On CONFLICT (match_id, half, value) DO UPDATE SET over = EXCLUDED.over, under = EXCLUDED.under, payout = EXCLUDED.payout;",
+                    (str(match_id), str(half), value, over, under, str(payout))
                     )
 
         self.pg.commit()
