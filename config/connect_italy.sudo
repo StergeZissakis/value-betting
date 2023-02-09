@@ -1,0 +1,3 @@
+#!/bin/bash
+
+(cd italy_vpn && /usr/sbin/openvpn --config ./openvpn.ovpn)
