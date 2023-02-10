@@ -137,8 +137,11 @@ class Browser:
         else:
             self.sleep_for_seconds(random.randint(1, 3))
 
-    def scroll_to_visible(self, element):
-        self.driver.execute_script("arguments[0].scrollIntoView(true);", element)
+    def scroll_to_visible(self, element, centre = False):
+        if centre:
+            self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", element)
+        else:
+            self.driver.execute_script("arguments[0].scrollIntoView(true);", element)
         self.sleep_for_millis_random(400)
 
     def move_to_element(self, element):
@@ -160,6 +163,9 @@ class Browser:
                 return self.wait_for_element_to_appear(wait_sync_element_xpath)
         return clickable
 
+    def scroll_move_left_click(self, element, wait_sync_element_xpath = "", parent_limit_xpath = ""):
+        self.scroll_to_visible(element, True)
+        return self.move_to_element_and_left_click(element, wait_sync_element_xpath, parent_limit_xpath)
 
     def move_to_element_and_middle_click(self, element):
         self.move_to_element(element)
@@ -168,8 +174,8 @@ class Browser:
             ActionChains(self.driver).key_down(Keys.CONTROL).click(clickable).key_up(Keys.CONTROL).perform()
             self.sleep_for_millis_random(300)
 
-    def accept_cookies(self, button_text):
-        button = self.driver.find_element(By.XPATH, "//button[text()='" + button_text + "']")
+    def accept_cookies(self, button_xpath):
+        button = self.driver.find_element(By.XPATH, button_xpath )
         if button:
             self.sleep_for_millis_random(200)
             self.move_to_element_and_left_click(button)
@@ -196,5 +202,13 @@ class Browser:
 
             self.sleep_for_millis_random(150)
         self.reset_page_to_current()
+
+    def ratio_odds_to_decimal(self, odds):
+        if odds.find('/') == -1:
+            return None
+
+        (nom, denom) = odds.split('/')
+        decimal = (int(nom) / int(denom) + 1)
+        return decimal
 
 

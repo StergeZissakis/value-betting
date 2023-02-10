@@ -9,14 +9,6 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as ExpectedCondition
 
-def odds_to_decimal(odds):
-    if odds.find('/') == -1:
-        return None
-
-    (nom, denom) = odds.split('/')
-    decimal = (int(nom) / int(denom) + 1)
-    return decimal
-
 def extract_common_event_details(browser):
     tab = browser.driver
 
@@ -48,8 +40,8 @@ def process_over_under_tab(browser, half, db):
     for row in rows:
         str_goals = row.find_element(By.XPATH, './div/div[2]/p[1]').text
         over_under_goal = float(str_goals.split(' ')[-1])
-        over = odds_to_decimal(row.find_element(By.XPATH,  './div/div[3]/div[1]/button/p').text)
-        under = odds_to_decimal(row.find_element(By.XPATH, './div/div[3]/div[2]/button/p').text)
+        over = browser.ratio_odds_to_decimal(row.find_element(By.XPATH,  './div/div[3]/div[1]/button/p').text)
+        under = browser.ratio_odds_to_decimal(row.find_element(By.XPATH, './div/div[3]/div[2]/button/p').text)
         probability = row.find_element(By.XPATH, './div/div[3]/div[3]/button/p').text
         event['goals'].append([over_under_goal, over, under, probability])
 
@@ -82,17 +74,7 @@ def process_over_under_values(browser, page, div_set):
     browser.move_to_element_and_left_click(ou_2nd_half, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[6]/div[@set="0"]')
     process_over_under_tab(browser, ou_2nd_half.text, db)
 
-if __name__ == "__main__":
-    db = PGConnector("postgres", "localhost")
-    if not db.is_connected():
-        exit(-1)
-
-    browser = Browser()
-    page = browser.get("https://www.oddsportal.com/")
-    
-    # Click I Accept
-    browser.accept_cookies("I Accept")
-
+def process_Greek_Super_League_OverUnder(db, browser, page):
     #Find soccer
     soccer_link = page.find_element(By.XPATH, "//p[text()='soccer']")
     browser.scroll_to_visible(soccer_link)
@@ -136,5 +118,15 @@ if __name__ == "__main__":
             page = browser.page
             div_sets = page.find_elements(By.XPATH, div_set_xpath)
 
+if __name__ == "__main__":
+    db = PGConnector("postgres", "localhost")
+    if not db.is_connected():
+        exit(-1)
 
+    browser = Browser()
+    page = browser.get("https://www.oddsportal.com/")
+    
+    # Click I Accept
+    browser.accept_cookies("//button[text()='I Accept']")
+    process_Greek_Super_League_OverUnder(db, browser, page)
 
