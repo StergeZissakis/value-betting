@@ -9,6 +9,10 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as ExpectedCondition
 
+def process_over_under_tab(browser, page, tab_button):
+    browser.move_to_element_and_left_click(tab_button)
+    browser.sleep_for_seconds(1)
+
 def process_Greek_Super_League_OverUnder(db, browser, page):
     browser.sleep_for_millis_random(500)
 
@@ -33,9 +37,15 @@ def process_Greek_Super_League_OverUnder(db, browser, page):
     browser.scroll_move_left_click(super_league_a)
     browser.sleep_for_millis_random(500)
 
-
-
-
+    page = browser.reset_page_to_current()
+    over_under_tab_buttons_xpath = '/html/body/div[2]/div[2]/main/div[2]/div[2]/button[contains(text(), "Ο/U")]'
+    
+    #browser.wait_for_element_to_appear(over_under_tab_buttons_xpath)
+    over_under_tab_buttons = page.find_elements(By.XPATH, over_under_tab_buttons_xpath)
+    print(len(over_under_tab_buttons))
+    for tab_button in over_under_tab_buttons:
+        print(tab_button.get_attribute('innerHTML'))
+        process_over_under_tab(browser, page, tab_button)
 
 if __name__ == "__main__":
     db = PGConnector("postgres", "localhost")

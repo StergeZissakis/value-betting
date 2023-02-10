@@ -47,6 +47,7 @@ class Browser:
 
     def reset_page_to_current(self):
         self.page = self.driver
+        return self.page
 
     def element_completely_visible(self, elem):
         elem_left_bound = elem.location.get('x')
@@ -175,6 +176,7 @@ class Browser:
             self.sleep_for_millis_random(300)
 
     def accept_cookies(self, button_xpath):
+        self.wait_for_element_to_appear(button_xpath)
         button = self.driver.find_element(By.XPATH, button_xpath )
         if button:
             self.sleep_for_millis_random(200)
