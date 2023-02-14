@@ -11,7 +11,34 @@ from selenium.webdriver.support import expected_conditions as ExpectedCondition
 
 def process_over_under_tab(browser, page, tab_button):
     browser.move_to_element_and_left_click(tab_button)
-    browser.sleep_for_seconds(1)
+    browser.sleep_for_millis_random(100)
+
+    page = browser.reset_page_to_current()
+
+    event_dates = page.find_elements(By.XPATH, '//div[@id="__next"]/div[2]/main/div[2]/div[3]/div[contains(@class, "league_date")]')
+    event_tables = page.find_elements(By.XPATH, '//div*[@id="__next"]/div[2]/main/div[2]/div[3]/div[contains(@class, "eventTable_eventsTable")]')
+    print(len(event_tables))
+    print(len(event_dates))
+    if len(event_dates) != len(event_tables):
+        print("Event Datesa and Tables mismatch: [" + len(event_dates) + "] VS [" + len(event_tables) + "]")
+    for i in range(0, len(event_dates)):
+        event_date = event_date[i].get_attrbiute('innerHTML')
+
+        event_table = event_table[i];
+        event_time = event_table.find_element(By.XPATH, "/div[3]/div[1]/div[1]/a/div[1]").get_attribute('innerHTML')
+        event_match = event_table.find_element(By.XPATH, "/div[3]/div[1]/div[1]/a/div[2]").get_attribute('innerHTML')
+
+        tmp_date = datetime.strptime(event_date, "%A %d/%m")
+        days_diff = tmp_date - datetime.datetime.today()
+        print("day_diff=" + day_diff)
+        event_date_with_year = datetime.today() + datetime.timedelta(days=days_diff) # to get the year! 
+        print(event_date_with_year)
+        
+
+
+
+    
+    
 
 def process_Greek_Super_League_OverUnder(db, browser, page):
     browser.sleep_for_millis_random(500)
@@ -40,11 +67,9 @@ def process_Greek_Super_League_OverUnder(db, browser, page):
     page = browser.reset_page_to_current()
     over_under_tab_buttons_xpath = '/html/body/div[2]/div[2]/main/div[2]/div[2]/button[contains(text(), "Ο/U")]'
     
-    #browser.wait_for_element_to_appear(over_under_tab_buttons_xpath)
+    browser.wait_for_element_to_appear(over_under_tab_buttons_xpath)
     over_under_tab_buttons = page.find_elements(By.XPATH, over_under_tab_buttons_xpath)
-    print(len(over_under_tab_buttons))
     for tab_button in over_under_tab_buttons:
-        print(tab_button.get_attribute('innerHTML'))
         process_over_under_tab(browser, page, tab_button)
 
 if __name__ == "__main__":

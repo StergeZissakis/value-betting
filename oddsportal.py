@@ -28,7 +28,7 @@ def process_over_under_tab(browser, half, db):
     tab = browser.driver
     event = extract_common_event_details(browser)
     
-    match_id = db.insert_or_update_oddsportal_match(event['home_team'], event['guest_team'], event['date_time'])
+    match_id = db.insert_or_update_match(event['home_team'], event['guest_team'], event['date_time'])
     if match_id is None:
         print("Failed to insert match data.")
         return
@@ -40,16 +40,14 @@ def process_over_under_tab(browser, half, db):
     for row in rows:
         str_goals = row.find_element(By.XPATH, './div/div[2]/p[1]').text
         over_under_goal = float(str_goals.split(' ')[-1])
-        over = browser.ratio_odds_to_decimal(row.find_element(By.XPATH,  './div/div[3]/div[1]/button/p').text)
-        under = browser.ratio_odds_to_decimal(row.find_element(By.XPATH, './div/div[3]/div[2]/button/p').text)
+        over = row.find_element(By.XPATH,  './div/div[3]/div[1]/button/p').text
+        under = row.find_element(By.XPATH, './div/div[3]/div[2]/button/p').text
         probability = row.find_element(By.XPATH, './div/div[3]/div[3]/button/p').text
-        event['goals'].append([over_under_goal, over, under, probability])
+        booky = None
+        bet_link = None
+        event['goals'].append([over_under_goal, over, under, probability, booky, bet_link])
 
-    status = db.insert_or_update_oddsportal_over_under(match_id, half, event['goals'])
-    if not status:
-        print("Failed to insert over under data: ")
-        pp = pprint.PrettyPrinter(indent=2)
-        pp.pprint(event)
+    db.insert_or_update_over_under(match_id, half, event['goals'])
 
 def process_over_under_values(browser, page, div_set):
     event_div = div_set.find_elements(By.XPATH, './div')[-1]

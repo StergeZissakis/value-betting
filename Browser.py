@@ -207,7 +207,7 @@ class Browser:
 
     def ratio_odds_to_decimal(self, odds):
         if odds.find('/') == -1:
-            return None
+            return odds
 
         (nom, denom) = odds.split('/')
         decimal = (int(nom) / int(denom) + 1)
