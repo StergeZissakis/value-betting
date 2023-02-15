@@ -104,7 +104,7 @@ class PGConnector(PGBase):
         cursor = self.pg.cursor()
         cursor.execute( 
                 "INSERT INTO \"OverUnder\" (match_id, half, goals, type, odds, bookie, bet_link, payout) VALUES (%s, %s, %s, %s, %s, %s, %s, %s) " +
-                "On CONFLICT (match_id, half, goals, type) DO UPDATE SET odds = EXCLUDED.odds, payout = EXCLUDED.payout;",
+                "ON CONFLICT ON CONSTRAINT over_under_unique DO UPDATE SET odds = EXCLUDED.odds, payout = EXCLUDED.payout;",
                 (str(match_id), str(half), goals, 'Over', odds, bookie, bet_link, str(payout))
                 )
 
@@ -119,7 +119,7 @@ class PGConnector(PGBase):
         cursor = self.pg.cursor()
         cursor.execute( 
                 "INSERT INTO \"OverUnder\" (match_id, half, goals, type, odds, bookie, bet_link, payout) VALUES (%s, %s, %s, %s, %s, %s, %s, %s) " +
-                "On CONFLICT (match_id, half, goals) DO UPDATE SET odds = EXCLUDED.odds, payout = EXCLUDED.payout;",
+                "ON CONFLICT ON CONSTRAINT  over_under_unique DO UPDATE SET odds = EXCLUDED.odds, payout = EXCLUDED.payout;",
                 (str(match_id), str(half), goals, 'Under', odds, bookie, bet_link, str(payout))
                 )
 
@@ -130,12 +130,12 @@ class PGConnector(PGBase):
         for row in data_array:
             (goals, over, under, payout, bookie, bet_link) = row
 
-            if str(over) not in (" ", "-"):
+            if over and str(over) not in ("", " ", "-"):
                 self.insert_or_update_over(match_id, half, goals, over, bookie, bet_link, payout)
             else:
                 print(str(over) + " is invalid")
 
-            if str(under) not in (" ", "-"):
+            if under and str(under) not in ("", " ", "-"):
                 self.insert_or_update_under(match_id, half, goals, under, bookie, bet_link, payout)
             else:
                 print(str(under) + " is invalid")
