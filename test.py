@@ -1,43 +1,23 @@
-from datetime import datetime
+from datetime import datetime, date, time, timedelta
+from dateutil.relativedelta import relativedelta
 import sqlparse
 
 
-def test_date_time():
-    event_date_time = 'Tomorrow, 04 Feb 2023, 15:00'
-
-    (str_dat, str_date, str_time) = [part.strip() for part in event_date_time.split(',')]
-    print(str_date)
-    print(str_time)
-
-    date = datetime.strptime(str_date + " " + str_time, "%d %b %Y %H:%M")
-    print(date)
-    
-
-def validate_non_sql_string(string):
-    try:
-        tp = sqlparse.parse(string)
-        for t in tp:
-            if t.get_type() != "UNKNOWN":
-                return False
-    except:
-        pass
-
-    return True
+def calculate_event_date(event_date):
+    today = datetime.today()
+    tmp_date = datetime.strptime(event_date, "%A %d/%m")
+    tmp_date = tmp_date.replace(year=today.year)
+    if tmp_date < today - relativedelta(months=1): # in case of new year ahead
+        tmp_date = tmp_date.replace(year=today.year + 1)
+    return tmp_date
 
 
-def validate_non_sql(strings):
-    if isinstance(strings, str):
-        return validate_non_sql_string(strings)
-    else:
-        for s in strings:
-            if not validate_non_sql_string(s):
-                return False
-                
-    return True
 
 if __name__ == "__main__":
-    print(validate_non_sql("select * from x;"))
-    print(validate_non_sql("Giannina"))
-    print(validate_non_sql(("select * from x;", "Giannina")))
+    event_date = 'Saturday 18/02'
+
+    print(calculate_event_date(event_date))
+
+
 
 
