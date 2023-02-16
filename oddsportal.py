@@ -28,7 +28,7 @@ def process_over_under_tab(browser, half, db):
     tab = browser.driver
     event = extract_common_event_details(browser)
     
-    match_id = db.insert_or_update_match(event['home_team'], event['guest_team'], event['date_time'])
+    match_id = db.insert_or_update_match('OddsPortalMatch', event['home_team'], event['guest_team'], event['date_time'])
     if match_id is None:
         print("Failed to insert match data.")
         return
@@ -47,7 +47,7 @@ def process_over_under_tab(browser, half, db):
         bet_link = None
         event['goals'].append([over_under_goal, over, under, probability, booky, bet_link])
 
-    db.insert_or_update_over_under(match_id, half, event['goals'])
+    db.insert_or_update_over_under('OddsPortalOverUnder', match_id, half, event['goals'])
 
 def process_over_under_values(browser, page, div_set):
     event_div = div_set.find_elements(By.XPATH, './div')[-1]

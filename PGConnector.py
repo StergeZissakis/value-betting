@@ -69,13 +69,13 @@ class PGConnector(PGBase):
         cursor.close()
         return ret
 
-    def insert_or_update_match(self, home_team, guest_team, date_time):
+    def insert_or_update_match(self, table_name, home_team, guest_team, date_time):
         if not self.validate_non_sql((home_team, guest_team, date_time)):
             return None
 
         cursor = self.pg.cursor()
 
-        cursor.execute( 'INSERT INTO "Match" (home_team, guest_team, date_time) VALUES (%s, %s, %s) ' + 
+        cursor.execute( 'INSERT INTO "' + table_name + '" (home_team, guest_team, date_time) VALUES (%s, %s, %s) ' + 
                         'ON CONFLICT (home_team, guest_team, date_time) DO NOTHING RETURNING id;', (home_team, guest_team, date_time) 
                         )
 
@@ -87,7 +87,7 @@ class PGConnector(PGBase):
             return ret
         else:
             cursor = self.pg.cursor()
-            cursor.execute( 'SELECT id FROM "Match" where home_team=%s and guest_team=%s and date_time=%s;', (home_team, guest_team, date_time))
+            cursor.execute( 'SELECT id FROM "' + table_name + '" where home_team=%s and guest_team=%s and date_time=%s;', (home_team, guest_team, date_time))
             ret = cursor.fetchone()
             if ret is not None:
                 ret = ret[0]
@@ -96,46 +96,42 @@ class PGConnector(PGBase):
 
         return None
 
-    def insert_or_update_over(self, match_id, half, goals, odds, bookie = "", bet_link = "", payout = "", sql_checked = True):
+    def insert_or_update_over(self, table_name, match_id, half, goals, odds, bookie = "", bet_link = "", payout = "", sql_checked = True):
         if not sql_checked and self.validate_non_sql((str(match_id), str(half), str(goals), str(odds), str(bookie), str(bet_link), str(payout))):
             print("Found SQL on page")
             return
 
         cursor = self.pg.cursor()
         cursor.execute( 
-                "INSERT INTO \"OverUnder\" (match_id, half, goals, type, odds, bookie, bet_link, payout) VALUES (%s, %s, %s, %s, %s, %s, %s, %s) " +
-                "ON CONFLICT ON CONSTRAINT over_under_unique DO UPDATE SET odds = EXCLUDED.odds, payout = EXCLUDED.payout;",
+                'INSERT INTO "' + table_name + '" (match_id, half, goals, type, odds, bookie, bet_link, payout) VALUES (%s, %s, %s, %s, %s, %s, %s, %s) ' +
+                'ON CONFLICT ON CONSTRAINT "' + table_name + '_unique" DO UPDATE SET odds = EXCLUDED.odds, payout = EXCLUDED.payout;',
                 (str(match_id), str(half), goals, 'Over', odds, bookie, bet_link, str(payout))
                 )
 
         self.pg.commit()
         cursor.close()
 
-    def insert_or_update_under(self, match_id, half, goals, odds, bookie = "", bet_link = "", payout = "", sql_checked = True):
+    def insert_or_update_under(self, table_name, match_id, half, goals, odds, bookie = "", bet_link = "", payout = "", sql_checked = True):
         if not sql_checked and self.validate_non_sql((str(match_id), str(half), str(goals), str(odds), str(bookie), str(bet_link), str(payout))):
             print("Found SQL on page")
             return
 
         cursor = self.pg.cursor()
         cursor.execute( 
-                "INSERT INTO \"OverUnder\" (match_id, half, goals, type, odds, bookie, bet_link, payout) VALUES (%s, %s, %s, %s, %s, %s, %s, %s) " +
-                "ON CONFLICT ON CONSTRAINT  over_under_unique DO UPDATE SET odds = EXCLUDED.odds, payout = EXCLUDED.payout;",
+                'INSERT INTO "' + table_name + '" (match_id, half, goals, type, odds, bookie, bet_link, payout) VALUES (%s, %s, %s, %s, %s, %s, %s, %s) ' +
+                'ON CONFLICT ON CONSTRAINT "' + table_name + '_unique" DO UPDATE SET odds = EXCLUDED.odds, payout = EXCLUDED.payout;',
                 (str(match_id), str(half), goals, 'Under', odds, bookie, bet_link, str(payout))
                 )
 
         self.pg.commit()
         cursor.close()
 
-    def insert_or_update_over_under(self, match_id, half, data_array):
+    def insert_or_update_over_under(self, table_name, match_id, half, data_array):
         for row in data_array:
             (goals, over, under, payout, bookie, bet_link) = row
 
             if over and str(over) not in ("", " ", "-"):
-                self.insert_or_update_over(match_id, half, goals, over, bookie, bet_link, payout)
-            else:
-                print(str(over) + " is invalid")
+                self.insert_or_update_over(table_name, match_id, half, goals, over, bookie, bet_link, payout)
 
             if under and str(under) not in ("", " ", "-"):
-                self.insert_or_update_under(match_id, half, goals, under, bookie, bet_link, payout)
-            else:
-                print(str(under) + " is invalid")
+                self.insert_or_update_under(table_name, match_id, half, goals, under, bookie, bet_link, payout)
