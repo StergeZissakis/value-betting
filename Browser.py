@@ -197,6 +197,9 @@ class Browser:
             self.wait_for_element_to_appear(wait_for_elelemt_xpath)
         return self.page
 
+    def close_tab(self, tab_index):
+        pass
+
     def go_back(self, times):
         #self.driver.back()
         for t in range(0, times):

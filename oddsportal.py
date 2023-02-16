@@ -43,9 +43,8 @@ def process_over_under_tab(browser, half, db):
         over = row.find_element(By.XPATH,  './div/div[3]/div[1]/button/p').text
         under = row.find_element(By.XPATH, './div/div[3]/div[2]/button/p').text
         probability = row.find_element(By.XPATH, './div/div[3]/div[3]/button/p').text
-        booky = None
-        bet_link = None
-        event['goals'].append([over_under_goal, over, under, probability, booky, bet_link])
+        bet_links = []
+        event['goals'].append([over_under_goal, over, under, probability, bet_links])
 
     db.insert_or_update_over_under('OddsPortalOverUnder', match_id, half, event['goals'])
 

@@ -96,31 +96,30 @@ class PGConnector(PGBase):
 
         return None
 
-    def insert_or_update_over(self, table_name, match_id, half, goals, odds, bookie = "", bet_link = "", payout = "", sql_checked = True):
-        if not sql_checked and self.validate_non_sql((str(match_id), str(half), str(goals), str(odds), str(bookie), str(bet_link), str(payout))):
+    def insert_or_update_over(self, table_name, match_id, half, goals, odds, bet_links = [], payout = "", sql_checked = True):
+        if not sql_checked and not self.validate_non_sql((str(match_id), str(half), str(goals), str(odds), str(payout))):
             print("Found SQL on page")
             return
-
         cursor = self.pg.cursor()
         cursor.execute( 
-                'INSERT INTO "' + table_name + '" (match_id, half, goals, type, odds, bookie, bet_link, payout) VALUES (%s, %s, %s, %s, %s, %s, %s, %s) ' +
+                'INSERT INTO "' + table_name + '" (match_id, half, goals, type, odds,  bet_links, payout) VALUES (%s, %s, %s, %s, %s, %s, %s) ' +
                 'ON CONFLICT ON CONSTRAINT "' + table_name + '_unique" DO UPDATE SET odds = EXCLUDED.odds, payout = EXCLUDED.payout;',
-                (str(match_id), str(half), goals, 'Over', odds, bookie, bet_link, str(payout))
+                (str(match_id), str(half), goals, 'Over', odds, bet_links, str(payout))
                 )
 
         self.pg.commit()
         cursor.close()
 
-    def insert_or_update_under(self, table_name, match_id, half, goals, odds, bookie = "", bet_link = "", payout = "", sql_checked = True):
-        if not sql_checked and self.validate_non_sql((str(match_id), str(half), str(goals), str(odds), str(bookie), str(bet_link), str(payout))):
+    def insert_or_update_under(self, table_name, match_id, half, goals, odds, bet_links = [], payout = "", sql_checked = True):
+        if not sql_checked and not self.validate_non_sql((str(match_id), str(half), str(goals), str(odds), str(payout))):
             print("Found SQL on page")
             return
 
         cursor = self.pg.cursor()
         cursor.execute( 
-                'INSERT INTO "' + table_name + '" (match_id, half, goals, type, odds, bookie, bet_link, payout) VALUES (%s, %s, %s, %s, %s, %s, %s, %s) ' +
+                'INSERT INTO "' + table_name + '" (match_id, half, goals, type, odds, bet_links, payout) VALUES (%s, %s, %s, %s, %s, %s, %s) ' +
                 'ON CONFLICT ON CONSTRAINT "' + table_name + '_unique" DO UPDATE SET odds = EXCLUDED.odds, payout = EXCLUDED.payout;',
-                (str(match_id), str(half), goals, 'Under', odds, bookie, bet_link, str(payout))
+                (str(match_id), str(half), goals, 'Under', odds, bet_links, str(payout))
                 )
 
         self.pg.commit()
@@ -128,10 +127,10 @@ class PGConnector(PGBase):
 
     def insert_or_update_over_under(self, table_name, match_id, half, data_array):
         for row in data_array:
-            (goals, over, under, payout, bookie, bet_link) = row
+            (goals, over, under, payout, bet_links) = row
 
             if over and str(over) not in ("", " ", "-"):
-                self.insert_or_update_over(table_name, match_id, half, goals, over, bookie, bet_link, payout)
+                self.insert_or_update_over(table_name, match_id, half, goals, over, bet_links, payout)
 
             if under and str(under) not in ("", " ", "-"):
-                self.insert_or_update_under(table_name, match_id, half, goals, under, bookie, bet_link, payout)
+                self.insert_or_update_under(table_name, match_id, half, goals, under, bet_links, payout)
