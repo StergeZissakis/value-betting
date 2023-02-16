@@ -20,8 +20,8 @@ class PGBase:
                 if t.get_type() != "UNKNOWN":
                     print(t + " is passed for sql")
                     return False
-        except:
-            print("sql.parse exception")
+        except sqlparse.exceptions.SQLParseError as e:
+            print("sql.parse exception:" + str(e))
             pass
 
         return True
