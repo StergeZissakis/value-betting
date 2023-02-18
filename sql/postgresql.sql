@@ -1,0 +1,1115 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 13.9 (Debian 13.9-0+deb11u1)
+-- Dumped by pg_dump version 13.9 (Debian 13.9-0+deb11u1)
+
+-- Started on 2023-02-18 20:56:18 GMT
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+DROP DATABASE IF EXISTS postgres;
+--
+-- TOC entry 3078 (class 1262 OID 13445)
+-- Name: postgres; Type: DATABASE; Schema: -; Owner: -
+--
+
+CREATE DATABASE postgres WITH TEMPLATE = template0 ENCODING = 'UTF8' LOCALE = 'en_GB.UTF-8';
+
+
+\connect postgres
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- TOC entry 3079 (class 0 OID 0)
+-- Dependencies: 3078
+-- Name: DATABASE postgres; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON DATABASE postgres IS 'default administrative connection database';
+
+
+--
+-- TOC entry 638 (class 1247 OID 24746)
+-- Name: MatchTime; Type: TYPE; Schema: public; Owner: -
+--
+
+CREATE TYPE public."MatchTime" AS ENUM (
+    'Full Time',
+    '1st Half',
+    '2nd Half'
+);
+
+
+--
+-- TOC entry 641 (class 1247 OID 24790)
+-- Name: OverUnderType; Type: TYPE; Schema: public; Owner: -
+--
+
+CREATE TYPE public."OverUnderType" AS ENUM (
+    'Over',
+    'Under'
+);
+
+
+--
+-- TOC entry 212 (class 1255 OID 24984)
+-- Name: ArchivePastMatches(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public."ArchivePastMatches"() RETURNS void
+    LANGUAGE sql
+    AS $$
+INSERT INTO public."OverUnderHistorical"("Teams", "DateTime", "Type", "Goals", "Odds_bet", "Margin", "Payout", "Bet_link")
+SELECT Event, DateTime, Type, Goals, SafariOdds, Margin, SafariPayout, bookie 
+FROM   public."PortalSafariBets"
+WHERE  DateTime + interval '5 hours' < now()$$;
+
+
+--
+-- TOC entry 210 (class 1255 OID 24779)
+-- Name: update_updated_on_Match(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public."update_updated_on_Match"() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+    NEW.updated = now();
+    RETURN NEW;
+END;
+$$;
+
+
+--
+-- TOC entry 211 (class 1255 OID 24778)
+-- Name: update_updated_on_OverUnder(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public."update_updated_on_OverUnder"() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+    NEW.updated = now();
+    RETURN NEW;
+END;
+$$;
+
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- TOC entry 200 (class 1259 OID 24718)
+-- Name: OddsPortalMatch; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public."OddsPortalMatch" (
+    id bigint NOT NULL,
+    home_team character varying NOT NULL,
+    guest_team character varying NOT NULL,
+    date_time timestamp with time zone NOT NULL,
+    created timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+--
+-- TOC entry 201 (class 1259 OID 24724)
+-- Name: Match_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public."Match_id_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- TOC entry 3081 (class 0 OID 0)
+-- Dependencies: 201
+-- Name: Match_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public."Match_id_seq" OWNED BY public."OddsPortalMatch".id;
+
+
+--
+-- TOC entry 202 (class 1259 OID 24726)
+-- Name: OddsPortalOverUnder; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public."OddsPortalOverUnder" (
+    id bigint NOT NULL,
+    goals numeric NOT NULL,
+    odds numeric(100,2),
+    match_id bigint NOT NULL,
+    half public."MatchTime" NOT NULL,
+    payout character varying,
+    created timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    type public."OverUnderType" NOT NULL,
+    bet_links character varying[]
+);
+
+
+--
+-- TOC entry 204 (class 1259 OID 24822)
+-- Name: OddsSafariMatch; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public."OddsSafariMatch" (
+)
+INHERITS (public."OddsPortalMatch");
+
+
+--
+-- TOC entry 205 (class 1259 OID 24836)
+-- Name: OddsSafariOverUnder; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public."OddsSafariOverUnder" (
+)
+INHERITS (public."OddsPortalOverUnder");
+
+
+--
+-- TOC entry 209 (class 1259 OID 24966)
+-- Name: OverUnderHistorical; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public."OverUnderHistorical" (
+    id bigint NOT NULL,
+    "Teams" character varying NOT NULL,
+    "DateTime" timestamp with time zone NOT NULL,
+    "Type" public."OverUnderType" NOT NULL,
+    "Goals" numeric NOT NULL,
+    "Odds_bet" numeric NOT NULL,
+    "Margin" numeric NOT NULL,
+    "Payout" character varying NOT NULL,
+    "Bet_link" character varying NOT NULL,
+    "Result" bit(1)
+);
+
+
+--
+-- TOC entry 208 (class 1259 OID 24964)
+-- Name: OverUnderHistorical_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public."OverUnderHistorical_id_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- TOC entry 3086 (class 0 OID 0)
+-- Dependencies: 208
+-- Name: OverUnderHistorical_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public."OverUnderHistorical_id_seq" OWNED BY public."OverUnderHistorical".id;
+
+
+--
+-- TOC entry 203 (class 1259 OID 24729)
+-- Name: OverUnder_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public."OverUnder_id_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- TOC entry 3087 (class 0 OID 0)
+-- Dependencies: 203
+-- Name: OverUnder_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public."OverUnder_id_seq" OWNED BY public."OddsPortalOverUnder".id;
+
+
+--
+-- TOC entry 206 (class 1259 OID 24910)
+-- Name: PortalSafariMatch; Type: VIEW; Schema: public; Owner: -
+--
+
+CREATE VIEW public."PortalSafariMatch" AS
+ SELECT portal.id AS portal_id,
+    portal.date_time AS portal_time,
+    portal.home_team AS portal_home_team,
+    portal.guest_team AS portal_guest_team,
+    safari.id AS safari_id,
+    safari.date_time AS safari_time,
+    safari.home_team AS safari_home_team,
+    safari.guest_team AS safari_guest_team
+   FROM (public."OddsPortalMatch" portal
+     JOIN public."OddsSafariMatch" safari ON ((portal.date_time = safari.date_time)))
+  WHERE (((portal.home_team)::text = (safari.home_team)::text) AND ((portal.guest_team)::text = (safari.guest_team)::text))
+  ORDER BY portal.date_time;
+
+
+--
+-- TOC entry 207 (class 1259 OID 24925)
+-- Name: PortalSafariBets; Type: VIEW; Schema: public; Owner: -
+--
+
+CREATE VIEW public."PortalSafariBets" AS
+ SELECT global_match.portal_time AS datetime,
+    concat(global_match.portal_home_team, ' - ', global_match.portal_guest_team) AS event,
+    portal_over_under.type,
+    portal_over_under.goals,
+    portal_over_under.odds AS portalodds,
+    safari_over_under.odds AS safariodds,
+    (safari_over_under.odds - portal_over_under.odds) AS margin,
+    portal_over_under.payout AS portalpayout,
+    safari_over_under.payout AS safaripayout,
+    safari_over_under.bet_links AS bookie
+   FROM ((public."PortalSafariMatch" global_match
+     JOIN public."OddsPortalOverUnder" portal_over_under ON ((global_match.portal_id = portal_over_under.match_id)))
+     JOIN public."OddsSafariOverUnder" safari_over_under ON ((global_match.safari_id = safari_over_under.match_id)))
+  WHERE ((portal_over_under.type = safari_over_under.type) AND (portal_over_under.goals = safari_over_under.goals) AND (safari_over_under.odds >= portal_over_under.odds) AND (portal_over_under.odds >= 1.7))
+  ORDER BY global_match.portal_time, (concat(global_match.portal_home_team, ' - ', global_match.portal_guest_team)), portal_over_under.type, portal_over_under.goals, portal_over_under.odds, safari_over_under.odds, (portal_over_under.odds - safari_over_under.odds) DESC;
+
+
+--
+-- TOC entry 2896 (class 2604 OID 24731)
+-- Name: OddsPortalMatch id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public."OddsPortalMatch" ALTER COLUMN id SET DEFAULT nextval('public."Match_id_seq"'::regclass);
+
+
+--
+-- TOC entry 2899 (class 2604 OID 24732)
+-- Name: OddsPortalOverUnder id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public."OddsPortalOverUnder" ALTER COLUMN id SET DEFAULT nextval('public."OverUnder_id_seq"'::regclass);
+
+
+--
+-- TOC entry 2902 (class 2604 OID 24825)
+-- Name: OddsSafariMatch id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public."OddsSafariMatch" ALTER COLUMN id SET DEFAULT nextval('public."Match_id_seq"'::regclass);
+
+
+--
+-- TOC entry 2903 (class 2604 OID 24826)
+-- Name: OddsSafariMatch created; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public."OddsSafariMatch" ALTER COLUMN created SET DEFAULT CURRENT_TIMESTAMP;
+
+
+--
+-- TOC entry 2904 (class 2604 OID 24827)
+-- Name: OddsSafariMatch updated; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public."OddsSafariMatch" ALTER COLUMN updated SET DEFAULT CURRENT_TIMESTAMP;
+
+
+--
+-- TOC entry 2905 (class 2604 OID 24839)
+-- Name: OddsSafariOverUnder id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public."OddsSafariOverUnder" ALTER COLUMN id SET DEFAULT nextval('public."OverUnder_id_seq"'::regclass);
+
+
+--
+-- TOC entry 2906 (class 2604 OID 24840)
+-- Name: OddsSafariOverUnder created; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public."OddsSafariOverUnder" ALTER COLUMN created SET DEFAULT CURRENT_TIMESTAMP;
+
+
+--
+-- TOC entry 2907 (class 2604 OID 24841)
+-- Name: OddsSafariOverUnder updated; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public."OddsSafariOverUnder" ALTER COLUMN updated SET DEFAULT CURRENT_TIMESTAMP;
+
+
+--
+-- TOC entry 2908 (class 2604 OID 24969)
+-- Name: OverUnderHistorical id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public."OverUnderHistorical" ALTER COLUMN id SET DEFAULT nextval('public."OverUnderHistorical_id_seq"'::regclass);
+
+
+--
+-- TOC entry 3065 (class 0 OID 24718)
+-- Dependencies: 200
+-- Data for Name: OddsPortalMatch; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY public."OddsPortalMatch" (id, home_team, guest_team, date_time, created, updated) FROM stdin;
+597	Panathinaikos	Volos	2023-02-18 15:00:00+00	2023-02-18 05:06:38.188301	2023-02-18 05:06:38.188301
+600	Asteras Tripolis	Giannina	2023-02-18 18:00:00+00	2023-02-18 05:06:59.657817	2023-02-18 05:06:59.657817
+603	Lamia	Olympiacos Piraeus	2023-02-19 14:00:00+00	2023-02-18 05:07:20.580925	2023-02-18 05:07:20.580925
+606	Panetolikos	Ionikos	2023-02-19 17:30:00+00	2023-02-18 05:07:41.726636	2023-02-18 05:07:41.726636
+609	PAOK	AEK Athens FC	2023-02-19 18:30:00+00	2023-02-18 05:08:03.66273	2023-02-18 05:08:03.66273
+612	Atromitos	Levadiakos	2023-02-20 16:00:00+00	2023-02-18 05:08:25.644897	2023-02-18 05:08:25.644897
+615	OFI Crete	Aris	2023-02-20 17:30:00+00	2023-02-18 05:08:46.73963	2023-02-18 05:08:46.73963
+618	Volos	Lamia	2023-02-24 18:00:00+00	2023-02-18 05:09:08.749075	2023-02-18 05:09:08.749075
+621	AEK Athens FC	Asteras Tripolis	2023-02-25 15:30:00+00	2023-02-18 05:09:31.545758	2023-02-18 05:09:31.545758
+624	Giannina	PAOK	2023-02-25 17:00:00+00	2023-02-18 05:09:53.101745	2023-02-18 05:09:53.101745
+\.
+
+
+--
+-- TOC entry 3067 (class 0 OID 24726)
+-- Dependencies: 202
+-- Data for Name: OddsPortalOverUnder; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY public."OddsPortalOverUnder" (id, goals, odds, match_id, half, payout, created, updated, type, bet_links) FROM stdin;
+4333	0.5	1.07	597	Full Time	96.7%	2023-02-18 05:06:40.328654	2023-02-18 05:06:40.328654	Over	{}
+4334	0.5	10.00	597	Full Time	96.7%	2023-02-18 05:06:40.336746	2023-02-18 05:06:40.336746	Under	{}
+4335	1.5	1.36	597	Full Time	95.9%	2023-02-18 05:06:40.3401	2023-02-18 05:06:40.3401	Over	{}
+4336	1.5	3.25	597	Full Time	95.9%	2023-02-18 05:06:40.343279	2023-02-18 05:06:40.343279	Under	{}
+4337	2.25	1.88	597	Full Time	96.4%	2023-02-18 05:06:40.345588	2023-02-18 05:06:40.345588	Over	{}
+4338	2.25	1.98	597	Full Time	96.4%	2023-02-18 05:06:40.34738	2023-02-18 05:06:40.34738	Under	{}
+4339	2.5	2.10	597	Full Time	94.9%	2023-02-18 05:06:40.349134	2023-02-18 05:06:40.349134	Over	{}
+4340	2.5	1.73	597	Full Time	94.9%	2023-02-18 05:06:40.350998	2023-02-18 05:06:40.350998	Under	{}
+4341	3.5	3.90	597	Full Time	94.7%	2023-02-18 05:06:40.352602	2023-02-18 05:06:40.352602	Over	{}
+4342	3.5	1.25	597	Full Time	94.7%	2023-02-18 05:06:40.354466	2023-02-18 05:06:40.354466	Under	{}
+4343	4.5	8.00	597	Full Time	95.2%	2023-02-18 05:06:40.356116	2023-02-18 05:06:40.356116	Over	{}
+4344	4.5	1.08	597	Full Time	95.2%	2023-02-18 05:06:40.357512	2023-02-18 05:06:40.357512	Under	{}
+4345	5.5	19.00	597	Full Time	96.8%	2023-02-18 05:06:40.359004	2023-02-18 05:06:40.359004	Over	{}
+4346	5.5	1.02	597	Full Time	96.8%	2023-02-18 05:06:40.360384	2023-02-18 05:06:40.360384	Under	{}
+4347	6.5	41.00	597	Full Time	97.6%	2023-02-18 05:06:40.361819	2023-02-18 05:06:40.361819	Over	{}
+4348	0.5	1.44	597	1st Half	95.7%	2023-02-18 05:06:42.665989	2023-02-18 05:06:42.665989	Over	{}
+4349	0.5	2.85	597	1st Half	95.7%	2023-02-18 05:06:44.158044	2023-02-18 05:06:44.158044	Under	{}
+4350	1.0	2.05	597	1st Half	94.4%	2023-02-18 05:06:44.160231	2023-02-18 05:06:44.160231	Over	{}
+4351	1.0	1.75	597	1st Half	94.4%	2023-02-18 05:06:44.16106	2023-02-18 05:06:44.16106	Under	{}
+4352	1.5	3.25	597	1st Half	97.8%	2023-02-18 05:06:44.16188	2023-02-18 05:06:44.16188	Over	{}
+4353	1.5	1.40	597	1st Half	97.8%	2023-02-18 05:06:44.16271	2023-02-18 05:06:44.16271	Under	{}
+4354	2.5	9.00	597	1st Half	96.4%	2023-02-18 05:06:44.163535	2023-02-18 05:06:44.163535	Over	{}
+4355	2.5	1.08	597	1st Half	96.4%	2023-02-18 05:06:44.164339	2023-02-18 05:06:44.164339	Under	{}
+4356	3.5	26.00	597	1st Half	98.1%	2023-02-18 05:06:44.165312	2023-02-18 05:06:44.165312	Over	{}
+4357	3.5	1.02	597	1st Half	98.1%	2023-02-18 05:06:44.166396	2023-02-18 05:06:44.166396	Under	{}
+4358	4.5	56.00	597	1st Half	98.2%	2023-02-18 05:06:44.167251	2023-02-18 05:06:44.167251	Over	{}
+4359	0.5	1.33	597	2nd Half	96.4%	2023-02-18 05:06:46.294752	2023-02-18 05:06:46.294752	Over	{}
+4360	0.5	3.50	597	2nd Half	96.4%	2023-02-18 05:06:47.181634	2023-02-18 05:06:47.181634	Under	{}
+4361	1.5	2.38	597	2nd Half	95.0%	2023-02-18 05:06:47.184413	2023-02-18 05:06:47.184413	Over	{}
+4362	1.5	1.58	597	2nd Half	95.0%	2023-02-18 05:06:47.187152	2023-02-18 05:06:47.187152	Under	{}
+4363	2.5	5.50	597	2nd Half	95.1%	2023-02-18 05:06:47.189459	2023-02-18 05:06:47.189459	Over	{}
+4364	2.5	1.15	597	2nd Half	95.1%	2023-02-18 05:06:47.191838	2023-02-18 05:06:47.191838	Under	{}
+4365	3.5	15.00	597	2nd Half	96.4%	2023-02-18 05:06:47.194265	2023-02-18 05:06:47.194265	Over	{}
+4366	3.5	1.03	597	2nd Half	96.4%	2023-02-18 05:06:47.196901	2023-02-18 05:06:47.196901	Under	{}
+4367	0.5	1.10	600	Full Time	95.9%	2023-02-18 05:07:01.866622	2023-02-18 05:07:01.866622	Over	{}
+4368	0.5	7.50	600	Full Time	95.9%	2023-02-18 05:07:01.868134	2023-02-18 05:07:01.868134	Under	{}
+4369	1.5	1.46	600	Full Time	93.9%	2023-02-18 05:07:01.869074	2023-02-18 05:07:01.869074	Over	{}
+4370	1.5	2.63	600	Full Time	93.9%	2023-02-18 05:07:01.86991	2023-02-18 05:07:01.86991	Under	{}
+4371	2.0	1.88	600	Full Time	96.4%	2023-02-18 05:07:01.870901	2023-02-18 05:07:01.870901	Over	{}
+4372	2.0	1.98	600	Full Time	96.4%	2023-02-18 05:07:01.871785	2023-02-18 05:07:01.871785	Under	{}
+4373	2.5	2.56	600	Full Time	95.8%	2023-02-18 05:07:01.872759	2023-02-18 05:07:01.872759	Over	{}
+4374	2.5	1.53	600	Full Time	95.8%	2023-02-18 05:07:01.875026	2023-02-18 05:07:01.875026	Under	{}
+4375	3.5	5.00	600	Full Time	96.8%	2023-02-18 05:07:01.877433	2023-02-18 05:07:01.877433	Over	{}
+4376	3.5	1.20	600	Full Time	96.8%	2023-02-18 05:07:01.879752	2023-02-18 05:07:01.879752	Under	{}
+4377	4.5	11.50	600	Full Time	97.1%	2023-02-18 05:07:01.880731	2023-02-18 05:07:01.880731	Over	{}
+4378	4.5	1.06	600	Full Time	97.1%	2023-02-18 05:07:01.881515	2023-02-18 05:07:01.881515	Under	{}
+4379	5.5	23.00	600	Full Time	97.7%	2023-02-18 05:07:01.882369	2023-02-18 05:07:01.882369	Over	{}
+4380	5.5	1.02	600	Full Time	97.7%	2023-02-18 05:07:01.88321	2023-02-18 05:07:01.88321	Under	{}
+4381	6.5	41.00	600	Full Time	97.6%	2023-02-18 05:07:01.883966	2023-02-18 05:07:01.883966	Over	{}
+4382	0.5	1.53	600	1st Half	94.9%	2023-02-18 05:07:03.539915	2023-02-18 05:07:03.539915	Over	{}
+4383	0.5	2.50	600	1st Half	94.9%	2023-02-18 05:07:05.078711	2023-02-18 05:07:05.078711	Under	{}
+4384	0.75	1.80	600	1st Half	94.7%	2023-02-18 05:07:05.079772	2023-02-18 05:07:05.079772	Over	{}
+4385	0.75	2.00	600	1st Half	94.7%	2023-02-18 05:07:05.080685	2023-02-18 05:07:05.080685	Under	{}
+4386	1.5	3.75	600	1st Half	96.5%	2023-02-18 05:07:05.081737	2023-02-18 05:07:05.081737	Over	{}
+4387	1.5	1.30	600	1st Half	96.5%	2023-02-18 05:07:05.082787	2023-02-18 05:07:05.082787	Under	{}
+4388	2.5	11.00	600	1st Half	96.7%	2023-02-18 05:07:05.083869	2023-02-18 05:07:05.083869	Over	{}
+4389	2.5	1.06	600	1st Half	96.7%	2023-02-18 05:07:05.085024	2023-02-18 05:07:05.085024	Under	{}
+4390	3.5	29.00	600	1st Half	97.6%	2023-02-18 05:07:05.085998	2023-02-18 05:07:05.085998	Over	{}
+4391	3.5	1.01	600	1st Half	97.6%	2023-02-18 05:07:05.086849	2023-02-18 05:07:05.086849	Under	{}
+4392	4.5	71.00	600	1st Half	98.6%	2023-02-18 05:07:05.087842	2023-02-18 05:07:05.087842	Over	{}
+4393	0.5	1.36	600	2nd Half	95.9%	2023-02-18 05:07:06.751734	2023-02-18 05:07:06.751734	Over	{}
+4394	0.5	3.25	600	2nd Half	95.9%	2023-02-18 05:07:07.870421	2023-02-18 05:07:07.870421	Under	{}
+4395	1.5	2.65	600	2nd Half	95.8%	2023-02-18 05:07:07.871553	2023-02-18 05:07:07.871553	Over	{}
+4396	1.5	1.50	600	2nd Half	95.8%	2023-02-18 05:07:07.872523	2023-02-18 05:07:07.872523	Under	{}
+4397	2.5	6.50	600	2nd Half	94.8%	2023-02-18 05:07:07.873327	2023-02-18 05:07:07.873327	Over	{}
+4398	2.5	1.11	600	2nd Half	94.8%	2023-02-18 05:07:07.874371	2023-02-18 05:07:07.874371	Under	{}
+4399	3.5	19.00	600	2nd Half	96.8%	2023-02-18 05:07:07.87573	2023-02-18 05:07:07.87573	Over	{}
+4400	3.5	1.02	600	2nd Half	96.8%	2023-02-18 05:07:07.876716	2023-02-18 05:07:07.876716	Under	{}
+4401	0.5	1.07	603	Full Time	97.5%	2023-02-18 05:07:22.626393	2023-02-18 05:07:22.626393	Over	{}
+4402	0.5	11.00	603	Full Time	97.5%	2023-02-18 05:07:22.627876	2023-02-18 05:07:22.627876	Under	{}
+4403	1.5	1.33	603	Full Time	97.5%	2023-02-18 05:07:22.628751	2023-02-18 05:07:22.628751	Over	{}
+4404	1.5	3.65	603	Full Time	97.5%	2023-02-18 05:07:22.629477	2023-02-18 05:07:22.629477	Under	{}
+4405	2.5	2.02	603	Full Time	96.6%	2023-02-18 05:07:22.630399	2023-02-18 05:07:22.630399	Over	{}
+4406	2.5	1.85	603	Full Time	96.6%	2023-02-18 05:07:22.63121	2023-02-18 05:07:22.63121	Under	{}
+4407	3.5	3.50	603	Full Time	94.8%	2023-02-18 05:07:22.631909	2023-02-18 05:07:22.631909	Over	{}
+4408	3.5	1.30	603	Full Time	94.8%	2023-02-18 05:07:22.632641	2023-02-18 05:07:22.632641	Under	{}
+4409	4.5	7.00	603	Full Time	95.8%	2023-02-18 05:07:22.633561	2023-02-18 05:07:22.633561	Over	{}
+4410	4.5	1.11	603	Full Time	95.8%	2023-02-18 05:07:22.63441	2023-02-18 05:07:22.63441	Under	{}
+4411	5.5	15.00	603	Full Time	96.4%	2023-02-18 05:07:22.635276	2023-02-18 05:07:22.635276	Over	{}
+4412	5.5	1.03	603	Full Time	96.4%	2023-02-18 05:07:22.636152	2023-02-18 05:07:22.636152	Under	{}
+4413	6.5	26.00	603	Full Time	96.3%	2023-02-18 05:07:22.636945	2023-02-18 05:07:22.636945	Over	{}
+4414	0.5	1.40	603	1st Half	94.9%	2023-02-18 05:07:24.861851	2023-02-18 05:07:24.861851	Over	{}
+4415	0.5	2.95	603	1st Half	94.9%	2023-02-18 05:07:26.462292	2023-02-18 05:07:26.462292	Under	{}
+4416	1.0	1.95	603	1st Half	94.9%	2023-02-18 05:07:26.463436	2023-02-18 05:07:26.463436	Over	{}
+4417	1.0	1.85	603	1st Half	94.9%	2023-02-18 05:07:26.464232	2023-02-18 05:07:26.464232	Under	{}
+4418	1.5	3.00	603	1st Half	95.5%	2023-02-18 05:07:26.465022	2023-02-18 05:07:26.465022	Over	{}
+4419	1.5	1.40	603	1st Half	95.5%	2023-02-18 05:07:26.465795	2023-02-18 05:07:26.465795	Under	{}
+4420	2.5	8.00	603	1st Half	95.2%	2023-02-18 05:07:26.466572	2023-02-18 05:07:26.466572	Over	{}
+4421	2.5	1.08	603	1st Half	95.2%	2023-02-18 05:07:26.467389	2023-02-18 05:07:26.467389	Under	{}
+4422	3.5	23.00	603	1st Half	97.7%	2023-02-18 05:07:26.468285	2023-02-18 05:07:26.468285	Over	{}
+4423	3.5	1.02	603	1st Half	97.7%	2023-02-18 05:07:26.469088	2023-02-18 05:07:26.469088	Under	{}
+4424	4.5	51.00	603	1st Half	98.1%	2023-02-18 05:07:26.469855	2023-02-18 05:07:26.469855	Over	{}
+4425	0.5	1.30	603	2nd Half	96.5%	2023-02-18 05:07:28.4835	2023-02-18 05:07:28.4835	Over	{}
+4426	0.5	3.75	603	2nd Half	96.5%	2023-02-18 05:07:29.712771	2023-02-18 05:07:29.712771	Under	{}
+4427	1.5	2.20	603	2nd Half	93.6%	2023-02-18 05:07:29.713505	2023-02-18 05:07:29.713505	Over	{}
+4428	1.5	1.63	603	2nd Half	93.6%	2023-02-18 05:07:29.714395	2023-02-18 05:07:29.714395	Under	{}
+4429	2.5	5.00	603	2nd Half	94.8%	2023-02-18 05:07:29.715264	2023-02-18 05:07:29.715264	Over	{}
+4430	2.5	1.17	603	2nd Half	94.8%	2023-02-18 05:07:29.716023	2023-02-18 05:07:29.716023	Under	{}
+4431	3.5	13.00	603	2nd Half	96.3%	2023-02-18 05:07:29.716744	2023-02-18 05:07:29.716744	Over	{}
+4432	3.5	1.04	603	2nd Half	96.3%	2023-02-18 05:07:29.717487	2023-02-18 05:07:29.717487	Under	{}
+4433	0.5	1.11	606	Full Time	96.7%	2023-02-18 05:07:43.976153	2023-02-18 05:07:43.976153	Over	{}
+4434	0.5	7.50	606	Full Time	96.7%	2023-02-18 05:07:43.977505	2023-02-18 05:07:43.977505	Under	{}
+4435	1.5	1.50	606	Full Time	95.8%	2023-02-18 05:07:43.978756	2023-02-18 05:07:43.978756	Over	{}
+4436	1.5	2.65	606	Full Time	95.8%	2023-02-18 05:07:43.979693	2023-02-18 05:07:43.979693	Under	{}
+4437	2.0	1.88	606	Full Time	96.4%	2023-02-18 05:07:43.980689	2023-02-18 05:07:43.980689	Over	{}
+4438	2.0	1.98	606	Full Time	96.4%	2023-02-18 05:07:43.98183	2023-02-18 05:07:43.98183	Under	{}
+4439	2.5	2.50	606	Full Time	94.9%	2023-02-18 05:07:43.982734	2023-02-18 05:07:43.982734	Over	{}
+4440	2.5	1.53	606	Full Time	94.9%	2023-02-18 05:07:43.983457	2023-02-18 05:07:43.983457	Under	{}
+4441	3.5	5.00	606	Full Time	95.5%	2023-02-18 05:07:43.984339	2023-02-18 05:07:43.984339	Over	{}
+4442	3.5	1.18	606	Full Time	95.5%	2023-02-18 05:07:43.985305	2023-02-18 05:07:43.985305	Under	{}
+4443	4.5	11.00	606	Full Time	96.7%	2023-02-18 05:07:43.986136	2023-02-18 05:07:43.986136	Over	{}
+4444	4.5	1.06	606	Full Time	96.7%	2023-02-18 05:07:43.986897	2023-02-18 05:07:43.986897	Under	{}
+4445	5.5	26.00	606	Full Time	98.1%	2023-02-18 05:07:43.987607	2023-02-18 05:07:43.987607	Over	{}
+4446	5.5	1.02	606	Full Time	98.1%	2023-02-18 05:07:43.988236	2023-02-18 05:07:43.988236	Under	{}
+4447	6.5	51.00	606	Full Time	98.1%	2023-02-18 05:07:43.98894	2023-02-18 05:07:43.98894	Over	{}
+4448	0.5	1.53	606	1st Half	94.9%	2023-02-18 05:07:46.229566	2023-02-18 05:07:46.229566	Over	{}
+4449	0.5	2.50	606	1st Half	94.9%	2023-02-18 05:07:48.239895	2023-02-18 05:07:48.239895	Under	{}
+4450	0.75	1.80	606	1st Half	94.7%	2023-02-18 05:07:48.242486	2023-02-18 05:07:48.242486	Over	{}
+4451	0.75	2.00	606	1st Half	94.7%	2023-02-18 05:07:48.244493	2023-02-18 05:07:48.244493	Under	{}
+4452	1.5	3.75	606	1st Half	96.5%	2023-02-18 05:07:48.245702	2023-02-18 05:07:48.245702	Over	{}
+4453	1.5	1.30	606	1st Half	96.5%	2023-02-18 05:07:48.247093	2023-02-18 05:07:48.247093	Under	{}
+4454	2.5	11.00	606	1st Half	96.7%	2023-02-18 05:07:48.248595	2023-02-18 05:07:48.248595	Over	{}
+4455	2.5	1.06	606	1st Half	96.7%	2023-02-18 05:07:48.250538	2023-02-18 05:07:48.250538	Under	{}
+4456	3.5	26.00	606	1st Half	97.2%	2023-02-18 05:07:48.251687	2023-02-18 05:07:48.251687	Over	{}
+4457	3.5	1.01	606	1st Half	97.2%	2023-02-18 05:07:48.253017	2023-02-18 05:07:48.253017	Under	{}
+4458	4.5	67.00	606	1st Half	98.5%	2023-02-18 05:07:48.254275	2023-02-18 05:07:48.254275	Over	{}
+4459	0.5	1.36	606	2nd Half	95.9%	2023-02-18 05:07:50.599168	2023-02-18 05:07:50.599168	Over	{}
+4460	0.5	3.25	606	2nd Half	95.9%	2023-02-18 05:07:51.605696	2023-02-18 05:07:51.605696	Under	{}
+4461	1.5	2.63	606	2nd Half	95.5%	2023-02-18 05:07:51.607201	2023-02-18 05:07:51.607201	Over	{}
+4462	1.5	1.50	606	2nd Half	95.5%	2023-02-18 05:07:51.608189	2023-02-18 05:07:51.608189	Under	{}
+4463	2.5	6.50	606	2nd Half	94.8%	2023-02-18 05:07:51.609199	2023-02-18 05:07:51.609199	Over	{}
+4464	2.5	1.11	606	2nd Half	94.8%	2023-02-18 05:07:51.610251	2023-02-18 05:07:51.610251	Under	{}
+4465	3.5	19.00	606	2nd Half	96.8%	2023-02-18 05:07:51.6114	2023-02-18 05:07:51.6114	Over	{}
+4466	3.5	1.02	606	2nd Half	96.8%	2023-02-18 05:07:51.612573	2023-02-18 05:07:51.612573	Under	{}
+4467	0.5	1.11	609	Full Time	95.8%	2023-02-18 05:08:06.018277	2023-02-18 05:08:06.018277	Over	{}
+4468	0.5	7.00	609	Full Time	95.8%	2023-02-18 05:08:06.020457	2023-02-18 05:08:06.020457	Under	{}
+4469	1.5	1.47	609	Full Time	94.3%	2023-02-18 05:08:06.021436	2023-02-18 05:08:06.021436	Over	{}
+4470	1.5	2.63	609	Full Time	94.3%	2023-02-18 05:08:06.022459	2023-02-18 05:08:06.022459	Under	{}
+4471	2.0	1.85	609	Full Time	96.1%	2023-02-18 05:08:06.02357	2023-02-18 05:08:06.02357	Over	{}
+4472	2.0	2.00	609	Full Time	96.1%	2023-02-18 05:08:06.025264	2023-02-18 05:08:06.025264	Under	{}
+4473	2.5	2.55	609	Full Time	95.6%	2023-02-18 05:08:06.027915	2023-02-18 05:08:06.027915	Over	{}
+4474	2.5	1.53	609	Full Time	95.6%	2023-02-18 05:08:06.029373	2023-02-18 05:08:06.029373	Under	{}
+4475	3.5	5.20	609	Full Time	97.5%	2023-02-18 05:08:06.030789	2023-02-18 05:08:06.030789	Over	{}
+4476	3.5	1.20	609	Full Time	97.5%	2023-02-18 05:08:06.032112	2023-02-18 05:08:06.032112	Under	{}
+4477	4.5	12.00	609	Full Time	96.6%	2023-02-18 05:08:06.033674	2023-02-18 05:08:06.033674	Over	{}
+4478	4.5	1.05	609	Full Time	96.6%	2023-02-18 05:08:06.035312	2023-02-18 05:08:06.035312	Under	{}
+4479	5.5	23.00	609	Full Time	97.7%	2023-02-18 05:08:06.036908	2023-02-18 05:08:06.036908	Over	{}
+4480	5.5	1.02	609	Full Time	97.7%	2023-02-18 05:08:06.038297	2023-02-18 05:08:06.038297	Under	{}
+4481	6.5	41.00	609	Full Time	97.6%	2023-02-18 05:08:06.039693	2023-02-18 05:08:06.039693	Over	{}
+4482	0.5	1.53	609	1st Half	94.9%	2023-02-18 05:08:08.241843	2023-02-18 05:08:08.241843	Over	{}
+4483	0.5	2.50	609	1st Half	94.9%	2023-02-18 05:08:09.875083	2023-02-18 05:08:09.875083	Under	{}
+4484	0.75	1.80	609	1st Half	94.7%	2023-02-18 05:08:09.876281	2023-02-18 05:08:09.876281	Over	{}
+4485	0.75	2.00	609	1st Half	94.7%	2023-02-18 05:08:09.877309	2023-02-18 05:08:09.877309	Under	{}
+4486	1.5	3.75	609	1st Half	96.5%	2023-02-18 05:08:09.878302	2023-02-18 05:08:09.878302	Over	{}
+4487	1.5	1.30	609	1st Half	96.5%	2023-02-18 05:08:09.879148	2023-02-18 05:08:09.879148	Under	{}
+4488	2.5	11.00	609	1st Half	95.9%	2023-02-18 05:08:09.880085	2023-02-18 05:08:09.880085	Over	{}
+4489	2.5	1.05	609	1st Half	95.9%	2023-02-18 05:08:09.880971	2023-02-18 05:08:09.880971	Under	{}
+4490	3.5	29.00	609	1st Half	97.6%	2023-02-18 05:08:09.881875	2023-02-18 05:08:09.881875	Over	{}
+4491	3.5	1.01	609	1st Half	97.6%	2023-02-18 05:08:09.882931	2023-02-18 05:08:09.882931	Under	{}
+4492	4.5	71.00	609	1st Half	98.6%	2023-02-18 05:08:09.883827	2023-02-18 05:08:09.883827	Over	{}
+4493	0.5	1.36	609	2nd Half	95.9%	2023-02-18 05:08:12.033874	2023-02-18 05:08:12.033874	Over	{}
+4494	0.5	3.25	609	2nd Half	95.9%	2023-02-18 05:08:13.105516	2023-02-18 05:08:13.105516	Under	{}
+4495	1.5	2.70	609	2nd Half	96.4%	2023-02-18 05:08:13.106581	2023-02-18 05:08:13.106581	Over	{}
+4496	1.5	1.50	609	2nd Half	96.4%	2023-02-18 05:08:13.107684	2023-02-18 05:08:13.107684	Under	{}
+4497	2.5	6.50	609	2nd Half	95.5%	2023-02-18 05:08:13.108858	2023-02-18 05:08:13.108858	Over	{}
+4498	2.5	1.12	609	2nd Half	95.5%	2023-02-18 05:08:13.109823	2023-02-18 05:08:13.109823	Under	{}
+4499	3.5	19.00	609	2nd Half	96.8%	2023-02-18 05:08:13.110994	2023-02-18 05:08:13.110994	Over	{}
+4500	3.5	1.02	609	2nd Half	96.8%	2023-02-18 05:08:13.112879	2023-02-18 05:08:13.112879	Under	{}
+4501	0.5	1.10	612	Full Time	95.9%	2023-02-18 05:08:27.949682	2023-02-18 05:08:27.949682	Over	{}
+4502	0.5	7.50	612	Full Time	95.9%	2023-02-18 05:08:27.951051	2023-02-18 05:08:27.951051	Under	{}
+4503	1.5	1.44	612	Full Time	94.5%	2023-02-18 05:08:27.951882	2023-02-18 05:08:27.951882	Over	{}
+4504	1.5	2.75	612	Full Time	94.5%	2023-02-18 05:08:27.952591	2023-02-18 05:08:27.952591	Under	{}
+4505	2.25	2.02	612	Full Time	96.0%	2023-02-18 05:08:27.953318	2023-02-18 05:08:27.953318	Over	{}
+4506	2.25	1.83	612	Full Time	96.0%	2023-02-18 05:08:27.954069	2023-02-18 05:08:27.954069	Under	{}
+4507	2.5	2.48	612	Full Time	98.0%	2023-02-18 05:08:27.954924	2023-02-18 05:08:27.954924	Over	{}
+4508	2.5	1.62	612	Full Time	98.0%	2023-02-18 05:08:27.955632	2023-02-18 05:08:27.955632	Under	{}
+4509	3.5	4.90	612	Full Time	97.7%	2023-02-18 05:08:27.956394	2023-02-18 05:08:27.956394	Over	{}
+4510	3.5	1.22	612	Full Time	97.7%	2023-02-18 05:08:27.957164	2023-02-18 05:08:27.957164	Under	{}
+4511	4.5	11.00	612	Full Time	96.7%	2023-02-18 05:08:27.95806	2023-02-18 05:08:27.95806	Over	{}
+4512	4.5	1.06	612	Full Time	96.7%	2023-02-18 05:08:27.959057	2023-02-18 05:08:27.959057	Under	{}
+4513	5.5	21.00	612	Full Time	97.3%	2023-02-18 05:08:27.959929	2023-02-18 05:08:27.959929	Over	{}
+4514	5.5	1.02	612	Full Time	97.3%	2023-02-18 05:08:27.960664	2023-02-18 05:08:27.960664	Under	{}
+4515	6.5	36.00	612	Full Time	97.3%	2023-02-18 05:08:27.96134	2023-02-18 05:08:27.96134	Over	{}
+4516	0.5	1.50	612	1st Half	93.8%	2023-02-18 05:08:30.172535	2023-02-18 05:08:30.172535	Over	{}
+4517	0.5	2.50	612	1st Half	93.8%	2023-02-18 05:08:31.590062	2023-02-18 05:08:31.590062	Under	{}
+4518	0.75	1.70	612	1st Half	93.9%	2023-02-18 05:08:31.592458	2023-02-18 05:08:31.592458	Over	{}
+4519	0.75	2.10	612	1st Half	93.9%	2023-02-18 05:08:31.597294	2023-02-18 05:08:31.597294	Under	{}
+4520	1.5	3.60	612	1st Half	97.1%	2023-02-18 05:08:31.600063	2023-02-18 05:08:31.600063	Over	{}
+4521	1.5	1.33	612	1st Half	97.1%	2023-02-18 05:08:31.602331	2023-02-18 05:08:31.602331	Under	{}
+4522	2.5	10.00	612	1st Half	95.8%	2023-02-18 05:08:31.604335	2023-02-18 05:08:31.604335	Over	{}
+4523	2.5	1.06	612	1st Half	95.8%	2023-02-18 05:08:31.606385	2023-02-18 05:08:31.606385	Under	{}
+4524	3.5	26.00	612	1st Half	97.2%	2023-02-18 05:08:31.608619	2023-02-18 05:08:31.608619	Over	{}
+4525	3.5	1.01	612	1st Half	97.2%	2023-02-18 05:08:31.610912	2023-02-18 05:08:31.610912	Under	{}
+4526	4.5	67.00	612	1st Half	98.5%	2023-02-18 05:08:31.612489	2023-02-18 05:08:31.612489	Over	{}
+4527	0.5	1.36	612	2nd Half	97.1%	2023-02-18 05:08:33.42836	2023-02-18 05:08:33.42836	Over	{}
+4528	0.5	3.40	612	2nd Half	97.1%	2023-02-18 05:08:34.413629	2023-02-18 05:08:34.413629	Under	{}
+4529	1.5	2.63	612	2nd Half	96.7%	2023-02-18 05:08:34.415642	2023-02-18 05:08:34.415642	Over	{}
+4530	1.5	1.53	612	2nd Half	96.7%	2023-02-18 05:08:34.417379	2023-02-18 05:08:34.417379	Under	{}
+4531	2.5	6.00	612	2nd Half	95.1%	2023-02-18 05:08:34.420006	2023-02-18 05:08:34.420006	Over	{}
+4532	2.5	1.13	612	2nd Half	95.1%	2023-02-18 05:08:34.422332	2023-02-18 05:08:34.422332	Under	{}
+4533	3.5	15.00	612	2nd Half	96.4%	2023-02-18 05:08:34.424168	2023-02-18 05:08:34.424168	Over	{}
+4534	3.5	1.03	612	2nd Half	96.4%	2023-02-18 05:08:34.426286	2023-02-18 05:08:34.426286	Under	{}
+4535	0.5	1.08	615	Full Time	95.2%	2023-02-18 05:08:49.135029	2023-02-18 05:08:49.135029	Over	{}
+4536	0.5	8.00	615	Full Time	95.2%	2023-02-18 05:08:49.138154	2023-02-18 05:08:49.138154	Under	{}
+4537	1.5	1.44	615	Full Time	96.0%	2023-02-18 05:08:49.140683	2023-02-18 05:08:49.140683	Over	{}
+4538	1.5	2.88	615	Full Time	96.0%	2023-02-18 05:08:49.14657	2023-02-18 05:08:49.14657	Under	{}
+4539	2.25	2.02	615	Full Time	96.0%	2023-02-18 05:08:49.148695	2023-02-18 05:08:49.148695	Over	{}
+4540	2.25	1.83	615	Full Time	96.0%	2023-02-18 05:08:49.15077	2023-02-18 05:08:49.15077	Under	{}
+4541	2.5	2.28	615	Full Time	94.7%	2023-02-18 05:08:49.152898	2023-02-18 05:08:49.152898	Over	{}
+4542	2.5	1.62	615	Full Time	94.7%	2023-02-18 05:08:49.155267	2023-02-18 05:08:49.155267	Under	{}
+4543	3.5	4.40	615	Full Time	95.5%	2023-02-18 05:08:49.157213	2023-02-18 05:08:49.157213	Over	{}
+4544	3.5	1.22	615	Full Time	95.5%	2023-02-18 05:08:49.159746	2023-02-18 05:08:49.159746	Under	{}
+4545	4.5	10.00	615	Full Time	96.7%	2023-02-18 05:08:49.162062	2023-02-18 05:08:49.162062	Over	{}
+4546	4.5	1.07	615	Full Time	96.7%	2023-02-18 05:08:49.164211	2023-02-18 05:08:49.164211	Under	{}
+4547	5.5	21.00	615	Full Time	97.3%	2023-02-18 05:08:49.166648	2023-02-18 05:08:49.166648	Over	{}
+4548	5.5	1.02	615	Full Time	97.3%	2023-02-18 05:08:49.168832	2023-02-18 05:08:49.168832	Under	{}
+4549	6.5	51.00	615	Full Time	98.1%	2023-02-18 05:08:49.171489	2023-02-18 05:08:49.171489	Over	{}
+4550	0.5	1.50	615	1st Half	95.4%	2023-02-18 05:08:50.881174	2023-02-18 05:08:50.881174	Over	{}
+4551	0.5	2.62	615	1st Half	95.4%	2023-02-18 05:08:52.536561	2023-02-18 05:08:52.536561	Under	{}
+4552	0.75	1.73	615	1st Half	94.4%	2023-02-18 05:08:52.538164	2023-02-18 05:08:52.538164	Over	{}
+4553	0.75	2.08	615	1st Half	94.4%	2023-02-18 05:08:52.53974	2023-02-18 05:08:52.53974	Under	{}
+4554	1.5	3.40	615	1st Half	97.1%	2023-02-18 05:08:52.541082	2023-02-18 05:08:52.541082	Over	{}
+4555	1.5	1.36	615	1st Half	97.1%	2023-02-18 05:08:52.542289	2023-02-18 05:08:52.542289	Under	{}
+4556	2.5	10.00	615	1st Half	95.8%	2023-02-18 05:08:52.543429	2023-02-18 05:08:52.543429	Over	{}
+4557	2.5	1.06	615	1st Half	95.8%	2023-02-18 05:08:52.545033	2023-02-18 05:08:52.545033	Under	{}
+4558	3.5	26.00	615	1st Half	97.2%	2023-02-18 05:08:52.5461	2023-02-18 05:08:52.5461	Over	{}
+4559	3.5	1.01	615	1st Half	97.2%	2023-02-18 05:08:52.547129	2023-02-18 05:08:52.547129	Under	{}
+4560	4.5	61.00	615	1st Half	98.4%	2023-02-18 05:08:52.548416	2023-02-18 05:08:52.548416	Over	{}
+4561	0.5	1.33	615	2nd Half	95.6%	2023-02-18 05:08:54.886632	2023-02-18 05:08:54.886632	Over	{}
+4562	0.5	3.40	615	2nd Half	95.6%	2023-02-18 05:08:55.889778	2023-02-18 05:08:55.889778	Under	{}
+4563	1.5	2.38	615	2nd Half	93.1%	2023-02-18 05:08:55.891974	2023-02-18 05:08:55.891974	Over	{}
+4564	1.5	1.53	615	2nd Half	93.1%	2023-02-18 05:08:55.893291	2023-02-18 05:08:55.893291	Under	{}
+4565	2.5	6.00	615	2nd Half	95.1%	2023-02-18 05:08:55.894482	2023-02-18 05:08:55.894482	Over	{}
+4566	2.5	1.13	615	2nd Half	95.1%	2023-02-18 05:08:55.896288	2023-02-18 05:08:55.896288	Under	{}
+4567	3.5	17.00	615	2nd Half	96.2%	2023-02-18 05:08:55.898522	2023-02-18 05:08:55.898522	Over	{}
+4568	3.5	1.02	615	2nd Half	96.2%	2023-02-18 05:08:55.90087	2023-02-18 05:08:55.90087	Under	{}
+4569	0.5	1.07	618	Full Time	95.0%	2023-02-18 05:09:10.977183	2023-02-18 05:09:10.977183	Over	{}
+4570	0.5	8.50	618	Full Time	95.0%	2023-02-18 05:09:10.98166	2023-02-18 05:09:10.98166	Under	{}
+4571	1.5	1.36	618	Full Time	93.6%	2023-02-18 05:09:10.984119	2023-02-18 05:09:10.984119	Over	{}
+4572	1.5	3.00	618	Full Time	93.6%	2023-02-18 05:09:10.986719	2023-02-18 05:09:10.986719	Under	{}
+4573	2.25	1.90	618	Full Time	96.2%	2023-02-18 05:09:10.989024	2023-02-18 05:09:10.989024	Over	{}
+4574	2.25	1.95	618	Full Time	96.2%	2023-02-18 05:09:10.990479	2023-02-18 05:09:10.990479	Under	{}
+4575	2.5	2.10	618	Full Time	93.9%	2023-02-18 05:09:10.992211	2023-02-18 05:09:10.992211	Over	{}
+4576	2.5	1.70	618	Full Time	93.9%	2023-02-18 05:09:10.993517	2023-02-18 05:09:10.993517	Under	{}
+4577	3.5	3.75	618	Full Time	93.8%	2023-02-18 05:09:10.994971	2023-02-18 05:09:10.994971	Over	{}
+4578	3.5	1.25	618	Full Time	93.8%	2023-02-18 05:09:10.99676	2023-02-18 05:09:10.99676	Under	{}
+4579	4.5	9.00	618	Full Time	96.4%	2023-02-18 05:09:10.998557	2023-02-18 05:09:10.998557	Over	{}
+4580	4.5	1.08	618	Full Time	96.4%	2023-02-18 05:09:11.000659	2023-02-18 05:09:11.000659	Under	{}
+4581	5.5	19.00	618	Full Time	96.8%	2023-02-18 05:09:11.002091	2023-02-18 05:09:11.002091	Over	{}
+4582	5.5	1.02	618	Full Time	96.8%	2023-02-18 05:09:11.003456	2023-02-18 05:09:11.003456	Under	{}
+4583	6.5	29.00	618	Full Time	96.7%	2023-02-18 05:09:11.004677	2023-02-18 05:09:11.004677	Over	{}
+4584	0.5	1.44	618	1st Half	94.5%	2023-02-18 05:09:12.691575	2023-02-18 05:09:12.691575	Over	{}
+4585	0.5	2.75	618	1st Half	94.5%	2023-02-18 05:09:14.286059	2023-02-18 05:09:14.286059	Under	{}
+4586	1.0	2.08	618	1st Half	94.4%	2023-02-18 05:09:14.288406	2023-02-18 05:09:14.288406	Over	{}
+4587	1.0	1.73	618	1st Half	94.4%	2023-02-18 05:09:14.290122	2023-02-18 05:09:14.290122	Under	{}
+4588	1.5	3.25	618	1st Half	97.8%	2023-02-18 05:09:14.29236	2023-02-18 05:09:14.29236	Over	{}
+4589	1.5	1.40	618	1st Half	97.8%	2023-02-18 05:09:14.294579	2023-02-18 05:09:14.294579	Under	{}
+4590	2.5	9.00	618	1st Half	96.4%	2023-02-18 05:09:14.296293	2023-02-18 05:09:14.296293	Over	{}
+4591	2.5	1.08	618	1st Half	96.4%	2023-02-18 05:09:14.298678	2023-02-18 05:09:14.298678	Under	{}
+4592	3.5	26.00	618	1st Half	98.1%	2023-02-18 05:09:14.300292	2023-02-18 05:09:14.300292	Over	{}
+4593	3.5	1.02	618	1st Half	98.1%	2023-02-18 05:09:14.302458	2023-02-18 05:09:14.302458	Under	{}
+4594	4.5	56.00	618	1st Half	98.2%	2023-02-18 05:09:14.304596	2023-02-18 05:09:14.304596	Over	{}
+4595	0.5	1.33	618	2nd Half	96.4%	2023-02-18 05:09:16.010013	2023-02-18 05:09:16.010013	Over	{}
+4596	0.5	3.50	618	2nd Half	96.4%	2023-02-18 05:09:17.136869	2023-02-18 05:09:17.136869	Under	{}
+4597	1.5	2.38	618	2nd Half	94.6%	2023-02-18 05:09:17.138729	2023-02-18 05:09:17.138729	Over	{}
+4598	1.5	1.57	618	2nd Half	94.6%	2023-02-18 05:09:17.140699	2023-02-18 05:09:17.140699	Under	{}
+4599	2.5	5.50	618	2nd Half	95.1%	2023-02-18 05:09:17.142691	2023-02-18 05:09:17.142691	Over	{}
+4600	2.5	1.15	618	2nd Half	95.1%	2023-02-18 05:09:17.144657	2023-02-18 05:09:17.144657	Under	{}
+4601	3.5	15.00	618	2nd Half	96.4%	2023-02-18 05:09:17.146551	2023-02-18 05:09:17.146551	Over	{}
+4602	3.5	1.03	618	2nd Half	96.4%	2023-02-18 05:09:17.148387	2023-02-18 05:09:17.148387	Under	{}
+4603	0.5	1.07	621	Full Time	95.3%	2023-02-18 05:09:33.52181	2023-02-18 05:09:33.52181	Over	{}
+4604	0.5	8.75	621	Full Time	95.3%	2023-02-18 05:09:33.526386	2023-02-18 05:09:33.526386	Under	{}
+4605	1.5	1.33	621	Full Time	95.6%	2023-02-18 05:09:33.529052	2023-02-18 05:09:33.529052	Over	{}
+4606	1.5	3.40	621	Full Time	95.6%	2023-02-18 05:09:33.53132	2023-02-18 05:09:33.53132	Under	{}
+4607	2.5	2.05	621	Full Time	95.8%	2023-02-18 05:09:33.533266	2023-02-18 05:09:33.533266	Over	{}
+4608	2.5	1.80	621	Full Time	95.8%	2023-02-18 05:09:33.535247	2023-02-18 05:09:33.535247	Under	{}
+4609	3.5	3.50	621	Full Time	94.8%	2023-02-18 05:09:33.537511	2023-02-18 05:09:33.537511	Over	{}
+4610	3.5	1.30	621	Full Time	94.8%	2023-02-18 05:09:33.539499	2023-02-18 05:09:33.539499	Under	{}
+4611	4.5	7.00	621	Full Time	95.1%	2023-02-18 05:09:33.541371	2023-02-18 05:09:33.541371	Over	{}
+4612	4.5	1.10	621	Full Time	95.1%	2023-02-18 05:09:33.54367	2023-02-18 05:09:33.54367	Under	{}
+4613	5.5	17.00	621	Full Time	97.1%	2023-02-18 05:09:33.545782	2023-02-18 05:09:33.545782	Over	{}
+4614	5.5	1.03	621	Full Time	97.1%	2023-02-18 05:09:33.547267	2023-02-18 05:09:33.547267	Under	{}
+4615	6.5	34.00	621	Full Time	97.1%	2023-02-18 05:09:33.548455	2023-02-18 05:09:33.548455	Over	{}
+4616	0.5	1.40	621	1st Half	95.5%	2023-02-18 05:09:35.144799	2023-02-18 05:09:35.144799	Over	{}
+4617	0.5	3.00	621	1st Half	95.5%	2023-02-18 05:09:36.604833	2023-02-18 05:09:36.604833	Under	{}
+4618	1.0	1.98	621	1st Half	95.1%	2023-02-18 05:09:36.605983	2023-02-18 05:09:36.605983	Over	{}
+4619	1.0	1.83	621	1st Half	95.1%	2023-02-18 05:09:36.607052	2023-02-18 05:09:36.607052	Under	{}
+4620	1.5	3.00	621	1st Half	97.3%	2023-02-18 05:09:36.60816	2023-02-18 05:09:36.60816	Over	{}
+4621	1.5	1.44	621	1st Half	97.3%	2023-02-18 05:09:36.609202	2023-02-18 05:09:36.609202	Under	{}
+4622	2.5	8.00	621	1st Half	96.7%	2023-02-18 05:09:36.610529	2023-02-18 05:09:36.610529	Over	{}
+4623	2.5	1.10	621	1st Half	96.7%	2023-02-18 05:09:36.611702	2023-02-18 05:09:36.611702	Under	{}
+4624	3.5	23.00	621	1st Half	97.7%	2023-02-18 05:09:36.612751	2023-02-18 05:09:36.612751	Over	{}
+4625	3.5	1.02	621	1st Half	97.7%	2023-02-18 05:09:36.613698	2023-02-18 05:09:36.613698	Under	{}
+4626	4.5	51.00	621	1st Half	99.0%	2023-02-18 05:09:36.614899	2023-02-18 05:09:36.614899	Over	{}
+4627	4.5	1.01	621	1st Half	99.0%	2023-02-18 05:09:36.615896	2023-02-18 05:09:36.615896	Under	{}
+4628	0.5	1.33	621	2nd Half	98.2%	2023-02-18 05:09:38.159055	2023-02-18 05:09:38.159055	Over	{}
+4629	0.5	3.75	621	2nd Half	98.2%	2023-02-18 05:09:39.380405	2023-02-18 05:09:39.380405	Under	{}
+4630	1.5	2.30	621	2nd Half	95.1%	2023-02-18 05:09:39.382326	2023-02-18 05:09:39.382326	Over	{}
+4631	1.5	1.62	621	2nd Half	95.1%	2023-02-18 05:09:39.384381	2023-02-18 05:09:39.384381	Under	{}
+4632	2.5	5.00	621	2nd Half	94.8%	2023-02-18 05:09:39.385908	2023-02-18 05:09:39.385908	Over	{}
+4633	2.5	1.17	621	2nd Half	94.8%	2023-02-18 05:09:39.388191	2023-02-18 05:09:39.388191	Under	{}
+4634	3.5	13.00	621	2nd Half	96.3%	2023-02-18 05:09:39.389858	2023-02-18 05:09:39.389858	Over	{}
+4635	3.5	1.04	621	2nd Half	96.3%	2023-02-18 05:09:39.391931	2023-02-18 05:09:39.391931	Under	{}
+4636	0.5	1.07	624	Full Time	95.6%	2023-02-18 05:09:55.32302	2023-02-18 05:09:55.32302	Over	{}
+4637	0.5	9.00	624	Full Time	95.6%	2023-02-18 05:09:55.324962	2023-02-18 05:09:55.324962	Under	{}
+4638	1.5	1.33	624	Full Time	96.4%	2023-02-18 05:09:55.326977	2023-02-18 05:09:55.326977	Over	{}
+4639	1.5	3.50	624	Full Time	96.4%	2023-02-18 05:09:55.32853	2023-02-18 05:09:55.32853	Under	{}
+4640	2.25	1.75	624	Full Time	96.1%	2023-02-18 05:09:55.330368	2023-02-18 05:09:55.330368	Over	{}
+4641	2.25	2.13	624	Full Time	96.1%	2023-02-18 05:09:55.332137	2023-02-18 05:09:55.332137	Under	{}
+4642	2.5	2.00	624	Full Time	94.7%	2023-02-18 05:09:55.333703	2023-02-18 05:09:55.333703	Over	{}
+4643	2.5	1.80	624	Full Time	94.7%	2023-02-18 05:09:55.335269	2023-02-18 05:09:55.335269	Under	{}
+4644	3.5	3.50	624	Full Time	94.8%	2023-02-18 05:09:55.336852	2023-02-18 05:09:55.336852	Over	{}
+4645	3.5	1.30	624	Full Time	94.8%	2023-02-18 05:09:55.338514	2023-02-18 05:09:55.338514	Under	{}
+4646	4.5	7.00	624	Full Time	95.1%	2023-02-18 05:09:55.339989	2023-02-18 05:09:55.339989	Over	{}
+4647	4.5	1.10	624	Full Time	95.1%	2023-02-18 05:09:55.341484	2023-02-18 05:09:55.341484	Under	{}
+4648	5.5	15.00	624	Full Time	96.4%	2023-02-18 05:09:55.343088	2023-02-18 05:09:55.343088	Over	{}
+4649	5.5	1.03	624	Full Time	96.4%	2023-02-18 05:09:55.344731	2023-02-18 05:09:55.344731	Under	{}
+4650	6.5	29.00	624	Full Time	97.6%	2023-02-18 05:09:55.346255	2023-02-18 05:09:55.346255	Over	{}
+4651	6.5	1.01	624	Full Time	97.6%	2023-02-18 05:09:55.34786	2023-02-18 05:09:55.34786	Under	{}
+4652	0.5	1.41	624	1st Half	93.2%	2023-02-18 05:09:57.568083	2023-02-18 05:09:57.568083	Over	{}
+4653	0.5	2.75	624	1st Half	93.2%	2023-02-18 05:09:59.148312	2023-02-18 05:09:59.148312	Under	{}
+4654	1.0	1.95	624	1st Half	94.9%	2023-02-18 05:09:59.150989	2023-02-18 05:09:59.150989	Over	{}
+4655	1.0	1.85	624	1st Half	94.9%	2023-02-18 05:09:59.153478	2023-02-18 05:09:59.153478	Under	{}
+4656	1.5	3.00	624	1st Half	95.5%	2023-02-18 05:09:59.155488	2023-02-18 05:09:59.155488	Over	{}
+4657	1.5	1.40	624	1st Half	95.5%	2023-02-18 05:09:59.157478	2023-02-18 05:09:59.157478	Under	{}
+4658	2.5	8.00	624	1st Half	96.7%	2023-02-18 05:09:59.159659	2023-02-18 05:09:59.159659	Over	{}
+4659	2.5	1.10	624	1st Half	96.7%	2023-02-18 05:09:59.161903	2023-02-18 05:09:59.161903	Under	{}
+4660	3.5	23.00	624	1st Half	97.7%	2023-02-18 05:09:59.164486	2023-02-18 05:09:59.164486	Over	{}
+4661	3.5	1.02	624	1st Half	97.7%	2023-02-18 05:09:59.16638	2023-02-18 05:09:59.16638	Under	{}
+4662	4.5	51.00	624	1st Half	99.0%	2023-02-18 05:09:59.167614	2023-02-18 05:09:59.167614	Over	{}
+4663	4.5	1.01	624	1st Half	99.0%	2023-02-18 05:09:59.168748	2023-02-18 05:09:59.168748	Under	{}
+4664	0.5	1.30	624	2nd Half	96.5%	2023-02-18 05:10:00.797874	2023-02-18 05:10:00.797874	Over	{}
+4665	0.5	3.75	624	2nd Half	96.5%	2023-02-18 05:10:01.833603	2023-02-18 05:10:01.833603	Under	{}
+4666	1.5	2.25	624	2nd Half	95.9%	2023-02-18 05:10:01.835863	2023-02-18 05:10:01.835863	Over	{}
+4667	1.5	1.67	624	2nd Half	95.9%	2023-02-18 05:10:01.837686	2023-02-18 05:10:01.837686	Under	{}
+4668	2.5	4.80	624	2nd Half	94.7%	2023-02-18 05:10:01.839711	2023-02-18 05:10:01.839711	Over	{}
+4669	2.5	1.18	624	2nd Half	94.7%	2023-02-18 05:10:01.841736	2023-02-18 05:10:01.841736	Under	{}
+4670	3.5	13.00	624	2nd Half	96.3%	2023-02-18 05:10:01.844265	2023-02-18 05:10:01.844265	Over	{}
+4671	3.5	1.04	624	2nd Half	96.3%	2023-02-18 05:10:01.84696	2023-02-18 05:10:01.84696	Under	{}
+\.
+
+
+--
+-- TOC entry 3069 (class 0 OID 24822)
+-- Dependencies: 204
+-- Data for Name: OddsSafariMatch; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY public."OddsSafariMatch" (id, home_team, guest_team, date_time, created, updated) FROM stdin;
+627	Panathinaikos	Volos	2023-02-18 17:00:00+00	2023-02-18 05:12:48.938929	2023-02-18 05:12:48.938929
+628	Asteras Tripolis	PAS Giannina	2023-02-18 20:00:00+00	2023-02-18 05:13:17.79373	2023-02-18 05:13:17.79373
+629	Lamia	Olympiacos	2023-02-19 16:00:00+00	2023-02-18 05:13:45.278074	2023-02-18 05:13:45.278074
+630	Panetolikos	Ionikos	2023-02-19 19:30:00+00	2023-02-18 05:14:12.201127	2023-02-18 05:14:12.201127
+631	PAOK	AEK	2023-02-19 20:30:00+00	2023-02-18 05:14:37.729253	2023-02-18 05:14:37.729253
+632	Atromitos	Levadiakos	2023-02-20 18:00:00+00	2023-02-18 05:15:04.728711	2023-02-18 05:15:04.728711
+633	OFI	Aris Salonika	2023-02-20 19:30:00+00	2023-02-18 05:15:31.620268	2023-02-18 05:15:31.620268
+634	Volos	Lamia	2023-02-24 20:00:00+00	2023-02-18 05:15:58.841268	2023-02-18 05:15:58.841268
+635	AEK	Asteras Tripolis	2023-02-25 17:30:00+00	2023-02-18 05:16:24.042607	2023-02-18 05:16:24.042607
+636	PAS Giannina	PAOK	2023-02-25 19:00:00+00	2023-02-18 05:16:49.64921	2023-02-18 05:16:49.64921
+637	Olympiacos	Panathinaikos	2023-02-25 20:30:00+00	2023-02-18 05:17:15.990048	2023-02-18 05:17:15.990048
+638	Ionikos	OFI	2023-02-26 16:00:00+00	2023-02-18 05:17:41.314011	2023-02-18 05:17:41.314011
+639	Levadiakos	Panetolikos	2023-02-26 16:00:00+00	2023-02-18 05:18:05.279829	2023-02-18 05:18:05.279829
+640	Aris Salonika	Atromitos	2023-02-26 19:30:00+00	2023-02-18 05:18:28.578351	2023-02-18 05:18:28.578351
+\.
+
+
+--
+-- TOC entry 3070 (class 0 OID 24836)
+-- Dependencies: 205
+-- Data for Name: OddsSafariOverUnder; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY public."OddsSafariOverUnder" (id, goals, odds, match_id, half, payout, created, updated, type, bet_links) FROM stdin;
+4672	2.5	2.17	627	Full Time	0.72%	2023-02-18 05:13:01.273233	2023-02-18 05:13:01.273233	Over	{https://record.affiliates.betshop.gr/_xVrm1kU5pcRLcRLGwHoTKWNd7ZgqdRLk/1/}
+4673	2.5	1.83	627	Full Time	0.72%	2023-02-18 05:13:01.278229	2023-02-18 05:13:01.278229	Under	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}
+4674	0.5	1.50	627	1st Half	2.33%	2023-02-18 05:13:07.584734	2023-02-18 05:13:07.584734	Over	{http://www.stoiximan.gr/}
+4675	0.5	2.80	627	1st Half	2.33%	2023-02-18 05:13:07.590137	2023-02-18 05:13:07.590137	Under	{https://affiliatesys.ads-tracking.com/redirect.aspx?pid=30676343&bid=8436}
+4676	0.5	1.30	627	2nd Half	3.80%	2023-02-18 05:13:14.516499	2023-02-18 05:13:14.516499	Over	{https://affiliatesys.ads-tracking.com/redirect.aspx?pid=30676343&bid=8436}
+4677	0.5	3.70	627	2nd Half	3.80%	2023-02-18 05:13:14.520365	2023-02-18 05:13:14.520365	Under	{}
+4678	2.5	2.55	628	Full Time	2.07%	2023-02-18 05:13:28.951263	2023-02-18 05:13:28.951263	Over	{https://record.affiliates.betshop.gr/_xVrm1kU5pcRLcRLGwHoTKWNd7ZgqdRLk/1/}
+4679	2.5	1.59	628	Full Time	2.07%	2023-02-18 05:13:28.956122	2023-02-18 05:13:28.956122	Under	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}
+4680	0.5	1.60	628	1st Half	3.21%	2023-02-18 05:13:34.9175	2023-02-18 05:13:34.9175	Over	{http://www.stoiximan.gr/}
+4681	0.5	2.45	628	1st Half	3.21%	2023-02-18 05:13:34.925414	2023-02-18 05:13:34.925414	Under	{https://affiliatesys.ads-tracking.com/redirect.aspx?pid=30676343&bid=8436}
+4682	0.5	1.37	628	2nd Half	3.63%	2023-02-18 05:13:41.910727	2023-02-18 05:13:41.910727	Over	{https://affiliatesys.ads-tracking.com/redirect.aspx?pid=30676343&bid=8436}
+4683	0.5	3.25	628	2nd Half	3.63%	2023-02-18 05:13:41.917034	2023-02-18 05:13:41.917034	Under	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+4684	2.5	2.00	629	Full Time	2.56%	2023-02-18 05:13:55.682482	2023-02-18 05:13:55.682482	Over	{https://record.betssongroupaffiliates.com/_WbYFYUdzQPOWzcyEjjoakGNd7ZgqdRLk/1/,https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+4685	2.5	1.90	629	Full Time	2.56%	2023-02-18 05:13:55.689584	2023-02-18 05:13:55.689584	Under	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}
+4686	0.5	1.45	629	1st Half	2.78%	2023-02-18 05:14:02.220798	2023-02-18 05:14:02.220798	Over	{http://www.stoiximan.gr/}
+4687	0.5	2.95	629	1st Half	2.78%	2023-02-18 05:14:02.22286	2023-02-18 05:14:02.22286	Under	{https://affiliatesys.ads-tracking.com/redirect.aspx?pid=30676343&bid=8436}
+4688	0.5	1.27	629	2nd Half	4.20%	2023-02-18 05:14:08.879825	2023-02-18 05:14:08.879825	Over	{https://affiliatesys.ads-tracking.com/redirect.aspx?pid=30676343&bid=8436}
+4689	0.5	3.90	629	2nd Half	4.20%	2023-02-18 05:14:08.884947	2023-02-18 05:14:08.884947	Under	{}
+4690	2.5	2.50	630	Full Time	1.70%	2023-02-18 05:14:22.930275	2023-02-18 05:14:22.930275	Over	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107,https://partners.opapaffiliates.gr/redirect.aspx?pid=2460&bid=1759,https://record.affiliates.betshop.gr/_xVrm1kU5pcRLcRLGwHoTKWNd7ZgqdRLk/1/}
+4691	2.5	1.62	630	Full Time	1.70%	2023-02-18 05:14:22.934468	2023-02-18 05:14:22.934468	Under	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}
+4692	0.5	1.60	630	1st Half	3.21%	2023-02-18 05:14:28.866247	2023-02-18 05:14:28.866247	Over	{http://www.stoiximan.gr/}
+4693	0.5	2.45	630	1st Half	3.21%	2023-02-18 05:14:28.87366	2023-02-18 05:14:28.87366	Under	{https://affiliatesys.ads-tracking.com/redirect.aspx?pid=30676343&bid=8436}
+4694	0.5	1.37	630	2nd Half	3.63%	2023-02-18 05:14:34.453072	2023-02-18 05:14:34.453072	Over	{https://affiliatesys.ads-tracking.com/redirect.aspx?pid=30676343&bid=8436}
+4695	0.5	3.25	630	2nd Half	3.63%	2023-02-18 05:14:34.456373	2023-02-18 05:14:34.456373	Under	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+4696	2.5	2.45	631	Full Time	2.48%	2023-02-18 05:14:48.082806	2023-02-18 05:14:48.082806	Over	{https://record.affiliates.betshop.gr/_xVrm1kU5pcRLcRLGwHoTKWNd7ZgqdRLk/1/}
+4697	2.5	1.62	631	Full Time	2.48%	2023-02-18 05:14:48.085853	2023-02-18 05:14:48.085853	Under	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}
+4698	0.5	1.60	631	1st Half	2.44%	2023-02-18 05:14:54.684731	2023-02-18 05:14:54.684731	Over	{http://www.stoiximan.gr/}
+4699	0.5	2.50	631	1st Half	2.44%	2023-02-18 05:14:54.687936	2023-02-18 05:14:54.687936	Under	{https://affiliatesys.ads-tracking.com/redirect.aspx?pid=30676343&bid=8436}
+4700	0.5	1.33	631	2nd Half	5.47%	2023-02-18 05:15:01.292701	2023-02-18 05:15:01.292701	Over	{https://record.betssongroupaffiliates.com/_WbYFYUdzQPOWzcyEjjoakGNd7ZgqdRLk/1/,http://www.stoiximan.gr/,https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+4701	0.5	3.25	631	2nd Half	5.47%	2023-02-18 05:15:01.297848	2023-02-18 05:15:01.297848	Under	{http://www.stoiximan.gr/,https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+4702	2.5	2.40	632	Full Time	3.46%	2023-02-18 05:15:15.349466	2023-02-18 05:15:15.349466	Over	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}
+4703	2.5	1.61	632	Full Time	3.46%	2023-02-18 05:15:15.355988	2023-02-18 05:15:15.355988	Under	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107,https://record.affiliates.betshop.gr/_xVrm1kU5pcRLcRLGwHoTKWNd7ZgqdRLk/1/}
+4704	0.5	1.57	632	1st Half	2.83%	2023-02-18 05:15:21.811392	2023-02-18 05:15:21.811392	Over	{http://www.stoiximan.gr/}
+4705	0.5	2.55	632	1st Half	2.83%	2023-02-18 05:15:21.816152	2023-02-18 05:15:21.816152	Under	{https://affiliatesys.ads-tracking.com/redirect.aspx?pid=30676343&bid=8436}
+4706	0.5	1.33	632	2nd Half	4.40%	2023-02-18 05:15:27.30561	2023-02-18 05:15:27.30561	Over	{https://affiliatesys.ads-tracking.com/redirect.aspx?pid=30676343&bid=8436,http://www.stoiximan.gr/}
+4707	0.5	3.40	632	2nd Half	4.40%	2023-02-18 05:15:27.310985	2023-02-18 05:15:27.310985	Under	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+4708	2.5	2.40	633	Full Time	3.28%	2023-02-18 05:15:41.881223	2023-02-18 05:15:41.881223	Over	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}
+4709	2.5	1.62	633	Full Time	3.28%	2023-02-18 05:15:41.883931	2023-02-18 05:15:41.883931	Under	{https://record.affiliates.betshop.gr/_xVrm1kU5pcRLcRLGwHoTKWNd7ZgqdRLk/1/}
+4710	0.5	1.55	633	1st Half	2.89%	2023-02-18 05:15:47.447452	2023-02-18 05:15:47.447452	Over	{http://www.stoiximan.gr/}
+4711	0.5	2.60	633	1st Half	2.89%	2023-02-18 05:15:47.452627	2023-02-18 05:15:47.452627	Under	{https://affiliatesys.ads-tracking.com/redirect.aspx?pid=30676343&bid=8436}
+4712	0.5	1.33	633	2nd Half	4.40%	2023-02-18 05:15:54.425253	2023-02-18 05:15:54.425253	Over	{https://affiliatesys.ads-tracking.com/redirect.aspx?pid=30676343&bid=8436}
+4713	0.5	3.40	633	2nd Half	4.40%	2023-02-18 05:15:54.430183	2023-02-18 05:15:54.430183	Under	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+4714	2.5	2.15	634	Full Time	3.83%	2023-02-18 05:16:09.300401	2023-02-18 05:16:09.300401	Over	{https://record.betssongroupaffiliates.com/_WbYFYUdzQPOWzcyEjjoakGNd7ZgqdRLk/1/}
+4715	2.5	1.74	634	Full Time	3.83%	2023-02-18 05:16:09.30527	2023-02-18 05:16:09.30527	Under	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}
+4716	0.5	1.44	634	1st Half	6.16%	2023-02-18 05:16:14.305929	2023-02-18 05:16:14.305929	Over	{https://sports.bwin.gr/el/sports?wm=5273373,https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+4717	0.5	2.68	634	1st Half	6.16%	2023-02-18 05:16:14.311078	2023-02-18 05:16:14.311078	Under	{https://record.betssongroupaffiliates.com/_WbYFYUdzQPOWzcyEjjoakGNd7ZgqdRLk/1/}
+4718	0.5	1.28	634	2nd Half	6.01%	2023-02-18 05:16:19.642677	2023-02-18 05:16:19.642677	Over	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+4719	0.5	3.50	634	2nd Half	6.01%	2023-02-18 05:16:19.646753	2023-02-18 05:16:19.646753	Under	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+4720	2.5	2.05	635	Full Time	-1.74%	2023-02-18 05:16:34.188507	2023-02-18 05:16:34.188507	Over	{https://record.betssongroupaffiliates.com/_WbYFYUdzQPOWzcyEjjoakGNd7ZgqdRLk/1/}
+4721	2.5	2.02	635	Full Time	-1.74%	2023-02-18 05:16:34.19208	2023-02-18 05:16:34.19208	Under	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}
+4722	0.5	1.41	635	1st Half	6.79%	2023-02-18 05:16:40.031817	2023-02-18 05:16:40.031817	Over	{https://record.betssongroupaffiliates.com/_WbYFYUdzQPOWzcyEjjoakGNd7ZgqdRLk/1/}
+4723	0.5	2.75	635	1st Half	6.79%	2023-02-18 05:16:40.037039	2023-02-18 05:16:40.037039	Under	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+4724	0.5	1.26	635	2nd Half	5.69%	2023-02-18 05:16:46.348524	2023-02-18 05:16:46.348524	Over	{https://sports.bwin.gr/el/sports?wm=5273373}
+4725	0.5	3.75	635	2nd Half	5.69%	2023-02-18 05:16:46.355252	2023-02-18 05:16:46.355252	Under	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+4726	2.5	2.25	636	Full Time	0.00%	2023-02-18 05:16:59.918768	2023-02-18 05:16:59.918768	Over	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}
+4727	2.5	1.80	636	Full Time	0.00%	2023-02-18 05:16:59.921551	2023-02-18 05:16:59.921551	Under	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+4728	0.5	1.44	636	1st Half	5.49%	2023-02-18 05:17:05.708817	2023-02-18 05:17:05.708817	Over	{https://record.betssongroupaffiliates.com/_WbYFYUdzQPOWzcyEjjoakGNd7ZgqdRLk/1/}
+4729	0.5	2.75	636	1st Half	5.49%	2023-02-18 05:17:05.712438	2023-02-18 05:17:05.712438	Under	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+4730	0.5	1.27	636	2nd Half	5.13%	2023-02-18 05:17:11.647585	2023-02-18 05:17:11.647585	Over	{https://sports.bwin.gr/el/sports?wm=5273373}
+4731	0.5	3.75	636	2nd Half	5.13%	2023-02-18 05:17:11.653651	2023-02-18 05:17:11.653651	Under	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+4732	2.5	2.40	637	Full Time	0.49%	2023-02-18 05:17:25.90915	2023-02-18 05:17:25.90915	Over	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}
+4733	2.5	1.70	637	Full Time	0.49%	2023-02-18 05:17:25.91147	2023-02-18 05:17:25.91147	Under	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107,https://partners.opapaffiliates.gr/redirect.aspx?pid=2460&bid=1759}
+4734	0.5	1.53	637	1st Half	3.34%	2023-02-18 05:17:31.889381	2023-02-18 05:17:31.889381	Over	{http://www.stoiximan.gr/}
+4735	0.5	2.63	637	1st Half	3.34%	2023-02-18 05:17:31.896783	2023-02-18 05:17:31.896783	Under	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+4736	0.5	1.30	637	2nd Half	5.21%	2023-02-18 05:17:37.901678	2023-02-18 05:17:37.901678	Over	{https://sports.bwin.gr/el/sports?wm=5273373,http://www.stoiximan.gr/}
+4737	0.5	3.50	637	2nd Half	5.21%	2023-02-18 05:17:37.904826	2023-02-18 05:17:37.904826	Under	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+4738	2.5	2.35	638	Full Time	3.06%	2023-02-18 05:17:50.936548	2023-02-18 05:17:50.936548	Over	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}
+4739	2.5	1.65	638	Full Time	3.06%	2023-02-18 05:17:50.939608	2023-02-18 05:17:50.939608	Under	{https://record.betssongroupaffiliates.com/_WbYFYUdzQPOWzcyEjjoakGNd7ZgqdRLk/1/}
+4740	0.5	1.51	638	1st Half	5.86%	2023-02-18 05:17:56.215004	2023-02-18 05:17:56.215004	Over	{https://record.betssongroupaffiliates.com/_WbYFYUdzQPOWzcyEjjoakGNd7ZgqdRLk/1/}
+4741	0.5	2.50	638	1st Half	5.86%	2023-02-18 05:17:56.217966	2023-02-18 05:17:56.217966	Under	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+4742	0.5	1.28	638	2nd Half	6.01%	2023-02-18 05:18:01.96025	2023-02-18 05:18:01.96025	Over	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+4743	0.5	3.50	638	2nd Half	6.01%	2023-02-18 05:18:01.974227	2023-02-18 05:18:01.974227	Under	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+4744	2.5	2.35	639	Full Time	3.76%	2023-02-18 05:18:14.665499	2023-02-18 05:18:14.665499	Over	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}
+4745	2.5	1.63	639	Full Time	3.76%	2023-02-18 05:18:14.670694	2023-02-18 05:18:14.670694	Under	{https://record.betssongroupaffiliates.com/_WbYFYUdzQPOWzcyEjjoakGNd7ZgqdRLk/1/}
+4746	0.5	1.50	639	1st Half	5.69%	2023-02-18 05:18:20.486493	2023-02-18 05:18:20.486493	Over	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+4747	0.5	2.54	639	1st Half	5.69%	2023-02-18 05:18:20.495336	2023-02-18 05:18:20.495336	Under	{https://record.betssongroupaffiliates.com/_WbYFYUdzQPOWzcyEjjoakGNd7ZgqdRLk/1/}
+4748	0.5	1.30	639	2nd Half	5.96%	2023-02-18 05:18:25.349735	2023-02-18 05:18:25.349735	Over	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+4749	0.5	3.40	639	2nd Half	5.96%	2023-02-18 05:18:25.352631	2023-02-18 05:18:25.352631	Under	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+4750	2.5	2.30	640	Full Time	2.58%	2023-02-18 05:18:38.124823	2023-02-18 05:18:38.124823	Over	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+4751	2.5	1.69	640	Full Time	2.58%	2023-02-18 05:18:38.129016	2023-02-18 05:18:38.129016	Under	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}
+4752	0.5	1.51	640	1st Half	5.86%	2023-02-18 05:18:44.197585	2023-02-18 05:18:44.197585	Over	{https://record.betssongroupaffiliates.com/_WbYFYUdzQPOWzcyEjjoakGNd7ZgqdRLk/1/}
+4753	0.5	2.50	640	1st Half	5.86%	2023-02-18 05:18:44.203761	2023-02-18 05:18:44.203761	Under	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+4754	0.5	1.30	640	2nd Half	5.96%	2023-02-18 05:18:50.132981	2023-02-18 05:18:50.132981	Over	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+4755	0.5	3.40	640	2nd Half	5.96%	2023-02-18 05:18:50.137232	2023-02-18 05:18:50.137232	Under	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+\.
+
+
+--
+-- TOC entry 3072 (class 0 OID 24966)
+-- Dependencies: 209
+-- Data for Name: OverUnderHistorical; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY public."OverUnderHistorical" (id, "Teams", "DateTime", "Type", "Goals", "Odds_bet", "Margin", "Payout", "Bet_link", "Result") FROM stdin;
+\.
+
+
+--
+-- TOC entry 3090 (class 0 OID 0)
+-- Dependencies: 201
+-- Name: Match_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+--
+
+SELECT pg_catalog.setval('public."Match_id_seq"', 640, true);
+
+
+--
+-- TOC entry 3091 (class 0 OID 0)
+-- Dependencies: 208
+-- Name: OverUnderHistorical_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+--
+
+SELECT pg_catalog.setval('public."OverUnderHistorical_id_seq"', 1, false);
+
+
+--
+-- TOC entry 3092 (class 0 OID 0)
+-- Dependencies: 203
+-- Name: OverUnder_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+--
+
+SELECT pg_catalog.setval('public."OverUnder_id_seq"', 4755, true);
+
+
+--
+-- TOC entry 2910 (class 2606 OID 24734)
+-- Name: OddsPortalMatch OddsPortalMatch_pk; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public."OddsPortalMatch"
+    ADD CONSTRAINT "OddsPortalMatch_pk" PRIMARY KEY (id);
+
+
+--
+-- TOC entry 2912 (class 2606 OID 24736)
+-- Name: OddsPortalMatch OddsPortalMatch_unique; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public."OddsPortalMatch"
+    ADD CONSTRAINT "OddsPortalMatch_unique" UNIQUE (home_team, guest_team, date_time);
+
+
+--
+-- TOC entry 2914 (class 2606 OID 24804)
+-- Name: OddsPortalOverUnder OddsPortalOverUnder_pk; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public."OddsPortalOverUnder"
+    ADD CONSTRAINT "OddsPortalOverUnder_pk" PRIMARY KEY (id, match_id, half, type, goals);
+
+
+--
+-- TOC entry 2916 (class 2606 OID 24862)
+-- Name: OddsPortalOverUnder OddsPortalOverUnder_unique; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public."OddsPortalOverUnder"
+    ADD CONSTRAINT "OddsPortalOverUnder_unique" UNIQUE (goals, match_id, half, type);
+
+
+--
+-- TOC entry 2918 (class 2606 OID 24833)
+-- Name: OddsSafariMatch OddsSafariMatch_pk; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public."OddsSafariMatch"
+    ADD CONSTRAINT "OddsSafariMatch_pk" PRIMARY KEY (id);
+
+
+--
+-- TOC entry 2920 (class 2606 OID 24835)
+-- Name: OddsSafariMatch OddsSafariMatch_unique; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public."OddsSafariMatch"
+    ADD CONSTRAINT "OddsSafariMatch_unique" UNIQUE (home_team, guest_team, date_time);
+
+
+--
+-- TOC entry 2922 (class 2606 OID 24846)
+-- Name: OddsSafariOverUnder OddsSafariOverUnder_pk; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public."OddsSafariOverUnder"
+    ADD CONSTRAINT "OddsSafariOverUnder_pk" PRIMARY KEY (id);
+
+
+--
+-- TOC entry 2924 (class 2606 OID 24848)
+-- Name: OddsSafariOverUnder OddsSafariOverUnder_unique; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public."OddsSafariOverUnder"
+    ADD CONSTRAINT "OddsSafariOverUnder_unique" UNIQUE (goals, match_id, half, type);
+
+
+--
+-- TOC entry 2928 (class 2606 OID 24974)
+-- Name: OverUnderHistorical OverUnderHistorical_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public."OverUnderHistorical"
+    ADD CONSTRAINT "OverUnderHistorical_pkey" PRIMARY KEY (id);
+
+
+--
+-- TOC entry 2925 (class 1259 OID 24860)
+-- Name: fki_OddsSafariOverUnder_Match_fk; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX "fki_OddsSafariOverUnder_Match_fk" ON public."OddsSafariOverUnder" USING btree (match_id);
+
+
+--
+-- TOC entry 2926 (class 1259 OID 24854)
+-- Name: fki_OddsSafariOverUnder_match_id_fk; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX "fki_OddsSafariOverUnder_match_id_fk" ON public."OddsSafariOverUnder" USING btree (match_id);
+
+
+--
+-- TOC entry 2931 (class 2620 OID 24783)
+-- Name: OddsPortalOverUnder update_updated_Match_trigger; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER "update_updated_Match_trigger" AFTER UPDATE ON public."OddsPortalOverUnder" FOR EACH ROW EXECUTE FUNCTION public."update_updated_on_Match"();
+
+
+--
+-- TOC entry 2932 (class 2620 OID 24782)
+-- Name: OddsPortalOverUnder update_updated_OverUnder_trigger; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER "update_updated_OverUnder_trigger" AFTER UPDATE ON public."OddsPortalOverUnder" FOR EACH ROW EXECUTE FUNCTION public."update_updated_on_OverUnder"();
+
+
+--
+-- TOC entry 2929 (class 2606 OID 24739)
+-- Name: OddsPortalOverUnder OddsPortalOverUnder_Match_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public."OddsPortalOverUnder"
+    ADD CONSTRAINT "OddsPortalOverUnder_Match_fk" FOREIGN KEY (match_id) REFERENCES public."OddsPortalMatch"(id) NOT VALID;
+
+
+--
+-- TOC entry 2930 (class 2606 OID 24855)
+-- Name: OddsSafariOverUnder OddsSafariOverUnder_Match_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public."OddsSafariOverUnder"
+    ADD CONSTRAINT "OddsSafariOverUnder_Match_fk" FOREIGN KEY (match_id) REFERENCES public."OddsSafariMatch"(id) NOT VALID;
+
+
+--
+-- TOC entry 3080 (class 0 OID 0)
+-- Dependencies: 200
+-- Name: TABLE "OddsPortalMatch"; Type: ACL; Schema: public; Owner: -
+--
+
+REVOKE ALL ON TABLE public."OddsPortalMatch" FROM postgres;
+
+
+--
+-- TOC entry 3082 (class 0 OID 0)
+-- Dependencies: 202
+-- Name: TABLE "OddsPortalOverUnder"; Type: ACL; Schema: public; Owner: -
+--
+
+REVOKE ALL ON TABLE public."OddsPortalOverUnder" FROM postgres;
+GRANT ALL ON TABLE public."OddsPortalOverUnder" TO postgres WITH GRANT OPTION;
+
+
+--
+-- TOC entry 3083 (class 0 OID 0)
+-- Dependencies: 204
+-- Name: TABLE "OddsSafariMatch"; Type: ACL; Schema: public; Owner: -
+--
+
+REVOKE ALL ON TABLE public."OddsSafariMatch" FROM postgres;
+GRANT ALL ON TABLE public."OddsSafariMatch" TO postgres WITH GRANT OPTION;
+
+
+--
+-- TOC entry 3084 (class 0 OID 0)
+-- Dependencies: 205
+-- Name: TABLE "OddsSafariOverUnder"; Type: ACL; Schema: public; Owner: -
+--
+
+REVOKE ALL ON TABLE public."OddsSafariOverUnder" FROM postgres;
+GRANT ALL ON TABLE public."OddsSafariOverUnder" TO postgres WITH GRANT OPTION;
+
+
+--
+-- TOC entry 3085 (class 0 OID 0)
+-- Dependencies: 209
+-- Name: TABLE "OverUnderHistorical"; Type: ACL; Schema: public; Owner: -
+--
+
+REVOKE ALL ON TABLE public."OverUnderHistorical" FROM postgres;
+GRANT ALL ON TABLE public."OverUnderHistorical" TO postgres WITH GRANT OPTION;
+
+
+--
+-- TOC entry 3088 (class 0 OID 0)
+-- Dependencies: 206
+-- Name: TABLE "PortalSafariMatch"; Type: ACL; Schema: public; Owner: -
+--
+
+REVOKE ALL ON TABLE public."PortalSafariMatch" FROM postgres;
+GRANT ALL ON TABLE public."PortalSafariMatch" TO postgres WITH GRANT OPTION;
+
+
+--
+-- TOC entry 3089 (class 0 OID 0)
+-- Dependencies: 207
+-- Name: TABLE "PortalSafariBets"; Type: ACL; Schema: public; Owner: -
+--
+
+REVOKE ALL ON TABLE public."PortalSafariBets" FROM postgres;
+GRANT ALL ON TABLE public."PortalSafariBets" TO postgres WITH GRANT OPTION;
+
+
+--
+-- TOC entry 1753 (class 826 OID 24717)
+-- Name: DEFAULT PRIVILEGES FOR TABLES; Type: DEFAULT ACL; Schema: -; Owner: -
+--
+
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres REVOKE ALL ON TABLES  FROM postgres;
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres GRANT ALL ON TABLES  TO postgres WITH GRANT OPTION;
+
+
+-- Completed on 2023-02-18 20:56:18 GMT
+
+--
+-- PostgreSQL database dump complete
+--
+
