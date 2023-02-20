@@ -69,20 +69,17 @@ def get_event_time(section_div, kind):
 
 def process_results(db, browser, page):
     container_div = page.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[7]/div[1]')
-    section_divs = container_div.find_elements(By.XPATH, './div[@set="65147"]');
-    if len(section_divs):
-        event_date = None
-        for section in section_divs:
-            browser.move_to_element_and_scroll_to_visible_bottom(section)
-            browser.sleep_for_millis_random(1200)
+    section_divs = container_div.find_elements(By.XPATH, './div[@set="65147"]')
+    print(len(section_divs))
+    event_date = None
+    for section in section_divs:
+        kind = get_section_kind(section)
+        if kind is not None:
+            event_date = get_event_date(section, event_date, kind) 
+            event_time = get_event_time(section, kind)
+            event_date_time = browser.add_time_to_date(event_date, event_time)
+            print(event_date_time)
 
-            kind = get_section_kind(section)
-            print(kind)
-            if kind is not None:
-                event_date = get_event_date(section, event_date, kind) 
-                event_time = get_event_time(section, kind)
-                event_date_time = browser.add_time_to_date(event_date, event_time)
-                print(event_date_time)
 
 
 if __name__ == "__main__":
@@ -96,4 +93,7 @@ if __name__ == "__main__":
     # Click I Accept
     browser.accept_cookies("//button[text()='I Accept']")
 
+    browser.scroll_to_bottom()
+    paginator = page.find_element(By.XPATH, '//div[@id="pagination"]')
+    browser.scroll_move_left_click(paginator.find_element(By.XPATH, './span'))
     process_results(db, browser, page)

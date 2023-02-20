@@ -225,3 +225,11 @@ class Browser:
         (hour, minute) = str(event_time).split(":")
         return event_date.replace(hour=int(hour), minute=int(minute), second=0, microsecond=0)
 
+    def scroll_to_bottom(self):
+        lenOfPage = self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);var lenOfPage=document.body.scrollHeight;return lenOfPage;")
+        match=False
+        while(not match):
+            lastCount = lenOfPage
+            self.sleep_for_millis_random(2000)
+            lenOfPage = self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);var lenOfPage=document.body.scrollHeight;return lenOfPage;")
+            match = lastCount == lenOfPage
