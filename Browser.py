@@ -150,6 +150,11 @@ class Browser:
             ActionChains(self.driver).move_to_element(element).perform()
         self.sleep_for_millis_random(300)
 
+    def move_to_element_and_scroll_to_visible_bottom(self, element):
+        self.move_to_element(element)
+        self.sleep_for_millis_random(400)
+        self.driver.execute_script("arguments[0].scrollIntoView(false);", element)
+
     def move_to_element_and_left_click(self, element, wait_sync_element_xpath = "", parent_limit_xpath = ""):
         self.move_to_element(element)
         clickable = self.get_interactible(element, parent_limit_xpath)
@@ -216,4 +221,7 @@ class Browser:
         decimal = (int(nom) / int(denom) + 1)
         return decimal
 
+    def add_time_to_date(self, event_date, event_time):
+        (hour, minute) = str(event_time).split(":")
+        return event_date.replace(hour=int(hour), minute=int(minute), second=0, microsecond=0)
 

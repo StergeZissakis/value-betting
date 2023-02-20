@@ -97,6 +97,7 @@ def process_Greek_Super_League_OverUnder(db, browser, page):
         set_ids.append(re.findall(r'^\d+', link.get_attribute("id"))[0])
         total_tabs += 1
         browser.move_to_element_and_middle_click(link);
+        break # Do not process the 2nd class League
 
     #Process tabs
     for tab in range(0, total_tabs):

@@ -23,10 +23,6 @@ def calculate_event_date(event_date):
 
     return tmp_date
 
-def add_time_to_date(event_date, event_time):
-    (hour, minute) = str(event_time).split(":")
-    return event_date.replace(hour=int(hour), minute=int(minute))
-
 def find_max_bookie(max_over, max_under, ul_element):
     ret = { 'over': [], 'under': [] }
 
@@ -99,7 +95,7 @@ def process_over_under_events(browser, page, db, tab_button):
 
             browser.sleep_for_seconds_random(2)
             event_time = event_table_row.find_element(By.XPATH, './div/a/div[contains(@class, "eventTable_date")]').get_attribute('innerHTML')
-            event_date_time = add_time_to_date(year_event_date, event_time) 
+            event_date_time = browser.add_time_to_date(year_event_date, event_time) 
 
             event_match_element = event_table_row.find_element(By.XPATH, './div/a/div[contains(@class, "eventTable_name")]')
             event_match = event_match_element.get_attribute('innerHTML')
