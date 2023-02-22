@@ -110,7 +110,10 @@ def process_Greek_Super_League_OverUnder(db, browser, page):
         num_div_sets = len(div_sets)
         for counter in range(0, num_div_sets):
             div_set = div_sets[counter]
-            process_over_under_values(browser, page, div_set)
+            try:
+                process_over_under_values(browser, page, div_set)
+            except:
+                pass
             browser.go_back(4)
             browser.sleep_for_seconds_random(2)
             page = browser.page
