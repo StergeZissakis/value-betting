@@ -134,3 +134,39 @@ class PGConnector(PGBase):
 
             if under and str(under) not in ("", " ", "-"):
                 self.insert_or_update_under(table_name, match_id, half, goals, under, bet_links, payout)
+
+    def update_historical_results_over_under(self, table_name, event_date_time, home_team, guest_team, home_goals, guest_goals):
+        update_sql = " UPDATE public.\"" + table_name + "\" SET \"Home_Team_Goals\" = %s, \"Guest_Team_Goals\" = %s "
+        where_sql =  " WHERE \"Date_Time\" = timestamp %s "
+        params = list()
+        params.append(home_goals)
+        params.append(guest_goals)
+        params.append(event_date_time)
+
+
+        if len(home_team.split(' ')) > 1:
+            home_parts = home_team.split(' ')
+            where_home_sql = " (\"Home_Team\" = ANY(%s) OR SPLIT_PART(\"Home_Team\", ' ', 1) = ANY(%s)) "
+            params.append(home_parts)
+            params.append(home_parts)
+        else:
+            where_home_sql = " (\"Home_Team\" = %s OR %s = ANY(string_to_array(\"Home_Team\", ' '))) "
+            params.append(home_team)
+            params.append(home_team)
+
+        if len(guest_team.split(' ')) > 1:
+            guest_parts = guest_team.split(' ')
+            where_guest_sql = " (\"Guest_Team\" = ANY(%s) OR SPLIT_PART(\"Guest_Team\", ' ', 1) = ANY(%s)) "
+            params.append(guest_parts)
+            params.append(guest_parts)
+        else:
+            where_guest_sql = " (\"Guest_Team\" = %s OR %s = ANY(string_to_array(\"Guest_Team\", ' '))) "
+            params.append(guest_team)
+            params.append(guest_team)
+
+        sql_update = update_sql + where_sql + " AND " + where_home_sql + " AND " + where_guest_sql + " ; "
+        cursor = self.pg.cursor()
+        cursor.execute(sql_update, params)
+        self.pg.commit()
+        cursor.close()
+

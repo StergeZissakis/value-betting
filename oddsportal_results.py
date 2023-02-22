@@ -81,16 +81,42 @@ def process_results(db, browser, page):
     processed_sections = 0;
     print("Num:" + str(num_sections))
     print("Prc:" + str(processed_sections))
-    while processed_sections < num_sections:
+    yesterday_found = False
+    while processed_sections <= num_sections:
         for section in section_divs:
+
             kind = get_section_kind(section)
             if kind is not None:
                 browser.scroll_to_visible(section)
                 browser.sleep_for_millis_random(300)
                 event_date = get_event_date(section, event_date, kind) 
+
+                if kind == "Date" and not yesterday_found:
+                    kind = "Yesterday"
+                    yesterday_found = True
+                elif not yesterday_found and kind == "Yesterday":
+                    yesterday_found = True
+
                 event_time = get_event_time(section, kind)
                 event_date_time = browser.add_time_to_date(event_date, event_time)
-                print(event_date_time)
+                if kind == "Today":
+                    print("#TODO: Today")
+                elif kind == "Yesterday":
+                    home_team = section.find_element(By.XPATH,  './div[3]/div/a/div[2]/div/a[1]/div[1]').text
+                    guest_team = section.find_element(By.XPATH, './div[3]/div/a/div[2]/div/a[2]/div[1]').text
+                    (home_goals, guest_goals) = section.find_element(By.XPATH, './div[3]/div/div[1]/div').text.split(':')
+                elif kind == "Date":
+                    home_team = section.find_element(By.XPATH,  './div[2]/div/a/div[2]/div/a[1]/div[1]').text
+                    guest_team = section.find_element(By.XPATH, './div[2]/div/a/div[2]/div/a[2]/div[1]').text
+                    (home_goals, guest_goals) = section.find_element(By.XPATH, './div[2]/div/div[1]/div').text.split(':')
+                elif kind == "Match":
+                    home_team = section.find_element(By.XPATH,  './div/div/a/div[2]/div/a[1]/div[1]').text
+                    guest_team = section.find_element(By.XPATH, './div/div/a/div[2]/div/a[2]/div[1]').text
+                    (home_goals, guest_goals) = section.find_element(By.XPATH, './div/div/div[1]/div').text.split(':')
+                print(str(event_date_time) + "->" + home_team + "_VS_" + guest_team + "=" + str(home_goals) + ":" + str(guest_goals))
+                db.update_historical_results_over_under("OverUnderHistorical", event_date_time, home_team, guest_team, home_goals, guest_goals)
+
+
 
         section_divs = container_div.find_elements(By.XPATH, './div[@set="65147"]')
         processed_sections += num_sections
@@ -104,6 +130,7 @@ def process_results(db, browser, page):
 if __name__ == "__main__":
     db = PGConnector("postgres", "localhost")
     if not db.is_connected():
+        print("Fialed to connect to DB")
         exit(-1)
 
     browser = Browser()
