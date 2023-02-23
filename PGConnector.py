@@ -135,12 +135,18 @@ class PGConnector(PGBase):
             if under and str(under) not in ("", " ", "-"):
                 self.insert_or_update_under(table_name, match_id, half, goals, under, bet_links, payout)
 
-    def update_historical_results_over_under(self, table_name, event_date_time, home_team, guest_team, home_goals, guest_goals):
-        update_sql = " UPDATE public.\"" + table_name + "\" SET \"Home_Team_Goals\" = %s, \"Guest_Team_Goals\" = %s "
-        where_sql =  " WHERE \"Date_Time\" = timestamp %s "
+    def update_historical_results_over_under(self, table_name, event_date_time, home_team, guest_team, home_goals, guest_goals, half_1_score, half_2_score):
+        update_sql  = " UPDATE public.\"" + table_name + "\" " + " SET \"Home_Team_Goals\" = %s, "
+        update_sql += " \"Guest_Team_Goals\" = %s, \"Home_Team_Goals_1st_Half\" = %s, \"Home_Team_Goals_2nd_Half\" = %s, "
+        update_sql += " \"Guest_Team_Goals_1st_Half\" = %s, \"Guest_Team_Goals_2nd_Half\" = %s "
+        where_sql   = " WHERE \"Date_Time\" = timestamp %s "
         params = list()
         params.append(home_goals)
         params.append(guest_goals)
+        params.append(half_1_score.split(':')[0])
+        params.append(half_2_score.split(':')[0])
+        params.append(half_1_score.split(':')[-1])
+        params.append(half_2_score.split(':')[-1])
         params.append(event_date_time)
 
 
