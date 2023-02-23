@@ -110,7 +110,7 @@ def process_Greek_Super_League_OverUnder(db, browser, page):
         num_div_sets = len(div_sets)
         for counter in range(0, num_div_sets):
             div_set = div_sets[counter]
-            try:
+            try: # some matches do not have odds set yet
                 process_over_under_values(browser, page, div_set)
             except:
                 pass
