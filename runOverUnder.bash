@@ -25,3 +25,5 @@ done
 kill -9 %1
 
 psql -h localhost -U postgres -c 'SELECT "CalculateOverUnderResults"();'
+
+ps -e | grep chrome | cut -d ' ' -f 4 | xargs kill -9
