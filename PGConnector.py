@@ -176,3 +176,16 @@ class PGConnector(PGBase):
         self.pg.commit()
         cursor.close()
 
+    def insert_or_update_1x2_odds(self, table_name, event_date_time, home_team, guest_team, odds):
+        print(odds)
+        for half in odds.keys():
+            for row in odds[half]:
+                cursor = self.pg.cursor()
+                cursor.execute( 
+                'INSERT INTO "' + table_name + '" (date_time, home_team, guest_team, half, "1_odds", x_odds, "2_odds") VALUES (%s, %s, %s, %s, %s, %s, %s) ' +
+                'ON CONFLICT ON CONSTRAINT "' + table_name + '_unique" DO UPDATE SET "1_odds" = EXCLUDED."1_odds", x_odds = EXCLUDED.x_odds, "2_odds" = EXCLUDED."2_odds";',
+                (event_date_time, home_team, guest_team, str(half), row["1_odds"], row["x_odds"], row["2_odds"])
+                )
+                self.pg.commit()
+                cursor.close()
+

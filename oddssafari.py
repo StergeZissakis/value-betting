@@ -80,8 +80,7 @@ def process_over_under_match(browser, db, match_id, event_date_time, click_eleme
             db.insert_or_update_under('OddsSafariOverUnder', match_id, half, goals, max_under, bet_links['under'], payout, sql_checked = False)
             break;
        
-    browser.driver.close()
-    browser.page = browser.switch_to_tab(0)
+    browser.close_tab()
 
 
 def process_over_under_events(browser, page, db, tab_button):

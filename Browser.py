@@ -13,7 +13,7 @@ from selenium.webdriver.support import expected_conditions as ExpectedCondition
 
 class Browser:
 
-    def __init__(self):
+    def __init__(self, headless = True):
         self.chrome_options = Options()
         self.chrome_options.add_argument('--no-sandbox')
         self.chrome_options.add_argument('--window-size=1920,1080')
@@ -25,7 +25,8 @@ class Browser:
         self.chrome_options.add_argument('--allow-running-insecure-content')
         self.chrome_options.add_experimental_option("detach", True)
         self.chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.5481.177 Safari/537.36")
-        self.chrome_options.add_argument('--headless=new')
+        if headless:
+            self.chrome_options.add_argument('--headless=new')
         
         self.driver = webdriver.Chrome("./drivers/chromedriver", chrome_options=self.chrome_options)
 
@@ -204,16 +205,17 @@ class Browser:
             self.wait_for_element_to_appear(wait_for_elelemt_xpath)
         return self.page
 
-    def close_tab(self, tab_index):
-        pass
+    def close_tab(self, go_to_tab = 0):
+        self.driver.close()
+        self.page = self.switch_to_tab(go_to_tab)
+        return self.page
 
     def go_back(self, times):
-        #self.driver.back()
         for t in range(0, times):
             self.driver.execute_script('window.history.go(-1)')
 
             self.sleep_for_millis_random(150)
-        self.reset_page_to_current()
+        return self.reset_page_to_current()
 
     def ratio_odds_to_decimal(self, odds):
         if odds.find('/') == -1:

@@ -66,7 +66,7 @@ def get_event_time(section_div, kind):
 
     return div.text
 
-def click_and_collect_over_under_details(browser, section, kind):
+def click_and_collect_over_under_details(browser, section, page, kind):
     if kind == "Yesterday":
         clickable_xpath = './div[3]/div/a'
         #clickable_xpath = './div[3]/div/a/div[2]/div/a[1]/'
@@ -79,18 +79,15 @@ def click_and_collect_over_under_details(browser, section, kind):
     else:
         return ()
 
-    browser.move_to_element_and_middle_click(section.find_element(By.XPATH, clickable_xpath));
+    browser.scroll_move_left_click(section.find_element(By.XPATH, clickable_xpath), '//*[@id="app"]/div/div[1]/div/main/div[2]/div[5]/div[2]/div[3]/div[2]/span');
     browser.sleep_for_millis_random(300)
-    page = browser.switch_to_tab(1, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[5]/div[2]/div[3]/div[2]/span')
 
     half_goals = page.find_element(By.XPATH, '//div[@id="app"]/div/div[1]/div/main/div[2]/div[5]/div[2]/div[3]/div[2]').text
     half_goals = half_goals.replace('(','').replace(')','').split('\n')[-1].strip()
     (half_1, half_2) = half_goals.split(',')
     half_1 = half_1.strip()
     half_2 = half_2.strip()
-    browser.driver.close()
-    browser.switch_to_tab(0)
-    browser.reset_page_to_current()
+    page = browser.go_back(1)
     return (half_1, half_2)
 
 
@@ -141,10 +138,9 @@ def process_results(db, browser, page):
                     guest_team = section.find_element(By.XPATH, './div/div/a/div[2]/div/a[2]/div[1]').text
                     (home_goals, guest_goals) = section.find_element(By.XPATH, './div/div/div[1]/div').text.split(':')
                 #click in and get more details
-                halfs = click_and_collect_over_under_details(browser, section, kind)
+                halfs = click_and_collect_over_under_details(browser, section, page, kind)
                 #print(str(event_date_time) + "->" + home_team + "_VS_" + guest_team + "=" + str(home_goals) + ":" + str(guest_goals))
                 db.update_historical_results_over_under("OverUnderHistorical", event_date_time, home_team, guest_team, home_goals, guest_goals, halfs[0], halfs[1])
-
 
 
         section_divs = container_div.find_elements(By.XPATH, './div[@set="65147"]')
