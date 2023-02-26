@@ -143,10 +143,14 @@ if __name__ == "__main__":
     if not db.is_connected():
         exit(-1)
 
-    browser = Browser()
+    headless = False
+    browser = Browser(headless)
     page = browser.get("https://www.oddssafari.gr/en")
     
     # Click I Accept
     browser.accept_cookies('//div[@id="qc-cmp2-ui"]/div[2]/div/button[@mode="primary"]/span[text()="AGREE"]') 
     process_Greek_Super_League_OverUnder(db, browser, page)
+
+    if headless:
+        browser.close()
 

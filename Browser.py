@@ -207,8 +207,11 @@ class Browser:
 
     def close_tab(self, go_to_tab = 0):
         self.driver.close()
-        self.page = self.switch_to_tab(go_to_tab)
-        return self.page
+        return self.switch_to_tab(go_to_tab)
+
+
+    def close(self):
+        self.driver.close()
 
     def go_back(self, times):
         for t in range(0, times):
