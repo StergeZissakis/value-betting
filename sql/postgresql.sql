@@ -5,7 +5,7 @@
 -- Dumped from database version 13.9 (Debian 13.9-0+deb11u1)
 -- Dumped by pg_dump version 13.9 (Debian 13.9-0+deb11u1)
 
--- Started on 2023-02-26 10:28:35 EET
+-- Started on 2023-02-26 10:44:44 EET
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -50,7 +50,7 @@ COMMENT ON DATABASE postgres IS 'default administrative connection database';
 
 
 --
--- TOC entry 675 (class 1247 OID 25025)
+-- TOC entry 670 (class 1247 OID 25025)
 -- Name: BetResult; Type: TYPE; Schema: public; Owner: -
 --
 
@@ -163,7 +163,7 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
--- TOC entry 213 (class 1259 OID 25102)
+-- TOC entry 211 (class 1259 OID 25102)
 -- Name: 1x2_oddsportal; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -182,7 +182,7 @@ CREATE TABLE public."1x2_oddsportal" (
 
 
 --
--- TOC entry 212 (class 1259 OID 25100)
+-- TOC entry 210 (class 1259 OID 25100)
 -- Name: 1x2_oddsportal_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -196,7 +196,7 @@ CREATE SEQUENCE public."1x2_oddsportal_id_seq"
 
 --
 -- TOC entry 3115 (class 0 OID 0)
--- Dependencies: 212
+-- Dependencies: 210
 -- Name: 1x2_oddsportal_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
@@ -280,34 +280,34 @@ INHERITS (public."OddsPortalOverUnder");
 
 
 --
--- TOC entry 208 (class 1259 OID 24966)
+-- TOC entry 213 (class 1259 OID 25135)
 -- Name: OverUnderHistorical; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public."OverUnderHistorical" (
     id bigint NOT NULL,
     "Date_Time" timestamp with time zone NOT NULL,
-    "Type" public."OverUnderType" NOT NULL,
-    "Goals" numeric NOT NULL,
-    "Odds_bet" numeric NOT NULL,
-    "Margin" numeric NOT NULL,
-    "Payout" character varying NOT NULL,
-    "Bet_link" character varying NOT NULL,
     "Home_Team" character varying NOT NULL,
     "Guest_Team" character varying NOT NULL,
+    "Type" public."OverUnderType" NOT NULL,
+    "Half" public."MatchTime",
+    "Odds_bet" numeric NOT NULL,
+    "Margin" numeric NOT NULL,
+    won public."BetResult",
+    "Goals" numeric NOT NULL,
     "Home_Team_Goals" smallint,
     "Guest_Team_Goals" smallint,
-    "Half" public."MatchTime",
-    won public."BetResult",
     "Home_Team_Goals_1st_Half" smallint,
     "Home_Team_Goals_2nd_Half" smallint,
     "Guest_Team_Goals_1st_Half" smallint,
-    "Guest_Team_Goals_2nd_Half" smallint
+    "Guest_Team_Goals_2nd_Half" smallint,
+    "Payout" character varying NOT NULL,
+    "Bet_link" character varying NOT NULL
 );
 
 
 --
--- TOC entry 207 (class 1259 OID 24964)
+-- TOC entry 212 (class 1259 OID 25133)
 -- Name: OverUnderHistorical_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -321,7 +321,7 @@ CREATE SEQUENCE public."OverUnderHistorical_id_seq"
 
 --
 -- TOC entry 3122 (class 0 OID 0)
--- Dependencies: 207
+-- Dependencies: 212
 -- Name: OverUnderHistorical_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
@@ -371,7 +371,7 @@ CREATE VIEW public."PortalSafariMatch" AS
 
 
 --
--- TOC entry 209 (class 1259 OID 24996)
+-- TOC entry 207 (class 1259 OID 24996)
 -- Name: PortalSafariBets; Type: VIEW; Schema: public; Owner: -
 --
 
@@ -395,7 +395,7 @@ CREATE VIEW public."PortalSafariBets" AS
 
 
 --
--- TOC entry 211 (class 1259 OID 25038)
+-- TOC entry 209 (class 1259 OID 25038)
 -- Name: soccer_statistics; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -436,7 +436,7 @@ CREATE TABLE public.soccer_statistics (
 
 
 --
--- TOC entry 210 (class 1259 OID 25036)
+-- TOC entry 208 (class 1259 OID 25036)
 -- Name: soccer_statistics_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -450,7 +450,7 @@ CREATE SEQUENCE public.soccer_statistics_id_seq
 
 --
 -- TOC entry 3127 (class 0 OID 0)
--- Dependencies: 210
+-- Dependencies: 208
 -- Name: soccer_statistics_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
@@ -458,7 +458,7 @@ ALTER SEQUENCE public.soccer_statistics_id_seq OWNED BY public.soccer_statistics
 
 
 --
--- TOC entry 2929 (class 2604 OID 25105)
+-- TOC entry 2928 (class 2604 OID 25105)
 -- Name: 1x2_oddsportal id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -530,7 +530,7 @@ ALTER TABLE ONLY public."OddsSafariOverUnder" ALTER COLUMN updated SET DEFAULT C
 
 
 --
--- TOC entry 2926 (class 2604 OID 24969)
+-- TOC entry 2931 (class 2604 OID 25138)
 -- Name: OverUnderHistorical id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -538,7 +538,7 @@ ALTER TABLE ONLY public."OverUnderHistorical" ALTER COLUMN id SET DEFAULT nextva
 
 
 --
--- TOC entry 2927 (class 2604 OID 25041)
+-- TOC entry 2926 (class 2604 OID 25041)
 -- Name: soccer_statistics id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -546,8 +546,8 @@ ALTER TABLE ONLY public.soccer_statistics ALTER COLUMN id SET DEFAULT nextval('p
 
 
 --
--- TOC entry 3106 (class 0 OID 25102)
--- Dependencies: 213
+-- TOC entry 3104 (class 0 OID 25102)
+-- Dependencies: 211
 -- Data for Name: 1x2_oddsportal; Type: TABLE DATA; Schema: public; Owner: -
 --
 
@@ -865,75 +865,75 @@ COPY public."OddsSafariOverUnder" (id, goals, odds, match_id, half, payout, crea
 
 
 --
--- TOC entry 3102 (class 0 OID 24966)
--- Dependencies: 208
+-- TOC entry 3106 (class 0 OID 25135)
+-- Dependencies: 213
 -- Data for Name: OverUnderHistorical; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-COPY public."OverUnderHistorical" (id, "Date_Time", "Type", "Goals", "Odds_bet", "Margin", "Payout", "Bet_link", "Home_Team", "Guest_Team", "Home_Team_Goals", "Guest_Team_Goals", "Half", won, "Home_Team_Goals_1st_Half", "Home_Team_Goals_2nd_Half", "Guest_Team_Goals_1st_Half", "Guest_Team_Goals_2nd_Half") FROM stdin;
-1	2023-02-18 17:00:00+02	Over	2.5	2.17	0.00	0.72%	{https://record.affiliates.betshop.gr/_xVrm1kU5pcRLcRLGwHoTKWNd7ZgqdRLk/1/}	Panathinaikos	Volos	2	0	\N	\N	0	2	0	0
-37	2023-02-24 20:00:00+02	Over	2.5	2.15	0.10	1.73%	{https://record.betssongroupaffiliates.com/_WbYFYUdzQPOWzcyEjjoakGNd7ZgqdRLk/1/}	Volos	Lamia	1	1	Full Time	\N	0	1	1	0
-38	2023-02-24 20:00:00+02	Over	2.5	2.15	0.00	1.73%	{https://record.betssongroupaffiliates.com/_WbYFYUdzQPOWzcyEjjoakGNd7ZgqdRLk/1/}	Volos	Lamia	1	1	Full Time	\N	0	1	1	0
-40	2023-02-24 20:00:00+02	Under	0.5	2.90	0.00	1.14%	{https://record.betssongroupaffiliates.com/_WbYFYUdzQPOWzcyEjjoakGNd7ZgqdRLk/1/}	Volos	Lamia	1	1	1st Half	\N	0	1	1	0
-41	2023-02-24 20:00:00+02	Under	0.5	3.75	0.00	4.02%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}	Volos	Lamia	1	1	2nd Half	\N	0	1	1	0
-42	2023-02-24 20:00:00+02	Under	0.5	3.75	0.00	4.02%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}	Volos	Lamia	1	1	2nd Half	\N	0	1	1	0
-43	2023-02-24 20:00:00+02	Under	2.5	1.81	0.73	1.73%	{https://partners.opapaffiliates.gr/redirect.aspx?pid=2460&bid=1759}	Volos	Lamia	1	1	1st Half	\N	0	1	1	0
-45	2023-02-24 20:00:00+02	Under	2.5	1.81	0.00	1.73%	{https://partners.opapaffiliates.gr/redirect.aspx?pid=2460&bid=1759}	Volos	Lamia	1	1	1st Half	\N	0	1	1	0
-20	2023-02-19 19:30:00+02	Under	0.5	3.25	0.00	3.63%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}	Panetolikos	Ionikos	1	0	\N	\N	0	1	0	0
-11	2023-02-19 16:00:00+02	Under	0.5	2.95	0.00	2.78%	{https://affiliatesys.ads-tracking.com/redirect.aspx?pid=30676343&bid=8436}	Lamia	Olympiacos	0	3	\N	\N	0	0	1	2
-12	2023-02-19 16:00:00+02	Under	0.5	3.90	0.95	4.20%	{}	Lamia	Olympiacos	0	3	\N	\N	0	0	1	2
-2	2023-02-18 17:00:00+02	Under	0.5	2.80	0.00	2.33%	{https://affiliatesys.ads-tracking.com/redirect.aspx?pid=30676343&bid=8436}	Panathinaikos	Volos	2	0	\N	\N	0	2	0	0
-3	2023-02-18 17:00:00+02	Under	0.5	3.70	0.90	3.80%	{}	Panathinaikos	Volos	2	0	\N	\N	0	2	0	0
-4	2023-02-18 17:00:00+02	Under	0.5	3.70	0.00	3.80%	{}	Panathinaikos	Volos	2	0	\N	\N	0	2	0	0
-5	2023-02-18 17:00:00+02	Under	2.5	1.83	0.00	0.72%	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}	Panathinaikos	Volos	2	0	\N	\N	0	2	0	0
-44	2023-02-24 20:00:00+02	Under	2.5	1.81	0.00	1.73%	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}	Volos	Lamia	1	1	Full Time	Won	0	1	1	0
-10	2023-02-19 16:00:00+02	Over	2.5	2.00	0.00	2.56%	{https://record.betssongroupaffiliates.com/_WbYFYUdzQPOWzcyEjjoakGNd7ZgqdRLk/1/,https://www.bet365.gr/olp/open-account?affiliate=365_01012107}	Lamia	Olympiacos	0	3	\N	Won	0	0	1	2
-6	2023-02-18 20:00:00+02	Over	2.5	2.55	0.00	2.07%	{https://record.affiliates.betshop.gr/_xVrm1kU5pcRLcRLGwHoTKWNd7ZgqdRLk/1/}	Asteras Tripolis	PAS Giannina	1	1	\N	\N	1	0	1	0
-7	2023-02-18 20:00:00+02	Under	0.5	2.45	0.00	3.21%	{https://affiliatesys.ads-tracking.com/redirect.aspx?pid=30676343&bid=8436}	Asteras Tripolis	PAS Giannina	1	1	\N	\N	1	0	1	0
-39	2023-02-24 20:00:00+02	Over	2.5	2.15	0.00	1.73%	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}	Volos	Lamia	1	1	1st Half	Won	0	1	1	0
-8	2023-02-18 20:00:00+02	Under	0.5	3.25	0.80	3.63%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}	Asteras Tripolis	PAS Giannina	1	1	\N	\N	1	0	1	0
-9	2023-02-18 20:00:00+02	Under	0.5	3.25	0.00	3.63%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}	Asteras Tripolis	PAS Giannina	1	1	\N	\N	1	0	1	0
-15	2023-02-19 19:30:00+02	Over	2.5	2.50	0.00	1.70%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107,https://partners.opapaffiliates.gr/redirect.aspx?pid=2460&bid=1759,https://record.affiliates.betshop.gr/_xVrm1kU5pcRLcRLGwHoTKWNd7ZgqdRLk/1/}	Panetolikos	Ionikos	1	0	\N	\N	0	1	0	0
-16	2023-02-19 19:30:00+02	Over	2.5	2.50	0.00	1.70%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107,https://partners.opapaffiliates.gr/redirect.aspx?pid=2460&bid=1759,https://record.affiliates.betshop.gr/_xVrm1kU5pcRLcRLGwHoTKWNd7ZgqdRLk/1/}	Panetolikos	Ionikos	1	0	\N	\N	0	1	0	0
-26	2023-02-20 18:00:00+02	Over	2.5	2.40	0.00	3.46%	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}	Atromitos	Levadiakos	1	0	\N	\N	1	0	0	0
-27	2023-02-20 18:00:00+02	Under	0.5	2.55	0.05	2.83%	{https://affiliatesys.ads-tracking.com/redirect.aspx?pid=30676343&bid=8436}	Atromitos	Levadiakos	1	0	\N	\N	1	0	0	0
-54	2023-02-25 20:30:00+02	Over	2.5	2.15	0.00	3.83%	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}	Olympiacos	Panathinaikos	0	0	Full Time	\N	0	0	0	0
-50	2023-02-25 19:00:00+02	Over	2.5	1.76	0.00	4.25%	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}	PAS Giannina	PAOK	0	0	Full Time	\N	0	0	0	0
-51	2023-02-25 19:00:00+02	Under	0.5	3.30	0.00	2.69%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}	PAS Giannina	PAOK	0	0	1st Half	\N	0	0	0	0
-52	2023-02-25 19:00:00+02	Under	0.5	4.40	0.00	4.36%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}	PAS Giannina	PAOK	0	0	2nd Half	\N	0	0	0	0
-28	2023-02-20 18:00:00+02	Under	0.5	3.40	0.90	4.40%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}	Atromitos	Levadiakos	1	0	\N	\N	1	0	0	0
-29	2023-02-20 18:00:00+02	Under	0.5	2.55	0.00	2.83%	{https://affiliatesys.ads-tracking.com/redirect.aspx?pid=30676343&bid=8436}	Atromitos	Levadiakos	1	0	\N	\N	1	0	0	0
-46	2023-02-25 17:30:00+02	Over	2.5	1.76	0.00	4.25%	{https://record.betssongroupaffiliates.com/_WbYFYUdzQPOWzcyEjjoakGNd7ZgqdRLk/1/}	AEK	Asteras Tripolis	2	0	Full Time	\N	1	1	0	0
-30	2023-02-20 18:00:00+02	Under	0.5	3.40	0.85	4.40%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}	Atromitos	Levadiakos	1	0	\N	\N	1	0	0	0
-17	2023-02-19 19:30:00+02	Under	0.5	2.45	0.00	3.21%	{https://affiliatesys.ads-tracking.com/redirect.aspx?pid=30676343&bid=8436}	Panetolikos	Ionikos	1	0	\N	\N	0	1	0	0
-18	2023-02-19 19:30:00+02	Under	0.5	3.25	0.80	3.63%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}	Panetolikos	Ionikos	1	0	\N	\N	0	1	0	0
-31	2023-02-20 18:00:00+02	Under	0.5	3.40	0.00	4.40%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}	Atromitos	Levadiakos	1	0	\N	\N	1	0	0	0
-22	2023-02-19 20:30:00+02	Over	2.5	2.45	0.00	2.48%	{https://record.affiliates.betshop.gr/_xVrm1kU5pcRLcRLGwHoTKWNd7ZgqdRLk/1/}	PAOK	AEK	2	0	\N	\N	1	1	0	0
-23	2023-02-19 20:30:00+02	Under	0.5	2.50	0.00	2.44%	{https://affiliatesys.ads-tracking.com/redirect.aspx?pid=30676343&bid=8436}	PAOK	AEK	2	0	\N	\N	1	1	0	0
-13	2023-02-19 16:00:00+02	Under	0.5	3.90	0.00	4.20%	{}	Lamia	Olympiacos	0	3	\N	\N	0	0	1	2
-14	2023-02-19 16:00:00+02	Under	2.5	1.90	0.00	2.56%	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}	Lamia	Olympiacos	0	3	\N	\N	0	0	1	2
-47	2023-02-25 17:30:00+02	Under	0.5	3.30	0.00	2.69%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}	AEK	Asteras Tripolis	2	0	1st Half	\N	1	1	0	0
-48	2023-02-25 17:30:00+02	Under	0.5	4.40	0.00	4.36%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}	AEK	Asteras Tripolis	2	0	2nd Half	\N	1	1	0	0
-24	2023-02-19 20:30:00+02	Under	0.5	3.25	0.75	5.47%	{http://www.stoiximan.gr/,https://www.bet365.gr/olp/open-account?affiliate=365_01012107}	PAOK	AEK	2	0	\N	\N	1	1	0	0
-25	2023-02-19 20:30:00+02	Under	0.5	3.25	0.00	5.47%	{http://www.stoiximan.gr/,https://www.bet365.gr/olp/open-account?affiliate=365_01012107}	PAOK	AEK	2	0	\N	\N	1	1	0	0
-53	2023-02-25 19:00:00+02	Under	2.5	2.10	0.00	4.25%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}	PAS Giannina	PAOK	0	0	Full Time	Won	0	0	0	0
-49	2023-02-25 17:30:00+02	Under	2.5	2.10	0.00	4.25%	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}	AEK	Asteras Tripolis	2	0	Full Time	Won	1	1	0	0
-33	2023-02-20 19:30:00+02	Over	2.5	2.40	0.00	3.28%	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}	OFI	Aris Salonika	0	3	\N	Won	0	0	2	1
-34	2023-02-20 19:30:00+02	Under	0.5	2.60	0.00	2.89%	{https://affiliatesys.ads-tracking.com/redirect.aspx?pid=30676343&bid=8436}	OFI	Aris Salonika	0	3	\N	\N	0	0	2	1
-35	2023-02-20 19:30:00+02	Under	0.5	3.40	0.80	4.40%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}	OFI	Aris Salonika	0	3	\N	\N	0	0	2	1
-36	2023-02-20 19:30:00+02	Under	0.5	3.40	0.00	4.40%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}	OFI	Aris Salonika	0	3	\N	\N	0	0	2	1
-55	2023-02-25 20:30:00+02	Under	0.5	2.80	0.00	1.48%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}	Olympiacos	Panathinaikos	0	0	1st Half	\N	0	0	0	0
-56	2023-02-25 20:30:00+02	Under	0.5	3.75	0.00	3.47%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}	Olympiacos	Panathinaikos	0	0	2nd Half	\N	0	0	0	0
-32	2023-02-20 18:00:00+02	Under	0.5	3.40	0.00	4.40%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}	Atromitos	Levadiakos	1	0	\N	\N	1	0	0	0
-19	2023-02-19 19:30:00+02	Under	0.5	3.25	0.75	3.63%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}	Panetolikos	Ionikos	1	0	\N	\N	0	1	0	0
-21	2023-02-19 19:30:00+02	Under	0.5	3.25	0.00	3.63%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}	Panetolikos	Ionikos	1	0	\N	\N	0	1	0	0
-57	2023-02-25 20:30:00+02	Under	2.5	1.74	0.00	3.83%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107,https://partners.opapaffiliates.gr/redirect.aspx?pid=2460&bid=1759}	Olympiacos	Panathinaikos	0	0	Full Time	Won	0	0	0	0
+COPY public."OverUnderHistorical" (id, "Date_Time", "Home_Team", "Guest_Team", "Type", "Half", "Odds_bet", "Margin", won, "Goals", "Home_Team_Goals", "Guest_Team_Goals", "Home_Team_Goals_1st_Half", "Home_Team_Goals_2nd_Half", "Guest_Team_Goals_1st_Half", "Guest_Team_Goals_2nd_Half", "Payout", "Bet_link") FROM stdin;
+1	2023-02-18 17:00:00+02	Panathinaikos	Volos	Over	\N	2.17	0	\N	2.5	2	0	0	2	0	0	0.72%	{https://record.affiliates.betshop.gr/_xVrm1kU5pcRLcRLGwHoTKWNd7ZgqdRLk/1/}
+37	2023-02-24 20:00:00+02	Volos	Lamia	Over	Full Time	2.15	0.1	\N	2.5	1	1	0	1	1	0	1.73%	{https://record.betssongroupaffiliates.com/_WbYFYUdzQPOWzcyEjjoakGNd7ZgqdRLk/1/}
+38	2023-02-24 20:00:00+02	Volos	Lamia	Over	Full Time	2.15	0	\N	2.5	1	1	0	1	1	0	1.73%	{https://record.betssongroupaffiliates.com/_WbYFYUdzQPOWzcyEjjoakGNd7ZgqdRLk/1/}
+40	2023-02-24 20:00:00+02	Volos	Lamia	Under	1st Half	2.9	0	\N	0.5	1	1	0	1	1	0	1.14%	{https://record.betssongroupaffiliates.com/_WbYFYUdzQPOWzcyEjjoakGNd7ZgqdRLk/1/}
+41	2023-02-24 20:00:00+02	Volos	Lamia	Under	2nd Half	3.75	0	\N	0.5	1	1	0	1	1	0	4.02%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+42	2023-02-24 20:00:00+02	Volos	Lamia	Under	2nd Half	3.75	0	\N	0.5	1	1	0	1	1	0	4.02%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+43	2023-02-24 20:00:00+02	Volos	Lamia	Under	1st Half	1.81	0.73	\N	2.5	1	1	0	1	1	0	1.73%	{https://partners.opapaffiliates.gr/redirect.aspx?pid=2460&bid=1759}
+45	2023-02-24 20:00:00+02	Volos	Lamia	Under	1st Half	1.81	0	\N	2.5	1	1	0	1	1	0	1.73%	{https://partners.opapaffiliates.gr/redirect.aspx?pid=2460&bid=1759}
+20	2023-02-19 19:30:00+02	Panetolikos	Ionikos	Under	\N	3.25	0	\N	0.5	1	0	0	1	0	0	3.63%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+11	2023-02-19 16:00:00+02	Lamia	Olympiacos	Under	\N	2.95	0	\N	0.5	0	3	0	0	1	2	2.78%	{https://affiliatesys.ads-tracking.com/redirect.aspx?pid=30676343&bid=8436}
+12	2023-02-19 16:00:00+02	Lamia	Olympiacos	Under	\N	3.9	0.95	\N	0.5	0	3	0	0	1	2	4.20%	{}
+2	2023-02-18 17:00:00+02	Panathinaikos	Volos	Under	\N	2.8	0	\N	0.5	2	0	0	2	0	0	2.33%	{https://affiliatesys.ads-tracking.com/redirect.aspx?pid=30676343&bid=8436}
+3	2023-02-18 17:00:00+02	Panathinaikos	Volos	Under	\N	3.7	0.9	\N	0.5	2	0	0	2	0	0	3.80%	{}
+4	2023-02-18 17:00:00+02	Panathinaikos	Volos	Under	\N	3.7	0	\N	0.5	2	0	0	2	0	0	3.80%	{}
+5	2023-02-18 17:00:00+02	Panathinaikos	Volos	Under	\N	1.83	0	\N	2.5	2	0	0	2	0	0	0.72%	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}
+44	2023-02-24 20:00:00+02	Volos	Lamia	Under	Full Time	1.81	0	Won	2.5	1	1	0	1	1	0	1.73%	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}
+10	2023-02-19 16:00:00+02	Lamia	Olympiacos	Over	\N	2	0	Won	2.5	0	3	0	0	1	2	2.56%	{https://record.betssongroupaffiliates.com/_WbYFYUdzQPOWzcyEjjoakGNd7ZgqdRLk/1/,https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+6	2023-02-18 20:00:00+02	Asteras Tripolis	PAS Giannina	Over	\N	2.55	0	\N	2.5	1	1	1	0	1	0	2.07%	{https://record.affiliates.betshop.gr/_xVrm1kU5pcRLcRLGwHoTKWNd7ZgqdRLk/1/}
+7	2023-02-18 20:00:00+02	Asteras Tripolis	PAS Giannina	Under	\N	2.45	0	\N	0.5	1	1	1	0	1	0	3.21%	{https://affiliatesys.ads-tracking.com/redirect.aspx?pid=30676343&bid=8436}
+39	2023-02-24 20:00:00+02	Volos	Lamia	Over	1st Half	2.15	0	Won	2.5	1	1	0	1	1	0	1.73%	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}
+8	2023-02-18 20:00:00+02	Asteras Tripolis	PAS Giannina	Under	\N	3.25	0.8	\N	0.5	1	1	1	0	1	0	3.63%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+9	2023-02-18 20:00:00+02	Asteras Tripolis	PAS Giannina	Under	\N	3.25	0	\N	0.5	1	1	1	0	1	0	3.63%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+15	2023-02-19 19:30:00+02	Panetolikos	Ionikos	Over	\N	2.5	0	\N	2.5	1	0	0	1	0	0	1.70%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107,https://partners.opapaffiliates.gr/redirect.aspx?pid=2460&bid=1759,https://record.affiliates.betshop.gr/_xVrm1kU5pcRLcRLGwHoTKWNd7ZgqdRLk/1/}
+16	2023-02-19 19:30:00+02	Panetolikos	Ionikos	Over	\N	2.5	0	\N	2.5	1	0	0	1	0	0	1.70%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107,https://partners.opapaffiliates.gr/redirect.aspx?pid=2460&bid=1759,https://record.affiliates.betshop.gr/_xVrm1kU5pcRLcRLGwHoTKWNd7ZgqdRLk/1/}
+26	2023-02-20 18:00:00+02	Atromitos	Levadiakos	Over	\N	2.4	0	\N	2.5	1	0	1	0	0	0	3.46%	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}
+27	2023-02-20 18:00:00+02	Atromitos	Levadiakos	Under	\N	2.55	0.05	\N	0.5	1	0	1	0	0	0	2.83%	{https://affiliatesys.ads-tracking.com/redirect.aspx?pid=30676343&bid=8436}
+54	2023-02-25 20:30:00+02	Olympiacos	Panathinaikos	Over	Full Time	2.15	0	\N	2.5	0	0	0	0	0	0	3.83%	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}
+50	2023-02-25 19:00:00+02	PAS Giannina	PAOK	Over	Full Time	1.76	0	\N	2.5	0	0	0	0	0	0	4.25%	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}
+51	2023-02-25 19:00:00+02	PAS Giannina	PAOK	Under	1st Half	3.3	0	\N	0.5	0	0	0	0	0	0	2.69%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+52	2023-02-25 19:00:00+02	PAS Giannina	PAOK	Under	2nd Half	4.4	0	\N	0.5	0	0	0	0	0	0	4.36%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+28	2023-02-20 18:00:00+02	Atromitos	Levadiakos	Under	\N	3.4	0.9	\N	0.5	1	0	1	0	0	0	4.40%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+29	2023-02-20 18:00:00+02	Atromitos	Levadiakos	Under	\N	2.55	0	\N	0.5	1	0	1	0	0	0	2.83%	{https://affiliatesys.ads-tracking.com/redirect.aspx?pid=30676343&bid=8436}
+46	2023-02-25 17:30:00+02	AEK	Asteras Tripolis	Over	Full Time	1.76	0	\N	2.5	2	0	1	1	0	0	4.25%	{https://record.betssongroupaffiliates.com/_WbYFYUdzQPOWzcyEjjoakGNd7ZgqdRLk/1/}
+30	2023-02-20 18:00:00+02	Atromitos	Levadiakos	Under	\N	3.4	0.85	\N	0.5	1	0	1	0	0	0	4.40%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+17	2023-02-19 19:30:00+02	Panetolikos	Ionikos	Under	\N	2.45	0	\N	0.5	1	0	0	1	0	0	3.21%	{https://affiliatesys.ads-tracking.com/redirect.aspx?pid=30676343&bid=8436}
+18	2023-02-19 19:30:00+02	Panetolikos	Ionikos	Under	\N	3.25	0.8	\N	0.5	1	0	0	1	0	0	3.63%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+31	2023-02-20 18:00:00+02	Atromitos	Levadiakos	Under	\N	3.4	0	\N	0.5	1	0	1	0	0	0	4.40%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+22	2023-02-19 20:30:00+02	PAOK	AEK	Over	\N	2.45	0	\N	2.5	2	0	1	1	0	0	2.48%	{https://record.affiliates.betshop.gr/_xVrm1kU5pcRLcRLGwHoTKWNd7ZgqdRLk/1/}
+23	2023-02-19 20:30:00+02	PAOK	AEK	Under	\N	2.5	0	\N	0.5	2	0	1	1	0	0	2.44%	{https://affiliatesys.ads-tracking.com/redirect.aspx?pid=30676343&bid=8436}
+13	2023-02-19 16:00:00+02	Lamia	Olympiacos	Under	\N	3.9	0	\N	0.5	0	3	0	0	1	2	4.20%	{}
+14	2023-02-19 16:00:00+02	Lamia	Olympiacos	Under	\N	1.9	0	\N	2.5	0	3	0	0	1	2	2.56%	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}
+47	2023-02-25 17:30:00+02	AEK	Asteras Tripolis	Under	1st Half	3.3	0	\N	0.5	2	0	1	1	0	0	2.69%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+48	2023-02-25 17:30:00+02	AEK	Asteras Tripolis	Under	2nd Half	4.4	0	\N	0.5	2	0	1	1	0	0	4.36%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+24	2023-02-19 20:30:00+02	PAOK	AEK	Under	\N	3.25	0.75	\N	0.5	2	0	1	1	0	0	5.47%	{http://www.stoiximan.gr/,https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+25	2023-02-19 20:30:00+02	PAOK	AEK	Under	\N	3.25	0	\N	0.5	2	0	1	1	0	0	5.47%	{http://www.stoiximan.gr/,https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+53	2023-02-25 19:00:00+02	PAS Giannina	PAOK	Under	Full Time	2.1	0	Won	2.5	0	0	0	0	0	0	4.25%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+49	2023-02-25 17:30:00+02	AEK	Asteras Tripolis	Under	Full Time	2.1	0	Won	2.5	2	0	1	1	0	0	4.25%	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}
+33	2023-02-20 19:30:00+02	OFI	Aris Salonika	Over	\N	2.4	0	Won	2.5	0	3	0	0	2	1	3.28%	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}
+34	2023-02-20 19:30:00+02	OFI	Aris Salonika	Under	\N	2.6	0	\N	0.5	0	3	0	0	2	1	2.89%	{https://affiliatesys.ads-tracking.com/redirect.aspx?pid=30676343&bid=8436}
+35	2023-02-20 19:30:00+02	OFI	Aris Salonika	Under	\N	3.4	0.8	\N	0.5	0	3	0	0	2	1	4.40%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+36	2023-02-20 19:30:00+02	OFI	Aris Salonika	Under	\N	3.4	0	\N	0.5	0	3	0	0	2	1	4.40%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+55	2023-02-25 20:30:00+02	Olympiacos	Panathinaikos	Under	1st Half	2.8	0	\N	0.5	0	0	0	0	0	0	1.48%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+56	2023-02-25 20:30:00+02	Olympiacos	Panathinaikos	Under	2nd Half	3.75	0	\N	0.5	0	0	0	0	0	0	3.47%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+32	2023-02-20 18:00:00+02	Atromitos	Levadiakos	Under	\N	3.4	0	\N	0.5	1	0	1	0	0	0	4.40%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+19	2023-02-19 19:30:00+02	Panetolikos	Ionikos	Under	\N	3.25	0.75	\N	0.5	1	0	0	1	0	0	3.63%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+21	2023-02-19 19:30:00+02	Panetolikos	Ionikos	Under	\N	3.25	0	\N	0.5	1	0	0	1	0	0	3.63%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+57	2023-02-25 20:30:00+02	Olympiacos	Panathinaikos	Under	Full Time	1.74	0	Won	2.5	0	0	0	0	0	0	3.83%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107,https://partners.opapaffiliates.gr/redirect.aspx?pid=2460&bid=1759}
 \.
 
 
 --
--- TOC entry 3104 (class 0 OID 25038)
--- Dependencies: 211
+-- TOC entry 3102 (class 0 OID 25038)
+-- Dependencies: 209
 -- Data for Name: soccer_statistics; Type: TABLE DATA; Schema: public; Owner: -
 --
 
@@ -943,7 +943,7 @@ COPY public.soccer_statistics (id, home_team, guest_team, date_time, goals_home,
 
 --
 -- TOC entry 3128 (class 0 OID 0)
--- Dependencies: 212
+-- Dependencies: 210
 -- Name: 1x2_oddsportal_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
@@ -961,11 +961,11 @@ SELECT pg_catalog.setval('public."Match_id_seq"', 949, true);
 
 --
 -- TOC entry 3130 (class 0 OID 0)
--- Dependencies: 207
+-- Dependencies: 212
 -- Name: OverUnderHistorical_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public."OverUnderHistorical_id_seq"', 57, true);
+SELECT pg_catalog.setval('public."OverUnderHistorical_id_seq"', 1, false);
 
 
 --
@@ -979,7 +979,7 @@ SELECT pg_catalog.setval('public."OverUnder_id_seq"', 8460, true);
 
 --
 -- TOC entry 3132 (class 0 OID 0)
--- Dependencies: 210
+-- Dependencies: 208
 -- Name: soccer_statistics_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
@@ -987,7 +987,7 @@ SELECT pg_catalog.setval('public.soccer_statistics_id_seq', 1, false);
 
 
 --
--- TOC entry 2956 (class 2606 OID 25112)
+-- TOC entry 2954 (class 2606 OID 25112)
 -- Name: 1x2_oddsportal 1x2_oddsportal_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -996,7 +996,7 @@ ALTER TABLE ONLY public."1x2_oddsportal"
 
 
 --
--- TOC entry 2958 (class 2606 OID 25114)
+-- TOC entry 2956 (class 2606 OID 25114)
 -- Name: 1x2_oddsportal 1x2_oddsportal_unique; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1077,7 +1077,7 @@ ALTER TABLE ONLY public."OddsSafariOverUnder"
 
 
 --
--- TOC entry 2952 (class 2606 OID 24974)
+-- TOC entry 2958 (class 2606 OID 25143)
 -- Name: OverUnderHistorical OverUnderHistorical_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1086,7 +1086,7 @@ ALTER TABLE ONLY public."OverUnderHistorical"
 
 
 --
--- TOC entry 2954 (class 2606 OID 25047)
+-- TOC entry 2952 (class 2606 OID 25047)
 -- Name: soccer_statistics soccer_statistics_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1154,7 +1154,7 @@ ALTER TABLE ONLY public."OddsSafariOverUnder"
 
 --
 -- TOC entry 3114 (class 0 OID 0)
--- Dependencies: 213
+-- Dependencies: 211
 -- Name: TABLE "1x2_oddsportal"; Type: ACL; Schema: public; Owner: -
 --
 
@@ -1203,7 +1203,7 @@ GRANT ALL ON TABLE public."OddsSafariOverUnder" TO postgres WITH GRANT OPTION;
 
 --
 -- TOC entry 3121 (class 0 OID 0)
--- Dependencies: 208
+-- Dependencies: 213
 -- Name: TABLE "OverUnderHistorical"; Type: ACL; Schema: public; Owner: -
 --
 
@@ -1223,7 +1223,7 @@ GRANT ALL ON TABLE public."PortalSafariMatch" TO postgres WITH GRANT OPTION;
 
 --
 -- TOC entry 3125 (class 0 OID 0)
--- Dependencies: 209
+-- Dependencies: 207
 -- Name: TABLE "PortalSafariBets"; Type: ACL; Schema: public; Owner: -
 --
 
@@ -1233,7 +1233,7 @@ GRANT ALL ON TABLE public."PortalSafariBets" TO postgres WITH GRANT OPTION;
 
 --
 -- TOC entry 3126 (class 0 OID 0)
--- Dependencies: 211
+-- Dependencies: 209
 -- Name: TABLE soccer_statistics; Type: ACL; Schema: public; Owner: -
 --
 
@@ -1250,7 +1250,7 @@ ALTER DEFAULT PRIVILEGES FOR ROLE postgres REVOKE ALL ON TABLES  FROM postgres;
 ALTER DEFAULT PRIVILEGES FOR ROLE postgres GRANT ALL ON TABLES  TO postgres WITH GRANT OPTION;
 
 
--- Completed on 2023-02-26 10:28:36 EET
+-- Completed on 2023-02-26 10:44:44 EET
 
 --
 -- PostgreSQL database dump complete
