@@ -9,10 +9,12 @@ sed '/Initialization Sequence Completed$/q' <&3 ; cat <&3 &
 
 export DISPLAY=:0
 
-time python ./oddsportal_results.py 2>&1 | tee logs/oddsportal_results.log  
+time ./python_env/bin/python ./oddsportal_results.py 2>&1 | tee logs/oddsportal_results.log  
 while [ $? != 0 ]; do
-    time python ./oddsportal_results.py 2>&1 | tee -a logs/oddsportal_results.log  
+    time ./python_env/bin/python ./oddsportal_results.py 2>&1 | tee -a logs/oddsportal_results.log  
 done
 
 
 psql -h localhost -U postgres -c 'SELECT "CalculateOverUnderResults"();' 2>&1 | tee -a logs/ArchivePastMatches.log
+
+ps -e | grep chrome | cut -d ' ' -f 1 | xargs kill -9
