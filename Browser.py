@@ -2,6 +2,7 @@ import os
 import time
 import pickle
 import random
+import argparse
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -13,7 +14,15 @@ from selenium.webdriver.support import expected_conditions as ExpectedCondition
 
 class Browser:
 
-    def __init__(self, headless = True):
+    def __init__(self):
+        parser = argparse.ArgumentParser()
+        parser.add_argument("--headed", help='Headed mode', action=argparse.BooleanOptionalAction, default=False)
+        args = parser.parse_args()
+
+        self.headless = True
+        if args.headed:
+            self.headless = False
+
         self.chrome_options = Options()
         self.chrome_options.add_argument('--no-sandbox')
         self.chrome_options.add_argument('--window-size=1920,1080')
@@ -25,7 +34,7 @@ class Browser:
         self.chrome_options.add_argument('--allow-running-insecure-content')
         self.chrome_options.add_experimental_option("detach", True)
         self.chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.5481.177 Safari/537.36")
-        if headless:
+        if self.headless:
             self.chrome_options.add_argument('--headless=new')
         
         self.driver = webdriver.Chrome("./drivers/chromedriver", chrome_options=self.chrome_options)

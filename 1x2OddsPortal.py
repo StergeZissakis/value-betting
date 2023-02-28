@@ -173,13 +173,12 @@ if __name__ == "__main__":
         print("Fialed to connect to DB")
         exit(-1)
 
-    headless = False
-    browser = Browser(headless)
+    browser = Browser()
     page = browser.get("https://www.oddsportal.com/soccer/greece/super-league/")
     
     # Click I Accept
     browser.accept_cookies("//button[text()='I Accept']")
     scrape_1x2(db, browser, page)
 
-    if headless:
+    if browser.headless:
         browser.close()

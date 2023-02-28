@@ -124,13 +124,12 @@ if __name__ == "__main__":
     if not db.is_connected():
         exit(-1)
 
-    headless = True
-    browser = Browser(headless)
+    browser = Browser()
     page = browser.get("https://www.oddsportal.com/")
     
     # Click I Accept
     browser.accept_cookies("//button[text()='I Accept']")
     process_Greek_Super_League_OverUnder(db, browser, page)
 
-    if headless:
+    if browser.headless:
         browser.close()

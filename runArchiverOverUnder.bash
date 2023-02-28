@@ -1,6 +1,6 @@
 #!/bin/bash
 
-config/disable_ipv6.sudo
+sudo config/disable_ipv6.sudo
 
 source python_env/bin/activate
 
@@ -12,6 +12,11 @@ sed '/Initialization Sequence Completed$/q' <&3 ; cat <&3 &
 export DISPLAY=:0
 
 time ./python_env/bin/python ./oddsportalOverUnder_results.py 2>&1 | tee logs/oddsportal_results.log  
+if [ $? != 0 ]
+then
+    time ./python_env/bin/python ./oddsportalOverUnder_results.py 2>&1 | tee logs/oddsportal_results.log  
+fi
+
 
 psql -h localhost -U postgres -c 'SELECT "CalculateOverUnderResults"();' 2>&1 | tee -a logs/ArchivePastMatches.log
 

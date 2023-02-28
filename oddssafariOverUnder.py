@@ -81,6 +81,8 @@ def process_over_under_match(browser, db, match_id, event_date_time, click_eleme
             break;
        
     browser.close_tab()
+    browser.switch_to_tab(0)
+    browser.reset_page_to_current()
 
 
 def process_over_under_events(browser, page, db, tab_button):
@@ -103,7 +105,7 @@ def process_over_under_events(browser, page, db, tab_button):
             match_id = db.insert_or_update_match('OddsSafariMatch', home_team.strip(), guest_team.strip(), str(event_date_time))
 
             process_over_under_match(browser, db, match_id, event_date_time, event_match_element)
-            browser.sleep_for_seconds_random(2)
+            browser.sleep_for_millis_random(1300)
     
 
 def process_Greek_Super_League_OverUnder(db, browser, page):
@@ -143,14 +145,13 @@ if __name__ == "__main__":
     if not db.is_connected():
         exit(-1)
 
-    headless = True
-    browser = Browser(headless)
+    browser = Browser()
     page = browser.get("https://www.oddssafari.gr/en")
     
     # Click I Accept
     browser.accept_cookies('//div[@id="qc-cmp2-ui"]/div[2]/div/button[@mode="primary"]/span[text()="AGREE"]') 
     process_Greek_Super_League_OverUnder(db, browser, page)
 
-    if headless:
+    if browser.headless:
         browser.close()
 
