@@ -1,5 +1,7 @@
 #!/bin/bash
 
+config/disable_ipv6.sudo
+
 source python_env/bin/activate
 
 psql -h localhost -U postgres -c 'SELECT "ArchivePastMatches"();' 2>&1 | tee -a logs/ArchivePastMatches.log
@@ -9,12 +11,8 @@ sed '/Initialization Sequence Completed$/q' <&3 ; cat <&3 &
 
 export DISPLAY=:0
 
-time ./python_env/bin/python ./oddsportal_results.py 2>&1 | tee logs/oddsportal_results.log  
-while [ $? != 0 ]; do
-    time ./python_env/bin/python ./oddsportal_results.py 2>&1 | tee -a logs/oddsportal_results.log  
-done
-
+time ./python_env/bin/python ./oddsportalOverUnder_results.py 2>&1 | tee logs/oddsportal_results.log  
 
 psql -h localhost -U postgres -c 'SELECT "CalculateOverUnderResults"();' 2>&1 | tee -a logs/ArchivePastMatches.log
 
-ps -e | grep chrome | cut -d ' ' -f 1 | xargs kill -9
+./kill_chrome.bash

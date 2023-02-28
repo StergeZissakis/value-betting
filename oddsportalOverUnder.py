@@ -124,7 +124,7 @@ if __name__ == "__main__":
     if not db.is_connected():
         exit(-1)
 
-    headless = False
+    headless = True
     browser = Browser(headless)
     page = browser.get("https://www.oddsportal.com/")
     

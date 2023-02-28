@@ -156,7 +156,7 @@ if __name__ == "__main__":
         print("Fialed to connect to DB")
         exit(-1)
 
-    headless = False
+    headless = True
     browser = Browser(headless)
     page = browser.get("https://www.oddsportal.com/soccer/greece/super-league/results/#/page/1/")
     
