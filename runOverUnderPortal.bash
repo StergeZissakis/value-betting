@@ -1,7 +1,5 @@
 #!/bin/bash
 
-sudo config/disable_ipv6.sudo
-
 source python_env/bin/activate
 
 export DISPLAY=:0
