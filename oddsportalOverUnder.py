@@ -73,7 +73,11 @@ def process_over_under_values(browser, page, div_set):
 
 def process_Greek_Super_League_OverUnder(db, browser, page):
     #Find soccer
-    soccer_link = page.find_element(By.XPATH, "//p[text()='soccer']")
+    try:
+        soccer_link = page.find_element(By.XPATH, "//p[text()='soccer']")
+    except:
+        soccer_link = page.find_element(By.XPATH, "//p[text()='football']")
+
     browser.scroll_to_visible(soccer_link)
     browser.move_to_element_and_left_click(soccer_link)
 
