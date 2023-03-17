@@ -5,7 +5,7 @@
 -- Dumped from database version 13.9 (Debian 13.9-0+deb11u1)
 -- Dumped by pg_dump version 13.9 (Debian 13.9-0+deb11u1)
 
--- Started on 2023-02-27 23:02:58 EET
+-- Started on 2023-03-17 04:17:44 EET
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -548,6 +548,13 @@ COPY public."OddsPortalOverUnder" (id, goals, odds, match_id, half, payout, crea
 --
 
 COPY public."OddsSafariMatch" (id, home_team, guest_team, date_time, created, updated) FROM stdin;
+1122	Asteras Tripolis	Panetolikos	2023-03-18 17:00:00+02	2023-03-17 01:48:27.270606	2023-03-17 01:48:27.270606
+1123	OFI	Levadiakos	2023-03-18 17:30:00+02	2023-03-17 01:48:54.524145	2023-03-17 01:48:54.524145
+1124	Atromitos	Ionikos	2023-03-18 19:30:00+02	2023-03-17 01:49:21.141226	2023-03-17 01:49:21.141226
+1125	Lamia	PAS Giannina	2023-03-18 21:00:00+02	2023-03-17 01:49:46.264255	2023-03-17 01:49:46.264255
+1126	Volos	Olympiacos	2023-03-19 17:30:00+02	2023-03-17 01:50:13.17195	2023-03-17 01:50:13.17195
+1132	Aris Salonika	PAOK	2023-03-19 19:00:00+02	2023-03-17 01:54:34.749014	2023-03-17 01:54:34.749014
+1133	AEK	Panathinaikos	2023-03-19 21:30:00+02	2023-03-17 01:55:01.391308	2023-03-17 01:55:01.391308
 \.
 
 
@@ -558,6 +565,48 @@ COPY public."OddsSafariMatch" (id, home_team, guest_team, date_time, created, up
 --
 
 COPY public."OddsSafariOverUnder" (id, goals, odds, match_id, half, payout, created, updated, type, bet_links) FROM stdin;
+10663	2.5	2.52	1122	Full Time	2.14%	2023-03-17 01:48:39.451202	2023-03-17 01:48:39.451202	Over	{https://gml-grp.com/C.ashx?btag=a_11671b_1371c_&affid=3817&siteid=11671&adid=1371&c=}
+10664	2.5	1.60	1122	Full Time	2.14%	2023-03-17 01:48:39.464707	2023-03-17 01:48:39.464707	Under	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}
+10665	0.5	1.57	1122	1st Half	3.56%	2023-03-17 01:48:45.626694	2023-03-17 01:48:45.626694	Over	{https://gml-grp.com/C.ashx?btag=a_11671b_1371c_&affid=3817&siteid=11671&adid=1371&c=}
+10666	0.5	2.50	1122	1st Half	3.56%	2023-03-17 01:48:45.63012	2023-03-17 01:48:45.63012	Under	{https://affiliatesys.ads-tracking.com/redirect.aspx?pid=30676343&bid=8436}
+10667	0.5	1.35	1122	2nd Half	4.62%	2023-03-17 01:48:51.734953	2023-03-17 01:48:51.734953	Over	{https://gml-grp.com/C.ashx?btag=a_11671b_1371c_&affid=3817&siteid=11671&adid=1371&c=}
+10668	0.5	3.25	1122	2nd Half	4.62%	2023-03-17 01:48:51.742863	2023-03-17 01:48:51.742863	Under	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+10669	2.5	2.45	1123	Full Time	-0.36%	2023-03-17 01:49:06.384111	2023-03-17 01:49:06.384111	Over	{https://gml-grp.com/C.ashx?btag=a_11671b_1371c_&affid=3817&siteid=11671&adid=1371&c=}
+10670	2.5	1.70	1123	Full Time	-0.36%	2023-03-17 01:49:06.391713	2023-03-17 01:49:06.391713	Under	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}
+10671	0.5	1.55	1123	1st Half	2.89%	2023-03-17 01:49:13.336725	2023-03-17 01:49:13.336725	Over	{https://gml-grp.com/C.ashx?btag=a_11671b_1371c_&affid=3817&siteid=11671&adid=1371&c=}
+10672	0.5	2.60	1123	1st Half	2.89%	2023-03-17 01:49:13.33994	2023-03-17 01:49:13.33994	Under	{https://affiliatesys.ads-tracking.com/redirect.aspx?pid=30676343&bid=8436}
+10673	0.5	1.33	1123	2nd Half	5.47%	2023-03-17 01:49:19.668655	2023-03-17 01:49:19.668655	Over	{https://affiliatesys.ads-tracking.com/redirect.aspx?pid=30676343&bid=8436,https://gml-grp.com/C.ashx?btag=a_11671b_1371c_&affid=3817&siteid=11671&adid=1371&c=,https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+10674	0.5	3.25	1123	2nd Half	5.47%	2023-03-17 01:49:19.675817	2023-03-17 01:49:19.675817	Under	{http://www.sportingbet.gr/,https://sports.bwin.gr/el/sports?wm=5273373,https://gml-grp.com/C.ashx?btag=a_11671b_1371c_&affid=3817&siteid=11671&adid=1371&c=,https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+10675	2.5	2.72	1124	Full Time	0.46%	2023-03-17 01:49:32.110851	2023-03-17 01:49:32.110851	Over	{https://gml-grp.com/C.ashx?btag=a_11671b_1371c_&affid=3817&siteid=11671&adid=1371&c=}
+10676	2.5	1.57	1124	Full Time	0.46%	2023-03-17 01:49:32.112918	2023-03-17 01:49:32.112918	Under	{}
+10677	0.5	1.62	1124	1st Half	3.28%	2023-03-17 01:49:37.418405	2023-03-17 01:49:37.418405	Over	{https://gml-grp.com/C.ashx?btag=a_11671b_1371c_&affid=3817&siteid=11671&adid=1371&c=}
+10678	0.5	2.40	1124	1st Half	3.28%	2023-03-17 01:49:37.424193	2023-03-17 01:49:37.424193	Under	{https://affiliatesys.ads-tracking.com/redirect.aspx?pid=30676343&bid=8436}
+10679	0.5	1.38	1124	2nd Half	3.13%	2023-03-17 01:49:43.308032	2023-03-17 01:49:43.308032	Over	{https://gml-grp.com/C.ashx?btag=a_11671b_1371c_&affid=3817&siteid=11671&adid=1371&c=}
+10680	0.5	3.25	1124	2nd Half	3.13%	2023-03-17 01:49:43.315039	2023-03-17 01:49:43.315039	Under	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+10681	2.5	2.77	1125	Full Time	1.44%	2023-03-17 01:49:57.919462	2023-03-17 01:49:57.919462	Over	{https://gml-grp.com/C.ashx?btag=a_11671b_1371c_&affid=3817&siteid=11671&adid=1371&c=}
+10682	2.5	1.53	1125	Full Time	1.44%	2023-03-17 01:49:57.922364	2023-03-17 01:49:57.922364	Under	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}
+10683	0.5	1.65	1125	1st Half	1.40%	2023-03-17 01:50:03.759122	2023-03-17 01:50:03.759122	Over	{https://gml-grp.com/C.ashx?btag=a_11671b_1371c_&affid=3817&siteid=11671&adid=1371&c=}
+10684	0.5	2.45	1125	1st Half	1.40%	2023-03-17 01:50:03.766085	2023-03-17 01:50:03.766085	Under	{https://affiliatesys.ads-tracking.com/redirect.aspx?pid=30676343&bid=8436}
+10685	0.5	1.39	1125	2nd Half	2.64%	2023-03-17 01:50:11.045745	2023-03-17 01:50:11.045745	Over	{https://gml-grp.com/C.ashx?btag=a_11671b_1371c_&affid=3817&siteid=11671&adid=1371&c=}
+10686	0.5	3.25	1125	2nd Half	2.64%	2023-03-17 01:50:11.050601	2023-03-17 01:50:11.050601	Under	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+10687	2.5	1.80	1126	Full Time	1.41%	2023-03-17 01:50:23.509128	2023-03-17 01:50:23.509128	Over	{}
+10688	2.5	2.18	1126	Full Time	1.41%	2023-03-17 01:50:23.511382	2023-03-17 01:50:23.511382	Under	{https://gml-grp.com/C.ashx?btag=a_11671b_1371c_&affid=3817&siteid=11671&adid=1371&c=}
+10715	0.5	1.37	1126	1st Half	1.94%	2023-03-17 01:54:25.544537	2023-03-17 01:54:25.544537	Over	{https://gml-grp.com/C.ashx?btag=a_11671b_1371c_&affid=3817&siteid=11671&adid=1371&c=}
+10716	0.5	3.45	1126	1st Half	1.94%	2023-03-17 01:54:25.55029	2023-03-17 01:54:25.55029	Under	{https://affiliatesys.ads-tracking.com/redirect.aspx?pid=30676343&bid=8436}
+10717	0.5	1.20	1126	2nd Half	5.40%	2023-03-17 01:54:31.510993	2023-03-17 01:54:31.510993	Over	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107,https://gml-grp.com/C.ashx?btag=a_11671b_1371c_&affid=3817&siteid=11671&adid=1371&c=,https://affiliatesys.ads-tracking.com/redirect.aspx?pid=30676343&bid=8436}
+10718	0.5	4.47	1126	2nd Half	5.40%	2023-03-17 01:54:31.518945	2023-03-17 01:54:31.518945	Under	{https://record.betssongroupaffiliates.com/_WbYFYUdzQPOWzcyEjjoakGNd7ZgqdRLk/1/}
+10719	2.5	2.55	1132	Full Time	0.56%	2023-03-17 01:54:44.832881	2023-03-17 01:54:44.832881	Over	{https://gml-grp.com/C.ashx?btag=a_11671b_1371c_&affid=3817&siteid=11671&adid=1371&c=}
+10720	2.5	1.63	1132	Full Time	0.56%	2023-03-17 01:54:44.839885	2023-03-17 01:54:44.839885	Under	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}
+10721	0.5	1.57	1132	1st Half	4.32%	2023-03-17 01:54:51.303559	2023-03-17 01:54:51.303559	Over	{https://gml-grp.com/C.ashx?btag=a_11671b_1371c_&affid=3817&siteid=11671&adid=1371&c=}
+10722	0.5	2.45	1132	1st Half	4.32%	2023-03-17 01:54:51.308265	2023-03-17 01:54:51.308265	Under	{https://affiliatesys.ads-tracking.com/redirect.aspx?pid=30676343&bid=8436}
+10723	0.5	1.37	1132	2nd Half	3.63%	2023-03-17 01:54:58.270378	2023-03-17 01:54:58.270378	Over	{https://affiliatesys.ads-tracking.com/redirect.aspx?pid=30676343&bid=8436}
+10724	0.5	3.25	1132	2nd Half	3.63%	2023-03-17 01:54:58.276388	2023-03-17 01:54:58.276388	Under	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+10725	2.5	2.60	1133	Full Time	2.50%	2023-03-17 01:55:12.478257	2023-03-17 01:55:12.478257	Over	{https://gml-grp.com/C.ashx?btag=a_11671b_1371c_&affid=3817&siteid=11671&adid=1371&c=}
+10726	2.5	1.56	1133	Full Time	2.50%	2023-03-17 01:55:12.481501	2023-03-17 01:55:12.481501	Under	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}
+10727	0.5	1.60	1133	1st Half	3.21%	2023-03-17 01:55:18.248372	2023-03-17 01:55:18.248372	Over	{https://gml-grp.com/C.ashx?btag=a_11671b_1371c_&affid=3817&siteid=11671&adid=1371&c=}
+10728	0.5	2.45	1133	1st Half	3.21%	2023-03-17 01:55:18.256112	2023-03-17 01:55:18.256112	Under	{https://affiliatesys.ads-tracking.com/redirect.aspx?pid=30676343&bid=8436}
+10729	0.5	1.37	1133	2nd Half	3.63%	2023-03-17 01:55:25.448191	2023-03-17 01:55:25.448191	Over	{https://affiliatesys.ads-tracking.com/redirect.aspx?pid=30676343&bid=8436}
+10730	0.5	3.25	1133	2nd Half	3.63%	2023-03-17 01:55:25.455165	2023-03-17 01:55:25.455165	Under	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
 \.
 
 
@@ -568,75 +617,105 @@ COPY public."OddsSafariOverUnder" (id, goals, odds, match_id, half, payout, crea
 --
 
 COPY public."OverUnderHistorical" (id, "Date_Time", "Home_Team", "Guest_Team", "Type", "Half", "Odds_bet", "Margin", won, "Goals", "Home_Team_Goals", "Guest_Team_Goals", "Home_Team_Goals_1st_Half", "Home_Team_Goals_2nd_Half", "Guest_Team_Goals_1st_Half", "Guest_Team_Goals_2nd_Half", "Payout", "Bet_link") FROM stdin;
-58	2023-02-26 16:00:00+02	Ionikos	OFI	Over	Full Time	2.30	0.00	Lost	2.5	0	2	0	0	0	2	4.26%	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}
-59	2023-02-26 16:00:00+02	Ionikos	OFI	Under	2nd Half	2.60	0.00	Lost	0.5	0	2	0	0	0	2	2.11%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
-60	2023-02-26 16:00:00+02	Ionikos	OFI	Under	1st Half	2.60	0.00	Lost	0.5	0	2	0	0	0	2	2.11%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+58	2023-02-26 16:00:00+02	Ionikos	OFI	Over	Full Time	2.30	0.00	Lost	2.5	0	0	0	0	0	2	4.26%	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}
+59	2023-02-26 16:00:00+02	Ionikos	OFI	Under	2nd Half	2.60	0.00	Lost	0.5	0	0	0	0	0	2	2.11%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+60	2023-02-26 16:00:00+02	Ionikos	OFI	Under	1st Half	2.60	0.00	Lost	0.5	0	0	0	0	0	2	2.11%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
 63	2023-02-26 16:00:00+02	Levadiakos	Panetolikos	Under	1st Half	2.45	0.00	Lost	0.5	0	0	0	0	0	0	3.21%	{https://record.betssongroupaffiliates.com/_WbYFYUdzQPOWzcyEjjoakGNd7ZgqdRLk/1/}
 64	2023-02-26 16:00:00+02	Levadiakos	Panetolikos	Under	1st Half	2.45	0.00	Lost	0.5	0	0	0	0	0	0	3.21%	{https://record.betssongroupaffiliates.com/_WbYFYUdzQPOWzcyEjjoakGNd7ZgqdRLk/1/}
 44	2023-02-24 20:00:00+02	Volos	Lamia	Under	Full Time	1.81	0	Won	2.5	1	1	0	1	1	0	1.73%	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}
-30	2023-02-20 18:00:00+02	Atromitos	Levadiakos	Under	\N	3.4	0.85	Lost	0.5	1	0	1	0	0	0	4.40%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
-31	2023-02-20 18:00:00+02	Atromitos	Levadiakos	Under	\N	3.4	0	Lost	0.5	1	0	1	0	0	0	4.40%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
-32	2023-02-20 18:00:00+02	Atromitos	Levadiakos	Under	\N	3.4	0	Lost	0.5	1	0	1	0	0	0	4.40%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
-21	2023-02-19 19:30:00+02	Panetolikos	Ionikos	Under	\N	3.25	0	Lost	0.5	1	0	0	1	0	0	3.63%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
-10	2023-02-19 16:00:00+02	Lamia	Olympiacos	Over	\N	2	0	Won	2.5	0	3	0	0	1	2	2.56%	{https://record.betssongroupaffiliates.com/_WbYFYUdzQPOWzcyEjjoakGNd7ZgqdRLk/1/,https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
-1	2023-02-18 17:00:00+02	Panathinaikos	Volos	Over	\N	2.17	0	Lost	2.5	2	0	0	2	0	0	0.72%	{https://record.affiliates.betshop.gr/_xVrm1kU5pcRLcRLGwHoTKWNd7ZgqdRLk/1/}
+30	2023-02-20 18:00:00+02	Atromitos	Levadiakos	Under	\N	3.4	0.85	Lost	0.5	1	1	1	0	0	0	4.40%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+74	2023-03-05 16:00:00+02	Olympiacos	Levadiakos	Under	1st Half	3.60	0.00	Lost	0.5	6	6	2	4	0	0	2.88%	{https://affiliatesys.ads-tracking.com/redirect.aspx?pid=30676343&bid=8436}
+70	2023-03-04 20:00:00+02	Asteras Tripolis	Atromitos	Over	Full Time	2.30	0.00	Lost	2.5	1	1	0	1	1	0	4.61%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107,https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145,https://record.affiliates.betshop.gr/_xVrm1kU5pcRLcRLGwHoTKWNd7ZgqdRLk/1/}
+71	2023-03-04 20:00:00+02	Asteras Tripolis	Atromitos	Under	1st Half	2.55	0.00	Lost	0.5	1	1	0	1	1	0	2.83%	{http://www.sportingbet.gr/,https://sports.bwin.gr/el/sports?wm=5273373,https://affiliatesys.ads-tracking.com/redirect.aspx?pid=30676343&bid=8436}
+72	2023-03-04 20:00:00+02	Asteras Tripolis	Atromitos	Under	2nd Half	3.40	0.00	Lost	0.5	1	1	0	1	1	0	4.40%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+31	2023-02-20 18:00:00+02	Atromitos	Levadiakos	Under	\N	3.4	0	Lost	0.5	1	1	1	0	0	0	4.40%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+32	2023-02-20 18:00:00+02	Atromitos	Levadiakos	Under	\N	3.4	0	Lost	0.5	1	1	1	0	0	0	4.40%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+21	2023-02-19 19:30:00+02	Panetolikos	Ionikos	Under	\N	3.25	0	Lost	0.5	1	1	0	1	0	0	3.63%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+10	2023-02-19 16:00:00+02	Lamia	Olympiacos	Over	\N	2	0	Won	2.5	0	0	0	0	1	2	2.56%	{https://record.betssongroupaffiliates.com/_WbYFYUdzQPOWzcyEjjoakGNd7ZgqdRLk/1/,https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+1	2023-02-18 17:00:00+02	Panathinaikos	Volos	Over	\N	2.17	0	Lost	2.5	2	2	0	2	0	0	0.72%	{https://record.affiliates.betshop.gr/_xVrm1kU5pcRLcRLGwHoTKWNd7ZgqdRLk/1/}
+77	2023-03-05 17:00:00+02	PAS Giannina	Volos	Over	Full Time	2.30	0.00	Lost	2.5	0	0	0	0	0	1	3.59%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107,https://record.affiliates.betshop.gr/_xVrm1kU5pcRLcRLGwHoTKWNd7ZgqdRLk/1/}
+78	2023-03-05 17:00:00+02	PAS Giannina	Volos	Under	1st Half	2.60	0.00	Lost	0.5	0	0	0	0	0	1	4.08%	{https://affiliatesys.ads-tracking.com/redirect.aspx?pid=30676343&bid=8436,https://record.betssongroupaffiliates.com/_WbYFYUdzQPOWzcyEjjoakGNd7ZgqdRLk/1/}
+75	2023-03-05 16:00:00+02	Olympiacos	Levadiakos	Under	2nd Half	4.75	0.00	Lost	0.5	6	6	2	4	0	0	4.20%	{http://www.sportingbet.gr/,https://sports.bwin.gr/el/sports?wm=5273373}
+76	2023-03-05 16:00:00+02	Olympiacos	Levadiakos	Under	Full Time	2.30	0.00	Lost	2.5	6	6	2	4	0	0	3.92%	{https://record.betssongroupaffiliates.com/_WbYFYUdzQPOWzcyEjjoakGNd7ZgqdRLk/1/}
+33	2023-02-20 19:30:00+02	OFI	Aris Salonika	Over	\N	2.4	0	Won	2.5	0	3	0	0	2	1	3.28%	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}
+20	2023-02-19 19:30:00+02	Panetolikos	Ionikos	Under	\N	3.25	0	Lost	0.5	1	1	0	1	0	0	3.63%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+11	2023-02-19 16:00:00+02	Lamia	Olympiacos	Under	\N	2.95	0	Lost	0.5	0	0	0	0	1	2	2.78%	{https://affiliatesys.ads-tracking.com/redirect.aspx?pid=30676343&bid=8436}
 57	2023-02-25 20:30:00+02	Olympiacos	Panathinaikos	Under	Full Time	1.74	0	Won	2.5	0	0	0	0	0	0	3.83%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107,https://partners.opapaffiliates.gr/redirect.aspx?pid=2460&bid=1759}
+12	2023-02-19 16:00:00+02	Lamia	Olympiacos	Under	\N	3.9	0.95	Lost	0.5	0	0	0	0	1	2	4.20%	{}
+2	2023-02-18 17:00:00+02	Panathinaikos	Volos	Under	\N	2.8	0	Lost	0.5	2	2	0	2	0	0	2.33%	{https://affiliatesys.ads-tracking.com/redirect.aspx?pid=30676343&bid=8436}
+3	2023-02-18 17:00:00+02	Panathinaikos	Volos	Under	\N	3.7	0.9	Lost	0.5	2	2	0	2	0	0	3.80%	{}
+4	2023-02-18 17:00:00+02	Panathinaikos	Volos	Under	\N	3.7	0	Lost	0.5	2	2	0	2	0	0	3.80%	{}
+5	2023-02-18 17:00:00+02	Panathinaikos	Volos	Under	\N	1.83	0	Lost	2.5	2	2	0	2	0	0	0.72%	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}
 53	2023-02-25 19:00:00+02	PAS Giannina	PAOK	Under	Full Time	2.1	0	Won	2.5	0	0	0	0	0	0	4.25%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
-49	2023-02-25 17:30:00+02	AEK	Asteras Tripolis	Under	Full Time	2.1	0	Won	2.5	2	0	1	1	0	0	4.25%	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}
+49	2023-02-25 17:30:00+02	AEK	Asteras Tripolis	Under	Full Time	2.1	0	Won	2.5	2	2	1	1	0	0	4.25%	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}
 37	2023-02-24 20:00:00+02	Volos	Lamia	Over	Full Time	2.15	0.1	Lost	2.5	1	1	0	1	1	0	1.73%	{https://record.betssongroupaffiliates.com/_WbYFYUdzQPOWzcyEjjoakGNd7ZgqdRLk/1/}
 38	2023-02-24 20:00:00+02	Volos	Lamia	Over	Full Time	2.15	0	Lost	2.5	1	1	0	1	1	0	1.73%	{https://record.betssongroupaffiliates.com/_WbYFYUdzQPOWzcyEjjoakGNd7ZgqdRLk/1/}
 40	2023-02-24 20:00:00+02	Volos	Lamia	Under	1st Half	2.9	0	Lost	0.5	1	1	0	1	1	0	1.14%	{https://record.betssongroupaffiliates.com/_WbYFYUdzQPOWzcyEjjoakGNd7ZgqdRLk/1/}
 41	2023-02-24 20:00:00+02	Volos	Lamia	Under	2nd Half	3.75	0	Lost	0.5	1	1	0	1	1	0	4.02%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
-42	2023-02-24 20:00:00+02	Volos	Lamia	Under	2nd Half	3.75	0	Lost	0.5	1	1	0	1	1	0	4.02%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
-43	2023-02-24 20:00:00+02	Volos	Lamia	Under	1st Half	1.81	0.73	Lost	2.5	1	1	0	1	1	0	1.73%	{https://partners.opapaffiliates.gr/redirect.aspx?pid=2460&bid=1759}
-45	2023-02-24 20:00:00+02	Volos	Lamia	Under	1st Half	1.81	0	Lost	2.5	1	1	0	1	1	0	1.73%	{https://partners.opapaffiliates.gr/redirect.aspx?pid=2460&bid=1759}
-33	2023-02-20 19:30:00+02	OFI	Aris Salonika	Over	\N	2.4	0	Won	2.5	0	3	0	0	2	1	3.28%	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}
-20	2023-02-19 19:30:00+02	Panetolikos	Ionikos	Under	\N	3.25	0	Lost	0.5	1	0	0	1	0	0	3.63%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
-11	2023-02-19 16:00:00+02	Lamia	Olympiacos	Under	\N	2.95	0	Lost	0.5	0	3	0	0	1	2	2.78%	{https://affiliatesys.ads-tracking.com/redirect.aspx?pid=30676343&bid=8436}
-12	2023-02-19 16:00:00+02	Lamia	Olympiacos	Under	\N	3.9	0.95	Lost	0.5	0	3	0	0	1	2	4.20%	{}
-2	2023-02-18 17:00:00+02	Panathinaikos	Volos	Under	\N	2.8	0	Lost	0.5	2	0	0	2	0	0	2.33%	{https://affiliatesys.ads-tracking.com/redirect.aspx?pid=30676343&bid=8436}
-3	2023-02-18 17:00:00+02	Panathinaikos	Volos	Under	\N	3.7	0.9	Lost	0.5	2	0	0	2	0	0	3.80%	{}
-4	2023-02-18 17:00:00+02	Panathinaikos	Volos	Under	\N	3.7	0	Lost	0.5	2	0	0	2	0	0	3.80%	{}
-5	2023-02-18 17:00:00+02	Panathinaikos	Volos	Under	\N	1.83	0	Lost	2.5	2	0	0	2	0	0	0.72%	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}
-39	2023-02-24 20:00:00+02	Volos	Lamia	Over	1st Half	2.15	0	Won	2.5	1	1	0	1	1	0	1.73%	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}
-61	2023-02-26 16:00:00+02	Levadiakos	Panetolikos	Over	Full Time	2.60	0.00	Lost	2.5	0	0	0	0	0	0	1.72%	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}
-62	2023-02-26 16:00:00+02	Levadiakos	Panetolikos	Over	Full Time	2.60	0.00	Lost	2.5	0	0	0	0	0	0	1.72%	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}
-54	2023-02-25 20:30:00+02	Olympiacos	Panathinaikos	Over	Full Time	2.15	0	Lost	2.5	0	0	0	0	0	0	3.83%	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}
-55	2023-02-25 20:30:00+02	Olympiacos	Panathinaikos	Under	1st Half	2.8	0	Lost	0.5	0	0	0	0	0	0	1.48%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
-56	2023-02-25 20:30:00+02	Olympiacos	Panathinaikos	Under	2nd Half	3.75	0	Lost	0.5	0	0	0	0	0	0	3.47%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
 50	2023-02-25 19:00:00+02	PAS Giannina	PAOK	Over	Full Time	1.76	0	Lost	2.5	0	0	0	0	0	0	4.25%	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}
 51	2023-02-25 19:00:00+02	PAS Giannina	PAOK	Under	1st Half	3.3	0	Lost	0.5	0	0	0	0	0	0	2.69%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
-52	2023-02-25 19:00:00+02	PAS Giannina	PAOK	Under	2nd Half	4.4	0	Lost	0.5	0	0	0	0	0	0	4.36%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
-46	2023-02-25 17:30:00+02	AEK	Asteras Tripolis	Over	Full Time	1.76	0	Lost	2.5	2	0	1	1	0	0	4.25%	{https://record.betssongroupaffiliates.com/_WbYFYUdzQPOWzcyEjjoakGNd7ZgqdRLk/1/}
-47	2023-02-25 17:30:00+02	AEK	Asteras Tripolis	Under	1st Half	3.3	0	Lost	0.5	2	0	1	1	0	0	2.69%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
-48	2023-02-25 17:30:00+02	AEK	Asteras Tripolis	Under	2nd Half	4.4	0	Lost	0.5	2	0	1	1	0	0	4.36%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+46	2023-02-25 17:30:00+02	AEK	Asteras Tripolis	Over	Full Time	1.76	0	Lost	2.5	2	2	1	1	0	0	4.25%	{https://record.betssongroupaffiliates.com/_WbYFYUdzQPOWzcyEjjoakGNd7ZgqdRLk/1/}
+47	2023-02-25 17:30:00+02	AEK	Asteras Tripolis	Under	1st Half	3.3	0	Lost	0.5	2	2	1	1	0	0	2.69%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
 34	2023-02-20 19:30:00+02	OFI	Aris Salonika	Under	\N	2.6	0	Lost	0.5	0	3	0	0	2	1	2.89%	{https://affiliatesys.ads-tracking.com/redirect.aspx?pid=30676343&bid=8436}
 35	2023-02-20 19:30:00+02	OFI	Aris Salonika	Under	\N	3.4	0.8	Lost	0.5	0	3	0	0	2	1	4.40%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
 36	2023-02-20 19:30:00+02	OFI	Aris Salonika	Under	\N	3.4	0	Lost	0.5	0	3	0	0	2	1	4.40%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
-26	2023-02-20 18:00:00+02	Atromitos	Levadiakos	Over	\N	2.4	0	Lost	2.5	1	0	1	0	0	0	3.46%	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}
-27	2023-02-20 18:00:00+02	Atromitos	Levadiakos	Under	\N	2.55	0.05	Lost	0.5	1	0	1	0	0	0	2.83%	{https://affiliatesys.ads-tracking.com/redirect.aspx?pid=30676343&bid=8436}
-28	2023-02-20 18:00:00+02	Atromitos	Levadiakos	Under	\N	3.4	0.9	Lost	0.5	1	0	1	0	0	0	4.40%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
-29	2023-02-20 18:00:00+02	Atromitos	Levadiakos	Under	\N	2.55	0	Lost	0.5	1	0	1	0	0	0	2.83%	{https://affiliatesys.ads-tracking.com/redirect.aspx?pid=30676343&bid=8436}
+26	2023-02-20 18:00:00+02	Atromitos	Levadiakos	Over	\N	2.4	0	Lost	2.5	1	1	1	0	0	0	3.46%	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}
+27	2023-02-20 18:00:00+02	Atromitos	Levadiakos	Under	\N	2.55	0.05	Lost	0.5	1	1	1	0	0	0	2.83%	{https://affiliatesys.ads-tracking.com/redirect.aspx?pid=30676343&bid=8436}
+80	2023-03-05 17:30:00+02	Lamia	Aris Salonika	Over	Full Time	2.09	0.00	Lost	2.5	2	2	2	0	1	0	3.00%	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}
+81	2023-03-05 17:30:00+02	Lamia	Aris Salonika	Under	1st Half	2.90	0.00	Lost	0.5	2	2	2	0	1	0	2.45%	{https://affiliatesys.ads-tracking.com/redirect.aspx?pid=30676343&bid=8436}
+79	2023-03-05 17:00:00+02	PAS Giannina	Volos	Under	2nd Half	3.40	0.00	Lost	0.5	0	0	0	0	0	1	4.40%	{http://www.sportingbet.gr/,https://sports.bwin.gr/el/sports?wm=5273373,https://record.betssongroupaffiliates.com/_WbYFYUdzQPOWzcyEjjoakGNd7ZgqdRLk/1/,http://www.stoiximan.gr/,https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+61	2023-02-26 16:00:00+02	Levadiakos	Panetolikos	Over	Full Time	2.60	0.00	Lost	2.5	0	0	0	0	0	0	1.72%	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}
+62	2023-02-26 16:00:00+02	Levadiakos	Panetolikos	Over	Full Time	2.60	0.00	Lost	2.5	0	0	0	0	0	0	1.72%	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}
+48	2023-02-25 17:30:00+02	AEK	Asteras Tripolis	Under	2nd Half	4.4	0	Lost	0.5	2	2	1	1	0	0	4.36%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+28	2023-02-20 18:00:00+02	Atromitos	Levadiakos	Under	\N	3.4	0.9	Lost	0.5	1	1	1	0	0	0	4.40%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
 22	2023-02-19 20:30:00+02	PAOK	AEK	Over	\N	2.45	0	Lost	2.5	2	0	1	1	0	0	2.48%	{https://record.affiliates.betshop.gr/_xVrm1kU5pcRLcRLGwHoTKWNd7ZgqdRLk/1/}
 23	2023-02-19 20:30:00+02	PAOK	AEK	Under	\N	2.5	0	Lost	0.5	2	0	1	1	0	0	2.44%	{https://affiliatesys.ads-tracking.com/redirect.aspx?pid=30676343&bid=8436}
 24	2023-02-19 20:30:00+02	PAOK	AEK	Under	\N	3.25	0.75	Lost	0.5	2	0	1	1	0	0	5.47%	{http://www.stoiximan.gr/,https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
-25	2023-02-19 20:30:00+02	PAOK	AEK	Under	\N	3.25	0	Lost	0.5	2	0	1	1	0	0	5.47%	{http://www.stoiximan.gr/,https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
-15	2023-02-19 19:30:00+02	Panetolikos	Ionikos	Over	\N	2.5	0	Lost	2.5	1	0	0	1	0	0	1.70%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107,https://partners.opapaffiliates.gr/redirect.aspx?pid=2460&bid=1759,https://record.affiliates.betshop.gr/_xVrm1kU5pcRLcRLGwHoTKWNd7ZgqdRLk/1/}
-16	2023-02-19 19:30:00+02	Panetolikos	Ionikos	Over	\N	2.5	0	Lost	2.5	1	0	0	1	0	0	1.70%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107,https://partners.opapaffiliates.gr/redirect.aspx?pid=2460&bid=1759,https://record.affiliates.betshop.gr/_xVrm1kU5pcRLcRLGwHoTKWNd7ZgqdRLk/1/}
-17	2023-02-19 19:30:00+02	Panetolikos	Ionikos	Under	\N	2.45	0	Lost	0.5	1	0	0	1	0	0	3.21%	{https://affiliatesys.ads-tracking.com/redirect.aspx?pid=30676343&bid=8436}
-18	2023-02-19 19:30:00+02	Panetolikos	Ionikos	Under	\N	3.25	0.8	Lost	0.5	1	0	0	1	0	0	3.63%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
-19	2023-02-19 19:30:00+02	Panetolikos	Ionikos	Under	\N	3.25	0.75	Lost	0.5	1	0	0	1	0	0	3.63%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
-13	2023-02-19 16:00:00+02	Lamia	Olympiacos	Under	\N	3.9	0	Lost	0.5	0	3	0	0	1	2	4.20%	{}
-14	2023-02-19 16:00:00+02	Lamia	Olympiacos	Under	\N	1.9	0	Lost	2.5	0	3	0	0	1	2	2.56%	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}
+15	2023-02-19 19:30:00+02	Panetolikos	Ionikos	Over	\N	2.5	0	Lost	2.5	1	1	0	1	0	0	1.70%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107,https://partners.opapaffiliates.gr/redirect.aspx?pid=2460&bid=1759,https://record.affiliates.betshop.gr/_xVrm1kU5pcRLcRLGwHoTKWNd7ZgqdRLk/1/}
+16	2023-02-19 19:30:00+02	Panetolikos	Ionikos	Over	\N	2.5	0	Lost	2.5	1	1	0	1	0	0	1.70%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107,https://partners.opapaffiliates.gr/redirect.aspx?pid=2460&bid=1759,https://record.affiliates.betshop.gr/_xVrm1kU5pcRLcRLGwHoTKWNd7ZgqdRLk/1/}
+17	2023-02-19 19:30:00+02	Panetolikos	Ionikos	Under	\N	2.45	0	Lost	0.5	1	1	0	1	0	0	3.21%	{https://affiliatesys.ads-tracking.com/redirect.aspx?pid=30676343&bid=8436}
+13	2023-02-19 16:00:00+02	Lamia	Olympiacos	Under	\N	3.9	0	Lost	0.5	0	0	0	0	1	2	4.20%	{}
+14	2023-02-19 16:00:00+02	Lamia	Olympiacos	Under	\N	1.9	0	Lost	2.5	0	0	0	0	1	2	2.56%	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}
 6	2023-02-18 20:00:00+02	Asteras Tripolis	PAS Giannina	Over	\N	2.55	0	Lost	2.5	1	1	1	0	1	0	2.07%	{https://record.affiliates.betshop.gr/_xVrm1kU5pcRLcRLGwHoTKWNd7ZgqdRLk/1/}
+54	2023-02-25 20:30:00+02	Olympiacos	Panathinaikos	Over	Full Time	2.15	0	Lost	2.5	0	0	0	0	0	0	3.83%	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}
 7	2023-02-18 20:00:00+02	Asteras Tripolis	PAS Giannina	Under	\N	2.45	0	Lost	0.5	1	1	1	0	1	0	3.21%	{https://affiliatesys.ads-tracking.com/redirect.aspx?pid=30676343&bid=8436}
+55	2023-02-25 20:30:00+02	Olympiacos	Panathinaikos	Under	1st Half	2.8	0	Lost	0.5	0	0	0	0	0	0	1.48%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+56	2023-02-25 20:30:00+02	Olympiacos	Panathinaikos	Under	2nd Half	3.75	0	Lost	0.5	0	0	0	0	0	0	3.47%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+52	2023-02-25 19:00:00+02	PAS Giannina	PAOK	Under	2nd Half	4.4	0	Lost	0.5	0	0	0	0	0	0	4.36%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+25	2023-02-19 20:30:00+02	PAOK	AEK	Under	\N	3.25	0	Lost	0.5	2	0	1	1	0	0	5.47%	{http://www.stoiximan.gr/,https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
 8	2023-02-18 20:00:00+02	Asteras Tripolis	PAS Giannina	Under	\N	3.25	0.8	Lost	0.5	1	1	1	0	1	0	3.63%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
 9	2023-02-18 20:00:00+02	Asteras Tripolis	PAS Giannina	Under	\N	3.25	0	Lost	0.5	1	1	1	0	1	0	3.63%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+84	2023-03-05 19:30:00+02	OFI	AEK	Over	Full Time	2.00	0.00	Lost	2.5	0	0	0	0	1	2	1.78%	{}
+85	2023-03-05 19:30:00+02	OFI	AEK	Under	1st Half	2.95	0.00	Lost	0.5	0	0	0	0	1	2	3.23%	{https://affiliatesys.ads-tracking.com/redirect.aspx?pid=30676343&bid=8436}
+86	2023-03-05 19:30:00+02	OFI	AEK	Under	2nd Half	3.90	0.00	Lost	0.5	0	0	0	0	1	2	4.77%	{}
+87	2023-03-05 19:30:00+02	OFI	AEK	Under	Full Time	1.93	0.00	Lost	2.5	0	0	0	0	1	2	1.78%	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}
+82	2023-03-05 17:30:00+02	Lamia	Aris Salonika	Under	2nd Half	3.75	0.00	Lost	0.5	2	2	2	0	1	0	5.13%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+83	2023-03-05 17:30:00+02	Lamia	Aris Salonika	Under	Full Time	1.81	0.00	Lost	2.5	2	2	2	0	1	0	3.00%	{https://record.affiliates.betshop.gr/_xVrm1kU5pcRLcRLGwHoTKWNd7ZgqdRLk/1/}
+29	2023-02-20 18:00:00+02	Atromitos	Levadiakos	Under	\N	2.55	0	Lost	0.5	1	1	1	0	0	0	2.83%	{https://affiliatesys.ads-tracking.com/redirect.aspx?pid=30676343&bid=8436}
+18	2023-02-19 19:30:00+02	Panetolikos	Ionikos	Under	\N	3.25	0.8	Lost	0.5	1	1	0	1	0	0	3.63%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+94	2023-03-06 19:30:00+02	Panathinaikos	Panetolikos	Over	Full Time	2.03	0.01	Lost	2.5	2	0	0	2	0	0	4.32%	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}
+95	2023-03-06 19:30:00+02	Panathinaikos	Panetolikos	Over	Full Time	2.03	0.00	Lost	2.5	2	0	0	2	0	0	4.32%	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}
+96	2023-03-06 19:30:00+02	Panathinaikos	Panetolikos	Under	1st Half	2.95	0.00	Lost	0.5	2	0	0	2	0	0	2.78%	{https://affiliatesys.ads-tracking.com/redirect.aspx?pid=30676343&bid=8436}
+97	2023-03-06 19:30:00+02	Panathinaikos	Panetolikos	Under	2nd Half	3.75	0.00	Lost	0.5	2	0	0	2	0	0	5.13%	{http://www.sportingbet.gr/,https://sports.bwin.gr/el/sports?wm=5273373,https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+98	2023-03-06 19:30:00+02	Panathinaikos	Panetolikos	Under	2nd Half	3.75	0.00	Lost	0.5	2	0	0	2	0	0	5.13%	{http://www.sportingbet.gr/,https://sports.bwin.gr/el/sports?wm=5273373,https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+19	2023-02-19 19:30:00+02	Panetolikos	Ionikos	Under	\N	3.25	0.75	Lost	0.5	1	1	0	1	0	0	3.63%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+39	2023-02-24 20:00:00+02	Volos	Lamia	Over	1st Half	2.15	0	Won	2.5	1	1	0	1	1	0	1.73%	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}
+99	2023-03-06 19:30:00+02	Panathinaikos	Panetolikos	Under	Full Time	1.81	0.00	Lost	2.5	2	0	0	2	0	0	4.32%	{https://record.affiliates.betshop.gr/_xVrm1kU5pcRLcRLGwHoTKWNd7ZgqdRLk/1/}
+73	2023-03-04 20:00:00+02	Asteras Tripolis	Atromitos	Under	2nd Half	3.40	0.00	Lost	0.5	1	1	0	1	1	0	4.40%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
 67	2023-02-26 19:30:00+02	Aris Salonika	Atromitos	Over	Full Time	2.60	0.00	Lost	2.5	2	1	2	0	0	1	1.72%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
 68	2023-02-26 19:30:00+02	Aris Salonika	Atromitos	Under	1st Half	2.45	0.00	Lost	0.5	2	1	2	0	0	1	3.21%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
 69	2023-02-26 19:30:00+02	Aris Salonika	Atromitos	Under	2nd Half	3.25	0.00	Lost	0.5	2	1	2	0	0	1	3.63%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
 65	2023-02-26 16:00:00+02	Levadiakos	Panetolikos	Under	2nd Half	3.25	0.00	Lost	0.5	0	0	0	0	0	0	3.63%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
 66	2023-02-26 16:00:00+02	Levadiakos	Panetolikos	Under	2nd Half	3.25	0.00	Lost	0.5	0	0	0	0	0	0	3.63%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+88	2023-03-05 20:30:00+02	PAOK	Ionikos	Over	Full Time	1.92	0.01	Lost	2.5	6	0	4	2	0	0	3.26%	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}
+89	2023-03-05 20:30:00+02	PAOK	Ionikos	Over	Full Time	1.92	0.00	Lost	2.5	6	0	4	2	0	0	3.26%	{https://rt.novibet.partners/o/w3W92s?lpage=2e4NMs&site_id=1000145}
+90	2023-03-05 20:30:00+02	PAOK	Ionikos	Under	1st Half	3.10	0.00	Lost	0.5	6	0	4	2	0	0	2.61%	{https://affiliatesys.ads-tracking.com/redirect.aspx?pid=30676343&bid=8436}
+91	2023-03-05 20:30:00+02	PAOK	Ionikos	Under	2nd Half	4.05	0.05	Lost	0.5	6	0	4	2	0	0	4.48%	{http://www.stoiximan.gr/}
+92	2023-03-05 20:30:00+02	PAOK	Ionikos	Under	2nd Half	4.05	0.00	Lost	0.5	6	0	4	2	0	0	4.48%	{http://www.stoiximan.gr/}
+93	2023-03-05 20:30:00+02	PAOK	Ionikos	Under	Full Time	1.95	0.00	Lost	2.5	6	0	4	2	0	0	3.26%	{https://affiliatesys.ads-tracking.com/redirect.aspx?pid=30676343&bid=8436,https://record.betssongroupaffiliates.com/_WbYFYUdzQPOWzcyEjjoakGNd7ZgqdRLk/1/,https://www.bet365.gr/olp/open-account?affiliate=365_01012107,https://record.affiliates.betshop.gr/_xVrm1kU5pcRLcRLGwHoTKWNd7ZgqdRLk/1/}
+42	2023-02-24 20:00:00+02	Volos	Lamia	Under	2nd Half	3.75	0	Lost	0.5	1	1	0	1	1	0	4.02%	{https://www.bet365.gr/olp/open-account?affiliate=365_01012107}
+43	2023-02-24 20:00:00+02	Volos	Lamia	Under	1st Half	1.81	0.73	Lost	2.5	1	1	0	1	1	0	1.73%	{https://partners.opapaffiliates.gr/redirect.aspx?pid=2460&bid=1759}
+45	2023-02-24 20:00:00+02	Volos	Lamia	Under	1st Half	1.81	0	Lost	2.5	1	1	0	1	1	0	1.73%	{https://partners.opapaffiliates.gr/redirect.aspx?pid=2460&bid=1759}
 \.
 
 
@@ -665,7 +744,7 @@ SELECT pg_catalog.setval('public."1x2_oddsportal_id_seq"', 1, false);
 -- Name: Match_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public."Match_id_seq"', 949, true);
+SELECT pg_catalog.setval('public."Match_id_seq"', 1133, true);
 
 
 --
@@ -674,7 +753,7 @@ SELECT pg_catalog.setval('public."Match_id_seq"', 949, true);
 -- Name: OverUnderHistorical_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public."OverUnderHistorical_id_seq"', 69, true);
+SELECT pg_catalog.setval('public."OverUnderHistorical_id_seq"', 99, true);
 
 
 --
@@ -683,7 +762,7 @@ SELECT pg_catalog.setval('public."OverUnderHistorical_id_seq"', 69, true);
 -- Name: OverUnder_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public."OverUnder_id_seq"', 8429, true);
+SELECT pg_catalog.setval('public."OverUnder_id_seq"', 10730, true);
 
 
 --
@@ -959,7 +1038,7 @@ ALTER DEFAULT PRIVILEGES FOR ROLE postgres REVOKE ALL ON TABLES  FROM postgres;
 ALTER DEFAULT PRIVILEGES FOR ROLE postgres GRANT ALL ON TABLES  TO postgres WITH GRANT OPTION;
 
 
--- Completed on 2023-02-27 23:02:58 EET
+-- Completed on 2023-03-17 04:17:45 EET
 
 --
 -- PostgreSQL database dump complete
