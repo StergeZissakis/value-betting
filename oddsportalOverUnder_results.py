@@ -4,6 +4,8 @@ from Browser import Browser
 from collections import OrderedDict
 from selenium.webdriver.common.by import By
 from datetime import datetime, date, timedelta
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions as ExpectedCondition
 
 def count_children_divs(section_div):
     return len(section_div.find_elements(By.XPATH, './div'))
@@ -41,7 +43,7 @@ def get_event_time(section_div, kind):
         div = section_div.find_element(By.XPATH, './div[3]/div/a/div[1]/div/div/p')
     elif kind == "DateRow":
         try:
-            div = section_div.find_element(By.XPATH, './div[2]/div/a/div/div/p')
+            div = section_div.find_element(By.XPATH, './div[2]/div/a/div[1]/div/div/p')
         except:
             div = section_div.find_element(By.XPATH, './div[3]/div/a/div[1]/div/div/p')
     elif kind == "Match":
@@ -52,19 +54,21 @@ def get_event_time(section_div, kind):
     return div.text
 
 def click_and_collect_over_under_details(browser, section, kind):
-    if kind  == "TopHeader" or kind == "DateRow":
-        clickable_xpath = './div[3]/div/a/div[2]/div/div/a[1]'
-    elif kind == "Match":
+    if kind == "Match":
         clickable_xpath = './div/div/a'
+    elif kind == "DateRow":
+        clickable_xpath = './div[2]/div/a/div[2]/div/div/a[1]/div[1]'
+    elif kind  == "TopHeader":
+        clickable_xpath = './div[3]/div/a/div[2]/div/div/a[1]'
     else:
         return ()
 
-    browser.move_to_element_and_middle_click(section.find_element(By.XPATH, clickable_xpath)) #, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[5]/div[2]/div[3]/div[2]/span')
+    browser.move_to_element_and_middle_click(section.find_element(By.XPATH, clickable_xpath))
     browser.sleep_for_millis_random(300)
     page = browser.switch_to_tab(1)
 
-    half_goals = page.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[2]/div[3]/div[2]').text.strip()
-    half_goals = half_goals.replace('(','').replace(')','').split('\n')[-1].strip()
+    goals = WebDriverWait(browser.driver, 3).until(ExpectedCondition.presence_of_element_located((By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[2]/div[3]/div[2]'))).text.strip()
+    half_goals = goals.split('\n')[-1].replace('(','').replace(')','').strip()
     (half_1, half_2) = half_goals.split(',')
     half_1 = half_1.strip()
     half_2 = half_2.strip()
@@ -93,30 +97,25 @@ def process_results(db, browser, page):
 
                 event_time = get_event_time(section, kind)
                 event_date_time = browser.add_time_to_date(event_date, event_time)
-                if kind == "TopHeader":
+                if kind == "Match":
+                    home_team = section.find_element(By.XPATH,   './div/div/a/div[2]/div/div/a[1]/div[1]').text
+                    guest_team = section.find_element(By.XPATH,  './div/div/a/div[2]/div/div/a[2]/div[1]').text
+                    home_goals = section.find_element(By.XPATH,  './div/div/a/div[2]/div/div/div/div/div[1]').text
+                    guest_goals = section.find_element(By.XPATH, './div/div/a/div[2]/div/div/div/div/div[1]').text
+                elif kind == "DateRow":
+                    home_team = section.find_element(By.XPATH,   './div[2]/div/a/div[2]/div/div/a[1]/div[1]').text
+                    guest_team = section.find_element(By.XPATH,  './div[2]/div/a/div[2]/div/div/a[2]/div[1]').text
+                    home_goals = section.find_element(By.XPATH,  './div[2]/div/a/div[2]/div/div/div/div/div[1]').text
+                    guest_goals = section.find_element(By.XPATH, './div[2]/div/a/div[2]/div/div/div/div/div[3]').text
+                elif kind == "TopHeader":
                     home_team = section.find_element(By.XPATH,   './div[3]/div/a/div[2]/div/div/a[1]/div[1]').text
                     guest_team = section.find_element(By.XPATH,  './div[3]/div/a/div[2]/div/div/a[2]/div[1]').text
                     home_goals = section.find_element(By.XPATH,  './div[3]/div/a/div[2]/div/div/div/div/div[1]').text
                     guest_goals = section.find_element(By.XPATH, './div[3]/div/a/div[2]/div/div/div/div/div[3]').text
-                elif kind == "DateRow":
-                    try:
-                        home_team = section.find_element(By.XPATH,  './div[2]/div/a/div[2]/div/a[1]/div[1]').text
-                        guest_team = section.find_element(By.XPATH, './div[2]/div/a/div[2]/div/a[2]/div[1]').text
-                        (home_goals, guest_goals) = section.find_element(By.XPATH, './div[2]/div/div[1]/div').text.split(':')
-                    except:
-                        home_team = section.find_element(By.XPATH,  './div[3]/div/a/div[2]/div/div/a[1]/div[1]').text
-                        guest_team = section.find_element(By.XPATH, './div[3]/div/a/div[2]/div/div/a[2]/div[1]').text
-                        home_goals = section.find_element(By.XPATH, './div[3]/div/a/div[2]/div/div/div/div/div[1]').text
-                        guest_goals = section.find_element(By.XPATH, './div[3]/div/a/div[2]/div/div/div/div/div[3]').text
-                elif kind == "Match":
-                    home_team = section.find_element(By.XPATH,  './div/div/a/div[2]/div/div/a[1]/div[1]').text
-                    guest_team = section.find_element(By.XPATH, './div/div/a/div[2]/div/div/a[2]/div[1]').text
-                    home_goals = section.find_element(By.XPATH, './div/div/a/div[2]/div/div/div/div/div[1]').text
-                    guest_goals = section.find_element(By.XPATH,'./div/div/a/div[2]/div/div/div/div/div[1]').text
                 #click in and get more details
-                halfs = click_and_collect_over_under_details(browser, section, kind)
-                #print(str(event_date_time) + "->" + home_team + "_VS_" + guest_team + "=" + str(home_goals) + ":" + str(guest_goals))
-                db.update_historical_results_over_under("OverUnderHistorical", event_date_time, home_team, guest_team, home_goals, guest_goals, halfs[0], halfs[1])
+                scores = click_and_collect_over_under_details(browser, section, kind)
+                print(str(event_date_time) + "->" + home_team + "_VS_" + guest_team + "=" + str(home_goals) + ":" + str(guest_goals))
+                db.update_historical_results_over_under("OverUnderHistorical", event_date_time, home_team, guest_team, home_goals, guest_goals, scores[0], scores[1])
 
 
         section_divs = container_div.find_elements(By.XPATH, './div[@set="65147"]')
