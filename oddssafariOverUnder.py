@@ -112,17 +112,17 @@ def process_Greek_Super_League_OverUnder(db, browser, page):
     browser.sleep_for_millis_random(700)
 
     #Find soccer
-    soccer_link = page.find_element(By.XPATH, '//div/div[2]/aside[1]/div[2]/div/ul/li/button/span[text()="Soccer"]')
+    soccer_link = page.find_element(By.XPATH, '//*/button/span[2][text()="Soccer"]')
     browser.scroll_move_left_click(soccer_link)
     browser.sleep_for_millis_random(600)
 
     #Find Countries A-Z
-    az = page.find_element(By.XPATH, '//div/div[2]/aside[1]/div[2]/div/ul/li/ul/li/button[text()="Countries A-Z"]')
+    az = page.find_element(By.XPATH, '//*/button[text()="Countries A-Z"]')
     browser.move_to_element_and_left_click(az)
     browser.sleep_for_millis_random(500)
 
     #Find Greece
-    greece_country_button = page.find_element(By.XPATH,   '//div/div[2]/aside[1]/div[2]/div/ul/li/ul/li/ul/li/button[text()="Greece"]')
+    greece_country_button = page.find_element(By.XPATH,  '//*/button[text()="Greece"]')
     browser.scroll_move_left_click(greece_country_button) 
     browser.sleep_for_seconds_random(2)
 
@@ -133,11 +133,10 @@ def process_Greek_Super_League_OverUnder(db, browser, page):
     browser.sleep_for_millis_random(1000)
 
     page = browser.reset_page_to_current()
-    over_under_tab_buttons_xpath = '/html/body/div[2]/div[2]/main/div[2]/div[2]/button[contains(text(), "Ο/U")]'
+    over_under_tab_buttons_xpath = '//*/button[contains(text(), "Ο/U")]'
     
     browser.wait_for_element_to_appear(over_under_tab_buttons_xpath)
-    over_under_tab_buttons = page.find_elements(By.XPATH, over_under_tab_buttons_xpath)
-    over_under_tab_button = over_under_tab_buttons[0]
+    over_under_tab_button = page.find_elements(By.XPATH, over_under_tab_buttons_xpath)[0]
     process_over_under_events(browser, page, db, over_under_tab_button)
 
 if __name__ == "__main__":

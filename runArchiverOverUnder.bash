@@ -1,11 +1,11 @@
 #!/bin/bash
 
+./kill_chrome.bash
+
 export DISPLAY=:0
 source python_env/bin/activate
 
-echo "*** Archiving rows..."
-psql -h localhost -U postgres -c 'SELECT "ArchivePastMatches"();' 2>&1 | tee -a ./logs/ArchivePastMatches.log
-echo "*** Archived rows."
+./runArchivePastMatches.bash
 
 echo "*** Connecting to Italy..."
 exec 3< <(cd config; sudo ./connect_italy.sudo 2>&1 | tee ../logs/italy_vpn_archiver.log)
@@ -21,8 +21,6 @@ then
 fi
 echo "*** Odds Portal Results Finished."
 
-echo "*** Calculating Results..."
-psql -h localhost -U postgres -c 'SELECT "CalculateOverUnderResults"();' 2>&1 | tee -a ./logs/ArchivePastMatches.log
-echo "*** Finished Calculating Results."
+./runCalculateOverUnderResults.bash
 
 ./kill_chrome.bash

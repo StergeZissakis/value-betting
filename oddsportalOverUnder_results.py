@@ -24,7 +24,8 @@ def get_section_kind(section_div):
     
 def get_event_date(section_div, event_date, kind):
     if kind == "TopHeader":
-        date = section_div.find_element(By.XPATH, './div[2]/div[1]/div').text
+        date = section_div.find_element(By.XPATH, './div[2]/div[1]/div').text.split('-')[0].strip()
+        print("Date: " + str(date))
         if date == 'Today':
             return datetime.today()
         elif date == 'Yesterday':
@@ -32,7 +33,8 @@ def get_event_date(section_div, event_date, kind):
         elif datetime.strptime(date, "%d %b %Y"):
             return datetime.strptime(date, "%d %b %Y")
     elif kind ==  "DateRow":
-        date = section_div.find_element(By.XPATH, './div/div/div').text
+        date = section_div.find_element(By.XPATH, './div/div/div').text.split('-')[0].strip()
+        print("Date: " + str(date))
         if datetime.strptime(date, "%d %b %Y"):
             return datetime.strptime(date, "%d %b %Y")
 
@@ -64,10 +66,12 @@ def click_and_collect_over_under_details(browser, section, kind):
         return ()
 
     browser.move_to_element_and_middle_click(section.find_element(By.XPATH, clickable_xpath))
-    browser.sleep_for_millis_random(300)
+    browser.sleep_for_millis_random(400)
     page = browser.switch_to_tab(1)
 
-    goals = WebDriverWait(browser.driver, 3).until(ExpectedCondition.presence_of_element_located((By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[2]/div[3]/div[2]'))).text.strip()
+    final_result = WebDriverWait(browser.driver, 5).until(ExpectedCondition.presence_of_element_located((By.XPATH, "//*[@id='app']/div/div[1]/div/main/div[2]/div[3]/div[2]/div[3]/div[2]/span[contains(text(),'result')]")))
+    final_result_parent = final_result.find_element(By.XPATH, '..')
+    goals = final_result_parent.text.strip()
     half_goals = goals.split('\n')[-1].replace('(','').replace(')','').strip()
     (half_1, half_2) = half_goals.split(',')
     half_1 = half_1.strip()

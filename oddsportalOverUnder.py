@@ -14,9 +14,9 @@ def extract_common_event_details(browser):
 
     event = OrderedDict()
 
-    event['home_team']  = tab.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[5]/div[1]/div[1]/div/div[1]/p').text
-    event['guest_team'] = tab.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[5]/div[1]/div[3]/div[1]/p').text
-    event_date_time = tab.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[5]/div[2]/div[1]/div[2]').text
+    event['home_team']  = tab.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[1]/div[1]/div/div[1]/p').text
+    event['guest_team'] = tab.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[1]/div[3]/div[1]/p').text
+    event_date_time = tab.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[2]/div[1]/div[2]').text
 
     (str_dat, str_date, str_time) = [part.strip() for part in event_date_time.split(',')]
     date_time = datetime.strptime(str_date + " " + str_time, "%d %b %Y %H:%M")
@@ -30,13 +30,13 @@ def process_over_under_tab(browser, half, db):
     
     match_id = db.insert_or_update_match('OddsPortalMatch', event['home_team'], event['guest_team'], event['date_time'])
     if match_id is None:
-        print("Failed to insert match data.")
+        print("Failed to insert match data: " + str(event))
         return
 
     event['half'] = half
     event['goals'] = []
 
-    rows = tab.find_elements(By.XPATH,     '//*[@id="app"]/div/div[1]/div/main/div[2]/div[6]/div[@set="0"]')
+    rows = tab.find_elements(By.XPATH,     '//*[@id="app"]/div/div[1]/div/main/div[2]/div[4]/div[@set="0"]')
     for row in rows:
         str_goals = row.find_element(By.XPATH, './div/div[2]/p[1]').text
         over_under_goal = float(str_goals.split(' ')[-1])
@@ -56,27 +56,25 @@ def process_over_under_values(browser, page, div_set):
     browser.move_to_element_and_left_click(event_a)
     
     over_under = page.find_element(By.XPATH, "//li[contains(@class, 'odds-item')]//span[@class='flex']//div[contains(text(), 'Over/Under')]")
-    browser.move_to_element_and_left_click(over_under, '//div[@set="0"]')
+    browser.move_to_element_and_left_click(over_under, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[4]/div[@set="0"]')
 
-    ou_full_time = page.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[5]/div[5]/div[1]')
-    ou_1st_half = page.find_element(By.XPATH,  '//*[@id="app"]/div/div[1]/div/main/div[2]/div[5]/div[5]/div[2]')
-    ou_2nd_half = page.find_element(By.XPATH,  '//*[@id="app"]/div/div[1]/div/main/div[2]/div[5]/div[5]/div[3]')
-
-    browser.sleep_for_seconds_random(2)
-
-    browser.move_to_element_and_left_click(ou_full_time, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[6]/div[@set="0"]')
+    ou_full_time = page.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[5]/div[1]')
+    browser.move_to_element_and_left_click(ou_full_time, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[4]/div[2]/div/div[2]')
     process_over_under_tab(browser,ou_full_time.text, db) 
-    browser.move_to_element_and_left_click(ou_1st_half, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[6]/div[@set="0"]')
+
+    ou_1st_half = page.find_element(By.XPATH,  '//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[5]/div[2]')
+    browser.move_to_element_and_left_click(ou_1st_half,  '//*[@id="app"]/div/div[1]/div/main/div[2]/div[4]/div[2]/div/div[2]')
+    ou_1st_half = page.find_element(By.XPATH,  '//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[5]/div[2]')
     process_over_under_tab(browser, ou_1st_half.text, db)
-    browser.move_to_element_and_left_click(ou_2nd_half, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[6]/div[@set="0"]')
+
+    ou_2nd_half = page.find_element(By.XPATH,  '//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[5]/div[3]')
+    browser.move_to_element_and_left_click(ou_2nd_half,  '//*[@id="app"]/div/div[1]/div/main/div[2]/div[4]/div[2]/div/div[2]')
+    ou_2nd_half = page.find_element(By.XPATH,  '//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[5]/div[3]')
     process_over_under_tab(browser, ou_2nd_half.text, db)
 
 def process_Greek_Super_League_OverUnder(db, browser, page):
     #Find soccer
-    try:
-        soccer_link = page.find_element(By.XPATH, "//p[text()='soccer']")
-    except:
-        soccer_link = page.find_element(By.XPATH, "//p[text()='football']")
+    soccer_link = page.find_element(By.XPATH, "//p[text()='football']")
 
     browser.scroll_to_visible(soccer_link)
     browser.move_to_element_and_left_click(soccer_link)
@@ -94,32 +92,34 @@ def process_Greek_Super_League_OverUnder(db, browser, page):
 
     # Variable to store the id by which elems will be sought within the tab, based on div's set= attrib
     set_ids = []
+    print("set_ids:" + str(set_ids))
+
 
     #Visit all 'Super League' links under Greece
     total_tabs = 0
     for link in greece_super_league:
         set_ids.append(re.findall(r'^\d+', link.get_attribute("id"))[0])
+        print("set_ids: " + str(set_ids))
         total_tabs += 1
         browser.move_to_element_and_middle_click(link);
         break # Do not process the 2nd class League
 
     #Process tabs
     for tab in range(0, total_tabs):
-        #print('Processing tab [' + str(set_ids[tab]) + ']')
-        #Ensure the tab has been loaded
+        print('Processing tab [' + str(set_ids[tab]) + ']')
+        # Ensure the tab has been loaded
         div_set_xpath = '//div/div/div[@set="' + str(set_ids[tab]) + '"]'
         page = browser.switch_to_tab(tab + 1, div_set_xpath)
         # Get all the matches
         div_sets = page.find_elements(By.XPATH, div_set_xpath)
+        print("div_sets: " + str(len(div_sets)))
         num_div_sets = len(div_sets)
         for counter in range(0, num_div_sets):
+            print("counter: " + str(counter))
             div_set = div_sets[counter]
-            try: # some matches do not have odds set yet
-                process_over_under_values(browser, page, div_set)
-            except:
-                pass
+            process_over_under_values(browser, page, div_set)
             browser.go_back(4)
-            browser.sleep_for_seconds_random(2)
+            browser.sleep_for_millis_random(1100)
             page = browser.page
             div_sets = page.find_elements(By.XPATH, div_set_xpath)
 
