@@ -55,22 +55,25 @@ def process_over_under_values(browser, page, div_set):
     event_a = event_inner_div.find_elements(By.XPATH, './a')[0]
     browser.move_to_element_and_left_click(event_a)
     
-    over_under = page.find_element(By.XPATH, "//li[contains(@class, 'odds-item')]//span[@class='flex']//div[contains(text(), 'Over/Under')]")
-    browser.move_to_element_and_left_click(over_under, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[4]/div[@set="0"]')
+    try:
+        over_under = page.find_element(By.XPATH, "//li[contains(@class, 'odds-item')]//span[@class='flex']//div[contains(text(), 'Over/Under')]")
+        browser.move_to_element_and_left_click(over_under, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[4]/div[@set="0"]')
 
-    ou_full_time = page.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[5]/div[1]')
-    browser.move_to_element_and_left_click(ou_full_time, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[4]/div[2]/div/div[2]')
-    process_over_under_tab(browser,ou_full_time.text, db) 
+        ou_full_time = page.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[5]/div[1]')
+        browser.move_to_element_and_left_click(ou_full_time, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[4]/div[2]/div/div[2]')
+        process_over_under_tab(browser,ou_full_time.text, db) 
+            
+        ou_1st_half = page.find_element(By.XPATH,  '//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[5]/div[2]')
+        browser.move_to_element_and_left_click(ou_1st_half,  '//*[@id="app"]/div/div[1]/div/main/div[2]/div[4]/div[2]/div/div[2]')
+        ou_1st_half = page.find_element(By.XPATH,  '//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[5]/div[2]')
+        process_over_under_tab(browser, ou_1st_half.text, db)
 
-    ou_1st_half = page.find_element(By.XPATH,  '//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[5]/div[2]')
-    browser.move_to_element_and_left_click(ou_1st_half,  '//*[@id="app"]/div/div[1]/div/main/div[2]/div[4]/div[2]/div/div[2]')
-    ou_1st_half = page.find_element(By.XPATH,  '//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[5]/div[2]')
-    process_over_under_tab(browser, ou_1st_half.text, db)
-
-    ou_2nd_half = page.find_element(By.XPATH,  '//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[5]/div[3]')
-    browser.move_to_element_and_left_click(ou_2nd_half,  '//*[@id="app"]/div/div[1]/div/main/div[2]/div[4]/div[2]/div/div[2]')
-    ou_2nd_half = page.find_element(By.XPATH,  '//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[5]/div[3]')
-    process_over_under_tab(browser, ou_2nd_half.text, db)
+        ou_2nd_half = page.find_element(By.XPATH,  '//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[5]/div[3]')
+        browser.move_to_element_and_left_click(ou_2nd_half,  '//*[@id="app"]/div/div[1]/div/main/div[2]/div[4]/div[2]/div/div[2]')
+        ou_2nd_half = page.find_element(By.XPATH,  '//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[5]/div[3]')
+        process_over_under_tab(browser, ou_2nd_half.text, db)
+    except:
+        pass
 
 def process_Greek_Super_League_OverUnder(db, browser, page):
     #Find soccer
