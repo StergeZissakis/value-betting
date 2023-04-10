@@ -40,9 +40,9 @@ def process_over_under_tab(browser, half, db):
     for row in rows:
         str_goals = row.find_element(By.XPATH, './div/div[2]/p[1]').text
         over_under_goal = float(str_goals.split(' ')[-1])
-        over = row.find_element(By.XPATH,  './div/div[3]/div[1]/button/p').text
-        under = row.find_element(By.XPATH, './div/div[3]/div[2]/button/p').text
-        probability = row.find_element(By.XPATH, './div/div[3]/div[3]/button/p').text
+        over = row.find_element(By.XPATH,  './div/div[3]/div[1]/div/div/p').text
+        under = row.find_element(By.XPATH, './div/div[3]/div[2]/div/div/p').text
+        probability = row.find_element(By.XPATH, './div/div[3]/div[3]/p').text
         bet_links = []
         event['goals'].append([over_under_goal, over, under, probability, bet_links])
 

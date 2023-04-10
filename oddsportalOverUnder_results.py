@@ -26,9 +26,9 @@ def get_event_date(section_div, event_date, kind):
     if kind == "TopHeader":
         date = section_div.find_element(By.XPATH, './div[2]/div[1]/div').text.split('-')[0].strip()
         print("Date: " + str(date))
-        if date == 'Today':
+        if date.startswith('Today'):
             return datetime.today()
-        elif date == 'Yesterday':
+        elif date.startswith('Yesterday'):
             return datetime.today() - timedelta(days=1)
         elif datetime.strptime(date, "%d %b %Y"):
             return datetime.strptime(date, "%d %b %Y")
