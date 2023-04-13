@@ -20,4 +20,4 @@ echo "*** Repeat Running Odds Safari..."
 fi
 echo "*** Odds Safari Finished."
 
-./kill_chrome.bash
+sudo ./kill_chrome_and_vpn.bash

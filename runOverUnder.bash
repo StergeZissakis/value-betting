@@ -5,7 +5,7 @@ source python_env/bin/activate
 export DISPLAY=:0
 
 
-./kill_chrome.bash
+./kill_chrome_and_vpn.bash
 
 ./runOverUnderPortal.bash
 
@@ -13,4 +13,4 @@ export DISPLAY=:0
 
 ./runArchiverOverUnder.bash
 
-./kill_chrome.bash
+./kill_chrome_and_vpn.bash

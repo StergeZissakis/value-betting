@@ -1,6 +1,6 @@
 #!/bin/bash
 
-./kill_chrome.bash
+./kill_chrome_and_vpn.bash
 
 export DISPLAY=:0
 source python_env/bin/activate
@@ -23,4 +23,4 @@ echo "*** Odds Portal Results Finished."
 
 ./runCalculateOverUnderResults.bash
 
-./kill_chrome.bash
+./kill_chrome_and_vpn.bash

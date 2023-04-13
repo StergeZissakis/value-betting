@@ -20,4 +20,4 @@ then
 fi
 echo "*** Odds Portal Finished."
 
-./kill_chrome.bash
+./kill_chrome_and_vpn.bash

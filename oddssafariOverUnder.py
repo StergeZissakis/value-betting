@@ -70,9 +70,11 @@ def process_over_under_match(browser, db, match_id, event_date_time, click_eleme
 
             goals = goal_container.find_element(By.XPATH, './div[contains(@class, "groups_goalItem")]').get_attribute('innerHTML').strip()
 
-            max_over  = goal_container.find_element(By.XPATH, './div[3]').get_attribute('innerHTML').strip()
-            max_under = goal_container.find_element(By.XPATH, './div[4]').get_attribute('innerHTML').strip()
-            payout    = goal_container.find_element(By.XPATH, './div[5]').get_attribute('innerHTML').strip()
+            over_under = goal_container.find_elements(By.XPATH, './div[contains(@class, "groups_overUnderItem")]')
+            
+            max_over  = over_under[0].get_attribute('innerHTML').strip()
+            max_under = over_under[1].get_attribute('innerHTML').strip()
+            payout    = goal_container.find_element(By.XPATH, './div[contains(@class, "groups_vigItem")]').get_attribute('innerHTML').strip()
 
             ul_bookies = group.find_element(By.XPATH, './div/div[2]/ul[contains(@class, "bets_rowCnt")]')
             bet_links = find_max_bookie(max_over, max_under, ul_bookies )
@@ -112,7 +114,8 @@ def process_Greek_Super_League_OverUnder(db, browser, page):
     browser.sleep_for_millis_random(700)
 
     #Find soccer
-    soccer_link = page.find_element(By.XPATH, '//*/button/span[2][text()="Soccer"]')
+                                               
+    soccer_link = page.find_element(By.XPATH, '//*[@id="__next"]/div[2]/aside[1]/div[2]/div/ul/li[1]/button/span[text()="Soccer"]')
     browser.scroll_move_left_click(soccer_link)
     browser.sleep_for_millis_random(600)
 
