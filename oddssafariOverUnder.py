@@ -151,7 +151,9 @@ if __name__ == "__main__":
     page = browser.get("https://www.oddssafari.gr/en")
     
     # Click I Accept
-    browser.accept_cookies('//div[@id="qc-cmp2-ui"]/div[2]/div/button[@mode="primary"]/span[text()="AGREE"]') 
+    agree_xpath = '//div[@id="qc-cmp2-ui"]/div[2]/div/button[@mode="primary"]/span[text()="AGREE"]'
+    browser.wait_for_element_to_appear(agree_xpath)
+    browser.accept_cookies(agree_xpath) 
     process_Greek_Super_League_OverUnder(db, browser, page)
 
     if browser.headless:

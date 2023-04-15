@@ -33,11 +33,12 @@ class Browser:
         self.chrome_options.add_argument('--ignore-certificate-errors')
         self.chrome_options.add_argument('--allow-running-insecure-content')
         self.chrome_options.add_experimental_option("detach", True)
-        self.chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.5481.77 Safari/537.36")
+        self.chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.5615.49 Safari/537.36")
         if self.headless:
             self.chrome_options.add_argument('--headless=new')
         
-        self.driver = webdriver.Chrome("./drivers/chromedriver", chrome_options=self.chrome_options)
+        #self.driver = webdriver.Chrome("./drivers/chromedriver", chrome_options=self.chrome_options)
+        self.driver = webdriver.Chrome(chrome_options=self.chrome_options)
 
         # Load cookies from previous session
         '''
