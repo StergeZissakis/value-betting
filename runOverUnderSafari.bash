@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source python_env/bin/activate
+source env/bin/activate
 
 export DISPLAY=:0
 
@@ -12,11 +12,11 @@ echo "*** Connected to Greece."
 sleep 5
 
 echo "*** Running Odds Safari..."
-time ./python_env/bin/python ./oddssafariOverUnder.py 2>&1 | tee ./logs/oddssafari.log 
+time ./env/bin/python ./oddssafariOverUnder.py 2>&1 | tee ./logs/oddssafari.log 
 if [ $? != 0 ]
 then
 echo "*** Repeat Running Odds Safari..."
-    time ./python_env/bin/python ./oddssafariOverUnder.py 2>&1 | tee ./logs/oddssafari.log 
+    time ./env/bin/python ./oddssafariOverUnder.py 2>&1 | tee ./logs/oddssafari.log 
 fi
 echo "*** Odds Safari Finished."
 

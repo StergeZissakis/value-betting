@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source python_env/bin/activate
+source env/bin/activate
 
 export DISPLAY=:0
 
@@ -12,11 +12,11 @@ echo "*** Connected to Italy."
 sleep 5
 
 echo "*** Running Odds Portal..."
-time ./python_env/bin/python ./oddsportalOverUnder.py 2>&1 | tee logs/oddsportal.log  
+time ./env/bin/python ./oddsportalOverUnder.py 2>&1 | tee logs/oddsportal.log  
 if [ $? != 0 ]
 then
     echo "*** Repeat Running Odds Portal..."
-    time ./python_env/bin/python ./oddsportalOverUnder.py 2>&1 | tee logs/oddsportal.log  
+    time ./env/bin/python ./oddsportalOverUnder.py 2>&1 | tee logs/oddsportal.log  
 fi
 echo "*** Odds Portal Finished."
 

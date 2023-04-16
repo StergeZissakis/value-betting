@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source python_env/bin/activate
+source env/bin/activate
 
 export DISPLAY=:0
 
