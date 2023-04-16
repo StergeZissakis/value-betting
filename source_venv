@@ -1,2 +1,2 @@
 export DISPLAY=:0
-source python_env/bin/activate
+source env/bin/activate
