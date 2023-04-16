@@ -1,3 +1,4 @@
 psycopg2
 sqlparse
 selenium
+python-dateutil
