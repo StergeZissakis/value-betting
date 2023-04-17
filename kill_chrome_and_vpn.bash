@@ -2,6 +2,7 @@
 
 echo "Cleaning up chrome leftovers..."
 killall chrome
+killall chromi
 killall -r "connect.*"
 killall -r "openvpn"
 
