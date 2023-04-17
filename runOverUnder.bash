@@ -1,9 +1,6 @@
 #!/bin/bash
 
-source env/bin/activate
-
-export DISPLAY=:0
-
+source ./source_env
 
 ./kill_chrome_and_vpn.bash
 
