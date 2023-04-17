@@ -81,6 +81,7 @@ def process_over_under_match(browser, db, match_id, event_date_time, click_eleme
             db.insert_or_update_over('OddsSafariOverUnder', match_id, half, goals, max_over, bet_links['over'], payout, sql_checked = False)
             db.insert_or_update_under('OddsSafariOverUnder', match_id, half, goals, max_under, bet_links['under'], payout, sql_checked = False)
             break;
+        break;  # we are not interested in the halves separately!
        
     browser.close_tab()
     browser.switch_to_tab(0)
