@@ -1,6 +1,7 @@
 #!/bin/bash
 
-source ./source_env
+export DISPLAY=:0
+source ./env/bin/activate
 
 echo "*** Connecting to Italy..."
 exec 3< <(cd config; sudo ./connect_italy.sudo 2>&1 | /usr/bin/tee ../logs/italy_vpn.log ) 

@@ -52,7 +52,12 @@ class Browser:
     def __del__(self):
         # Save cookies for next session
         #pickle.dump(self.driver.get_cookies(), open(self.cookies_file, "wb"))
+        if self.headless:
+            self.quit()
         pass
+
+    def quit(self):
+        self.driver.quit()
 
     def get(self, url):
         self.page = self.driver.get(url)

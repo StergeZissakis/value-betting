@@ -1,6 +1,7 @@
 #!/bin/bash
 
-source ./source_env
+export DISPLAY=:0
+source ./env/bin/activate
 
 echo "*** Connecting to Greece..."
 exec 3< <(cd config; sudo ./connect_greece.sudo 2>&1 | tee ../logs/greece_vpn.log)
