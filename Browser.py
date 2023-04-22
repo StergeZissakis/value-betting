@@ -28,12 +28,18 @@ class Browser:
         self.chrome_options.add_argument('--window-size=1920,1080')
         #self.chrome_options.add_argument("--incognito")
         self.chrome_options.add_argument('--start-maximized')
-        #self.chrome_options.add_argument('--disable-dev-shm-usage')
-        #self.chrome_options.add_argument('--disable-gpu')
+        self.chrome_options.add_argument('--disable-dev-shm-usage')
+        self.chrome_options.add_argument('--disable-gpu')
         self.chrome_options.add_argument('--ignore-certificate-errors')
         self.chrome_options.add_argument('--allow-running-insecure-content')
         self.chrome_options.add_experimental_option("detach", True)
-        self.chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.5615.49 Safari/537.36")
+        #self.chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.5615.49 Safari/537.36")
+        self.chrome_options.add_argument("enable-automation")
+        self.chrome_options.add_argument("--disable-extensions")
+        self.chrome_options.add_argument("--dns-prefetch-disable")
+        #self.chrome_options.add_argument(PageLoadStrategy.NORMAL)
+        self.chrome_options.add_argument("--disable-browser-side-navigation")
+
         if self.headless:
             self.chrome_options.add_argument('--headless=new')
         
