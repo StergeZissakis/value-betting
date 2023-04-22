@@ -3,7 +3,8 @@
 export DISPLAY=:0
 source ./env/bin/activate
 
-./kill_chrome_and_vpn.bash
+sudo ./kill_vpn.bash
+./kill_chrome.bash
 
 ./runOverUnderPortal.bash
 
@@ -11,4 +12,5 @@ source ./env/bin/activate
 
 ./runArchiverOverUnder.bash
 
-./kill_chrome_and_vpn.bash
+sudo ./kill_vpn.bash
+./kill_chrome.bash

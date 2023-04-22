@@ -158,5 +158,5 @@ if __name__ == "__main__":
     process_Greek_Super_League_OverUnder(db, browser, page)
 
     if browser.headless:
-        browser.close()
+        browser.quit()
 

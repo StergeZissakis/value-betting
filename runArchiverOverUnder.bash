@@ -1,7 +1,8 @@
 #!/bin/bash
 
 
-./kill_chrome_and_vpn.bash
+sudo ./kill_vpn.bash
+./kill_chrome.bash
 
 export DISPLAY=:0
 source env/bin/activate
@@ -9,19 +10,23 @@ source env/bin/activate
 ./runArchivePastMatches.bash
 
 echo "*** Connecting to Italy..."
-exec 3< <(cd config; sudo ./connect_italy.sudo 2>&1 | tee ../logs/italy_vpn_archiver.log)
-sed '/Initialization Sequence Completed$/q' <&3 ; cat <&3 &
+nohup sudo config/connect_italy.sudo 2>&1 | tee ./logs/italy_vpn_archiver.log & > /dev/null 2>&1
+echo $! > config/italy_vpn.pid
+grep -q "Initialization Sequence Completed" logs/italy_vpn_archiver.log
+while [ $? != 0 ];
+do
+    sleep 1
+    grep -q "Initialization Sequence Completed" logs/italy_vpn_archiver.log
+done;
 echo "*** Connected to Italy."
 
 echo "Running Odds Portal Results..."
 time python ./oddsportalOverUnder_results.py 2>&1 | tee ./logs/oddsportal_results.log  
-if [ $? != 0 ]
-then
-    echo "Re-running Odds Portal Results..."
-    time python ./oddsportalOverUnder_results.py 2>&1 | tee ./logs/oddsportal_results.log  
-fi
 echo "*** Odds Portal Results Finished."
 
 ./runCalculateOverUnderResults.bash
 
+kill `cat config/italy_vpn.pid`
+rm -f config/italy_vpn.pid
+sudo ./kill_chrome_and_vpn.bash
 ./kill_chrome_and_vpn.bash

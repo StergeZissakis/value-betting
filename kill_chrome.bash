@@ -1,10 +1,8 @@
 #!/bin/bash
 
 echo "Cleaning up chrome leftovers..."
-killall chrome
-killall chromi
-killall -r "connect.*"
-killall -r "openvpn"
+killall -r ".*chrome.*"
+killall -r ".*chromioum.*"
 
 #ps -e | grep chrome | cut -d " " -f 4 | xargs kill -9
 #ps -e | grep openvpn | cut -d " " -f 4 | xargs sudo kill -9

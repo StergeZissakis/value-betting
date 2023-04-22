@@ -1,3 +1,4 @@
 #!/bin/bash
 
-(cd italy_vpn && /usr/sbin/openvpn --auth-nocache --config ./openvpn.ovpn)
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+/usr/sbin/openvpn --cd $SCRIPT_DIR/italy_vpn/ --auth-nocache --config openvpn.ovpn

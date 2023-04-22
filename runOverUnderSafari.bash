@@ -3,20 +3,25 @@
 export DISPLAY=:0
 source ./env/bin/activate
 
-echo "*** Connecting to Greece..."
-exec 3< <(cd config; sudo ./connect_greece.sudo 2>&1 | tee ../logs/greece_vpn.log)
-sed '/Initialization Sequence Completed$/q' <&3 ; cat <&3 &
-echo "*** Connected to Greece."
+sudo ./kill_chrome_and_vpn.bash
+./kill_chrome_and_vpn.bash
 
-sleep 5
+echo "*** Connecting to Greece..."
+nohup sudo config/connect_greece.sudo 2>&1 | tee ./logs/greece_vpn.log & > /dev/null 2>&1
+echo $! > config/greece_vpn.pid
+grep -q "Initialization Sequence Completed" logs/greece_vpn.log
+while [ $? != 0 ];
+do
+    sleep 1
+    grep -q "Initialization Sequence Completed" ./logs/greece_vpn.log
+done;
+echo "*** Connected to Greece."
 
 echo "*** Running Odds Safari..."
 time python ./oddssafariOverUnder.py 2>&1 | tee ./logs/oddssafari.log 
-if [ $? != 0 ]
-then
-echo "*** Repeat Running Odds Safari..."
-    time python ./oddssafariOverUnder.py 2>&1 | tee ./logs/oddssafari.log 
-fi
 echo "*** Odds Safari Finished."
 
+kill `cat config/greece_vpn.pid`
+rm -f config/greece_vpn.pid
 sudo ./kill_chrome_and_vpn.bash
+./kill_chrome_and_vpn.bash

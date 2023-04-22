@@ -144,4 +144,4 @@ if __name__ == "__main__":
     process_results(db, browser, page)
 
     if browser.headless:
-        browser.close()
+        browser.quit()
