@@ -3,11 +3,11 @@
 export DISPLAY=:0
 source ./env/bin/activate
 
-sudo ./kill_chrome_and_vpn.bash
-./kill_chrome_and_vpn.bash
+sudo ./kill__vpn.bash
+./kill_chrome.bash
 
 echo "*** Connecting to Italy..."
-nohup sudo config/connect_italy.sudo 2>&1 | tee ./logs/italy_vpn.log & > /dev/null 2>&1
+nohup sudo config/connect_italy.sudo > ./logs/italy_vpn.log  2>&1 &
 echo $! > config/italy_vpn.pid
 grep -q "Initialization Sequence Completed" logs/italy_vpn.log
 while [ $? != 0 ];
@@ -18,7 +18,7 @@ done;
 echo "*** Connected to Italy."
 
 echo "*** Running Odds Portal..."
-time python ./oddsportalOverUnder.py 2>&1 | tee logs/oddsportal.log  
+time nice -10 python ./oddsportalOverUnder.py 2>&1 | tee logs/oddsportal.log  
 echo "*** Odds Portal Finished."
 
 
