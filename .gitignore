@@ -4,3 +4,4 @@ core
 *.log
 env
 nohup.out
+config/*.pid
