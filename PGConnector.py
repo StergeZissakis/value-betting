@@ -1,8 +1,6 @@
 import psycopg2
 import sqlparse
 
-
-
 class PGBase:
 
     def __init__(self, db, db_host, db_user='postgres', db_pass='p0stgr35', db_port=5432):
