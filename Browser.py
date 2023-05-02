@@ -70,9 +70,15 @@ class Browser:
         self.page = self.driver.get(url)
         return self.driver
 
+    def get_no_reset(self, url):
+        return self.driver.get(url)
+
     def reset_page_to_current(self):
         self.page = self.driver
         return self.page
+
+    def reset_page(self, page):
+        self.page = page
 
     def element_completely_visible(self, elem):
         elem_left_bound = elem.location.get('x')
@@ -230,7 +236,6 @@ class Browser:
     def close_tab(self, go_to_tab = 0):
         self.driver.close()
         return self.switch_to_tab(go_to_tab)
-
 
     def close(self):
         self.driver.close()
