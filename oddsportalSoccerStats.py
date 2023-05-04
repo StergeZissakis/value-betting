@@ -25,7 +25,7 @@ def process_header(browser, page, data):
     first_half_goals, second_half_goals = half_goals.split(',')
     frist_half_goals = first_half_goals[1:].strip()
     second_half_goals = second_half_goals[1:-1].strip()
-    data.set('first_half_goals_home'   , first_half_goals.split(':')[0])
+    data.set('first_half_goals_home'   , first_half_goals.split(':')[0][1:])
     data.set('first_half_goals_guest'  , first_half_goals.split(':')[1])
     data.set('second_half_goals_home'  , second_half_goals.split(':')[0])
     data.set('second_half_goals_guest' , second_half_goals.split(':')[1])
@@ -70,7 +70,7 @@ def process_results_page(db, browser, page):
         if kind is not None:
             browser.sleep_for_millis_random(300)
             row = process_Section(browser, page, section, kind)
-            db.insert_or_update_1x2_odds(row)
+            db.insert_or_update_soccer_statistics(row)
 
 
 if __name__ == "__main__":

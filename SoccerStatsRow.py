@@ -8,37 +8,37 @@ class SoccerStatsRow:
 
     def __init__(self):
         self.data = {
-                "home_team": "",
-                "guest_team": "",
-                "date_time": "",
-                "goals_home": 0,
-                "goals_guest": 0,
-                "first_half_goals_guest": 0,
-                "first_half_goals_home": 0,
-                "second_half_goals_guest": 0,
-                "second_half_goals_home": 0,
-                "full_time_home_win_odds": 0.0,
-                "full_time_draw_odds": 0.0,
-                "full_time_guest_win_odds": 0.0,
-                "fisrt_half_home_win_odds": 0.0,
-                "first_half_draw_odds": 0.0,
-                "first_half_guest_win_odds": 0.0,
-                "second_half_home_win_odds": 0.0,
-                "second_half_draw_odds": 0.0,
-                "second_half_guest_win_odds": 0.0,
-                "full_time_over_under_goals": 0,
-                "full_time_over_odds": 0.0,
-                "full_time_under_odds": 0.0,
-                "full_time_payout": 0.0,
-                "first_half_over_under_goals": 0,
-                "first_half_over_odds": 0.0,
-                "first_half_under_odds": 0.0,
-                "first_half_payout": 0.0,
-                "second_half_over_under_goals": 0,
-                "second_half_over_odds": 0.0,
-                "second_half_under_odds": 0.0,
-                "second_half_payout": 0.0,
-                "url": ""
+                "home_team": None,
+                "guest_team": None,
+                "date_time": None,
+                "goals_home": None,
+                "goals_guest": None,
+                "first_half_goals_guest": None,
+                "first_half_goals_home": None,
+                "second_half_goals_guest": None,
+                "second_half_goals_home": None,
+                "full_time_home_win_odds": None,
+                "full_time_draw_odds": None,
+                "full_time_guest_win_odds": None,
+                "fisrt_half_home_win_odds": None,
+                "first_half_draw_odds": None,
+                "first_half_guest_win_odds": None,
+                "second_half_home_win_odds": None,
+                "second_half_draw_odds": None,
+                "second_half_guest_win_odds": None,
+                "full_time_over_under_goals": None,
+                "full_time_over_odds": None,
+                "full_time_under_odds": None,
+                "full_time_payout": None,
+                "first_half_over_under_goals": None,
+                "first_half_over_odds": None,
+                "first_half_under_odds": None,
+                "first_half_payout": None,
+                "second_half_over_under_goals": None,
+                "second_half_over_odds": None,
+                "second_half_under_odds": None,
+                "second_half_payout": None,
+                "url": None
                 }
 
 
@@ -55,22 +55,22 @@ class SoccerStatsRow:
         return self.data[key]
 
     def generate_sql_insert_into_values(self, table_name):
-        return 'INSERT INTO "' + table_name + "' (" + ", ".join(self.data.keys()) + ") VALUES (" + "%s, " * (len(self.data.keys()) - 1) + "%s)"
+        return 'INSERT INTO ' + table_name + ' (' + ", ".join(self.data.keys()) + ' ) VALUES ( ' + '%s, ' * (len(self.data.keys()) - 1) + '%s)'
 
     def generate_do_update_set(self):
         ret = ""
 
         for k in islice(self.data.keys(), 3, None):  
-            ret += '"' + k + '" = EXCLUDED."' + k + '", '
+            ret += ' ' + k + ' = EXCLUDED.' + k + ', '
 
         return ret[0:-2]
 
     def generate_sql_insert_values(self):
-        vals = ()
+        vals = []
         for k, v in self.data.items():
-            if str(v).isnumeric():
+            if str(v).isnumeric() or v is None:
                 vals.append(v)
             else:
-                vals.append( "'" + str(v) + "'" )
+                vals.append( str(v) )
         return vals
 
