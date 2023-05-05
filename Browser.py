@@ -212,8 +212,12 @@ class Browser:
             self.sleep_for_millis_random(300)
 
     def accept_cookies(self, button_xpath):
-        self.wait_for_element_to_appear(button_xpath)
-        button = self.driver.find_element(By.XPATH, button_xpath )
+        try:
+            self.wait_for_element_to_appear(button_xpath)
+            button = self.driver.find_element(By.XPATH, button_xpath )
+        except:
+            return
+
         if button:
             self.sleep_for_millis_random(200)
             self.move_to_element_and_left_click(button)
