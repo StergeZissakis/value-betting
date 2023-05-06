@@ -64,10 +64,11 @@ class SoccerStatsRow:
 
     def generate_sql_insert_values(self):
         vals = []
-        for k, v in self.data.items():
-            if v is None or v is []  or str(v).isnumeric() or str(v).isdecimal():
-                vals.append(v)
+        for v in self.data.values():
+            if isinstance(v, list) and len(v) == 0: 
+                vals.append(None)
             else:
                 vals.append( v )
+
         return vals
 

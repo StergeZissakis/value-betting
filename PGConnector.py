@@ -179,7 +179,9 @@ class PGConnector(PGBase):
         table_name = "soccer_statistics"
 
         sql = soccerStatsRow.generate_sql_insert_into_values(table_name) + ' ON CONFLICT ON CONSTRAINT ' + table_name + '_unique DO UPDATE SET ' + soccerStatsRow.generate_do_update_set();
+        #print(sql)
         values = soccerStatsRow.generate_sql_insert_values()
+        #print(values)
         cursor = self.pg.cursor()
         cursor.execute( sql, values )
         self.pg.commit()

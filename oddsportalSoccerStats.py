@@ -14,6 +14,8 @@ def process_header(browser, page, data):
 
     browser.wait_for_element_to_appear('.//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[1]/div[1]/div/div[1]/p')
 
+    browser.sleep_for_millis_random(800)
+
     data.set('home_team'   , page.find_element(By.XPATH, './/*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[1]/div[1]/div/div[1]/p').text)
     data.set('guest_team'  , page.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[1]/div[3]/div[1]/p').text)
     data.set('date_time'   , page.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[2]/div[1]/div[2]').text)
@@ -21,6 +23,7 @@ def process_header(browser, page, data):
     data.set('goals_home'  , int(page.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[1]/div[1]/div/div[2]/div').text))
     data.set('goals_guest' , int(page.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[1]/div[3]/div[2]/div').text))
 
+    browser.wait_for_element_to_appear('//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[2]/div[3]/div[2]')
     half_goals = page.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[2]/div[3]/div[2]').text.split('\n')[2].strip()
     first_half_goals, second_half_goals = half_goals.split(',')
     frist_half_goals = first_half_goals[1:].strip()
@@ -33,7 +36,7 @@ def process_header(browser, page, data):
     data.set('url', browser.driver.current_url)
 
 def get_max_values_from_1x2_table(browser, page):
-    table_root = page.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[4]/div[@set="0"]/div')
+    table_root = page.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[4]/div[1]/div')
     rows = table_root.find_elements(By.XPATH, './div[@class = "flex text-xs border-b h-9 border-l border-r"]')
     
     one_odds = []
@@ -41,13 +44,31 @@ def get_max_values_from_1x2_table(browser, page):
     two_odds = []
     for row in rows:
         try:
-            one_odds.append(float(row.find_element(By.XPATH, './div[2]/div/div/p[@class="height-content"]').text))
-            x_odds.append(float(row.find_element(By.XPATH,   './div[3]/div/div/p[@class="height-content"]').text))
-            two_odds.append(float(row.find_element(By.XPATH, './div[4]/div/div/p[@class="height-content"]').text))
+            val = row.find_element(By.XPATH, './div[2]/div/div/p[@class="height-content" and @class!="line-through"]').text
+            if val != '-':
+                one_odds.append(float(val))
+            val = row.find_element(By.XPATH,   './div[3]/div/div/p[@class="height-content" and @class!="line-through"]').text
+            if val != '-':
+                x_odds.append(float(val))
+            val = row.find_element(By.XPATH, './div[4]/div/div/p[@class="height-content" and @class!="line-through"]').text
+            if val != '-':
+                two_odds.append(float(val))
         except:
-            continue
-
-    return (max(one_odds), max(x_odds), max(two_odds))
+            pass
+                
+    if isinstance(one_odds, list) and len(one_odds):
+        ret_one = max(one_odds)
+    else:
+        ret_one = None
+    if isinstance(x_odds, list) and len(x_odds): 
+        ret_x   = max(x_odds)
+    else:
+        ret_x   = None
+    if isinstance(two_odds, list) and len(two_odds):
+        ret_two = max(two_odds)
+    else:
+        ret_two = None
+    return (ret_one, ret_x, ret_two)
 
 
 def process_1x2(browser, page, data):
@@ -165,23 +186,30 @@ def process_Section(browser, page, section, kind):
     return data
 
 def process_results_page(db, browser, page):
-    container_div = page.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[5]/div[1]')
-    try:
-        section_divs = container_div.find_elements(By.XPATH, './div[@set="65147"]')
-    except:
-        section_divs = container_div.find_elements(By.XPATH, './div[@set="29543"]')
 
-    event_date = None
-    for section in section_divs:
-        browser.scroll_to_visible(section)
-        kind = get_section_kind(section)
-        if kind is not None:
-            browser.sleep_for_millis_random(300)
-            row = process_Section(browser, page, section, kind)
-            db.insert_or_update_soccer_statistics(row)
-
-    
-
+    next_page_button = True
+    while(next_page_button):
+        try:
+            next_page_button = page.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[5]/div[4]/div/div[3]/a[1]/div/p')
+        except:
+            next_page_button = False
+            pass
+        container_dix_xapth = '//*[@id="app"]/div/div[1]/div/main/div[2]/div[5]/div[1]'
+        container_div = page.find_element(By.XPATH, container_dix_xapth )
+        section_divs = container_div.find_elements(By.XPATH, './div[@set!=""]')
+        event_date = None
+        for section in section_divs:
+            browser.scroll_to_visible(section)
+            kind = get_section_kind(section)
+            if kind is not None:
+                browser.sleep_for_millis_random(300)
+                row = process_Section(browser, page, section, kind)
+                #print(row)
+                db.insert_or_update_soccer_statistics(row)
+        
+        if not isinstance(next_page_button, bool):
+            browser.scroll_move_left_click(next_page_button, container_dix_xapth)
+            page = brower.page
 
 if __name__ == "__main__":
     db = PGConnector("postgres", "localhost")
@@ -201,14 +229,14 @@ if __name__ == "__main__":
     
     # Process all years to 1999
     tmp_years = []
-    #for year in range(-2021, -2006):
-    for year in range(-2017, -2006):
+    #@for year in range(-2017, -2006):
+    for year in range(-2021, -2006):
         tmp_years.append(str(year))
     
     years = []
     i = 0
-    #for year in range(-2022, -2007):
-    for year in range(-2018, -2007):
+    #for year in range(-2018, -2007):
+    for year in range(-2022, -2007):
         years.append((tmp_years[i], str(year)))
         i += 1
 
