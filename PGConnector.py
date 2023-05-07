@@ -175,15 +175,15 @@ class PGConnector(PGBase):
         self.pg.commit()
         cursor.close()
 
-    def insert_or_update_1x2_odds(self, soccerStatsRow):
+    def insert_or_update_soccer_statistics(self, soccerStatsRow):
         table_name = "soccer_statistics"
 
+        sql = soccerStatsRow.generate_sql_insert_into_values(table_name) + ' ON CONFLICT ON CONSTRAINT ' + table_name + '_unique DO UPDATE SET ' + soccerStatsRow.generate_do_update_set();
+        #print(sql)
+        values = soccerStatsRow.generate_sql_insert_values()
+        #print(values)
         cursor = self.pg.cursor()
-        cursor.execute( 
-            'INSERT INTO "' + table_name + '" ' + soccerStatsRow.generate_sql_insert_into_values(table_name) +  
-            'ON CONFLICT ON CONSTRAINT "' + table_name + soccerStatsRow.generate_do_update_set() + ";",
-            soccerStatsRow.generate_sql_insert_values()
-        )
+        cursor.execute( sql, values )
         self.pg.commit()
         cursor.close()
 

@@ -1,0 +1,3 @@
+#!/bin/bash
+
+cat Requirements.txt  | xargs pip3 install --upgrade

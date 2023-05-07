@@ -70,9 +70,15 @@ class Browser:
         self.page = self.driver.get(url)
         return self.driver
 
+    def get_no_reset(self, url):
+        return self.driver.get(url)
+
     def reset_page_to_current(self):
         self.page = self.driver
         return self.page
+
+    def reset_page(self, page):
+        self.page = page
 
     def element_completely_visible(self, elem):
         elem_left_bound = elem.location.get('x')
@@ -206,8 +212,12 @@ class Browser:
             self.sleep_for_millis_random(300)
 
     def accept_cookies(self, button_xpath):
-        self.wait_for_element_to_appear(button_xpath)
-        button = self.driver.find_element(By.XPATH, button_xpath )
+        try:
+            self.wait_for_element_to_appear(button_xpath)
+            button = self.driver.find_element(By.XPATH, button_xpath )
+        except:
+            return
+
         if button:
             self.sleep_for_millis_random(200)
             self.move_to_element_and_left_click(button)
@@ -230,7 +240,6 @@ class Browser:
     def close_tab(self, go_to_tab = 0):
         self.driver.close()
         return self.switch_to_tab(go_to_tab)
-
 
     def close(self):
         self.driver.close()
