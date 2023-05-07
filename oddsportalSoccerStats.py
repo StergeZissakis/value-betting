@@ -19,7 +19,17 @@ def process_header(browser, page, data):
     data.set('home_team'   , page.find_element(By.XPATH, './/*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[1]/div[1]/div/div[1]/p').text)
     data.set('guest_team'  , page.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[1]/div[3]/div[1]/p').text)
     data.set('date_time'   , page.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[2]/div[1]/div[2]').text)
-    data.set('date_time'   , datetime.strptime(data.get('date_time'), "%A, %d %b %Y, %H:%M"))
+    dt = data.get('date_time')
+    if str(dt).startswith('Yesterday'):
+        yesterday = datetime.now() - timedelta(1)
+        yesterday_day = yesterday.strftime('%A')
+        dt = dt.replace('Yesterday', yesterday_day)
+    elif str(dt).startswith('Today'):
+        today = datetime.now()
+        today_day = today.strftime('%A')
+        dt = dt.replace('Today', today_day)
+    data.set('date_time'   , datetime.strptime(dt, "%A, %d %b %Y, %H:%M"))
+    print(str(data.get('date_time')) + " " + str(data.get('home_team')) + " VS " + str(data.get('guest_team')))
     data.set('goals_home'  , int(page.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[1]/div[1]/div/div[2]/div').text))
     data.set('goals_guest' , int(page.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[1]/div[3]/div[2]/div').text))
 
@@ -47,12 +57,18 @@ def get_max_values_from_1x2_table(browser, page):
             val = row.find_element(By.XPATH, './div[2]/div/div/p[@class="height-content" and @class!="line-through"]').text
             if val != '-':
                 one_odds.append(float(val))
+            else:
+                one_odds.append(None)
             val = row.find_element(By.XPATH,   './div[3]/div/div/p[@class="height-content" and @class!="line-through"]').text
             if val != '-':
                 x_odds.append(float(val))
+            else:
+                x_odds.append(None)
             val = row.find_element(By.XPATH, './div[4]/div/div/p[@class="height-content" and @class!="line-through"]').text
             if val != '-':
                 two_odds.append(float(val))
+            else:
+                two_odds.append(None)
         except:
             pass
                 
@@ -109,15 +125,6 @@ def get_values_from_overunder_table(browser, page):
             goals.append(float(row.find_element(By.XPATH, './div/div[2]/p[1]').text.split(' +')[1]))
             over.append(float(row.find_element(By.XPATH,  './div/div[3]/div[1]/div[1]/div/p').text))
             under.append(float(row.find_element(By.XPATH, './div/div[3]/div[2]/div[1]/div/p').text))
-
-            #g = row.find_element(By.XPATH, './div/div[2]/p[1]').text.split(' +')[1]
-            #o = row.find_element(By.XPATH,  './div/div[3]/div[1]/div[1]/div/p').text
-            #u = row.find_element(By.XPATH, './div/div[3]/div[2]/div[1]/div/p').text
-            #if '-' in (g, o, u):
-            #    continue
-            #goals.append(float(g))
-            #over.append(float(o))
-            #under.append(float(u))
         except:
             continue
 
@@ -161,8 +168,6 @@ def process_OverUnder(browser, page, data):
     data.set('second_half_over_odds',      over)
     data.set('second_half_under_odds', under)
 
-    #print(data) 
-
 def process_Section(browser, page, section, kind):
     data = SoccerStatsRow()
 
@@ -187,29 +192,40 @@ def process_Section(browser, page, section, kind):
 
 def process_results_page(db, browser, page):
 
-    next_page_button = True
-    while(next_page_button):
-        try:
-            next_page_button = page.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[5]/div[4]/div/div[3]/a[1]/div/p')
-        except:
-            next_page_button = False
-            pass
-        container_dix_xapth = '//*[@id="app"]/div/div[1]/div/main/div[2]/div[5]/div[1]'
-        container_div = page.find_element(By.XPATH, container_dix_xapth )
+    page_number = 1
+    next_page_button_xpath = '//*[@id="app"]/div/div[1]/div/main/div[2]/div[5]/div[4]/div/div[3]/a[1]/div/p'
+    next_page = True
+    while(next_page):
+        browser.scroll_to_bottom()
+        browser.sleep_for_millis_random(300)
+        container_div_xapth = '//*[@id="app"]/div/div[1]/div/main/div[2]/div[5]/div[1]'
+        container_div = page.find_element(By.XPATH, container_div_xapth )
         section_divs = container_div.find_elements(By.XPATH, './div[@set!=""]')
-        event_date = None
+        print("Page: " + str(page_number) + " Total matches: " + str(len(section_divs)))
         for section in section_divs:
             browser.scroll_to_visible(section)
             kind = get_section_kind(section)
             if kind is not None:
                 browser.sleep_for_millis_random(300)
                 row = process_Section(browser, page, section, kind)
-                #print(row)
                 db.insert_or_update_soccer_statistics(row)
-        
-        if not isinstance(next_page_button, bool):
-            browser.scroll_move_left_click(next_page_button, container_dix_xapth)
-            page = brower.page
+
+        try:
+            browser.scroll_to_bottom()
+            browser.sleep_for_millis_random(300)
+            next_page_button = page.find_element(By.XPATH, next_page_button_xpath) 
+        except:
+            next_page= False
+
+        if next_page:
+            browser.scroll_to_visible(next_page_button, True)
+            table_header_xpath = '//*[@id="app"]/div/div[1]/div/main/div[2]/div[5]/div[1]/div[1]/div[1]'
+            browser.move_to_element_and_left_click(next_page_button, table_header_xpath)
+            page = browser.driver
+            browser.sleep_for_millis_random(350)
+            browser.scroll_to_visible(page.find_element(By.XPATH, table_header_xpath))
+        page_number = page_number + 1
+
 
 if __name__ == "__main__":
     db = PGConnector("postgres", "localhost")
@@ -218,15 +234,13 @@ if __name__ == "__main__":
         exit(-1)
 
     browser = Browser()
-    '''
     url = "https://www.oddsportal.com/football/greece/super-league/results/" # current year
     page = browser.get(url)
     # Click I Accept
     browser.accept_cookies("//button[text()='I Accept']")
     # Process the 1st page
     process_results_page(db, browser, page)
-    '''
-    
+
     # Process all years to 1999
     tmp_years = []
     #@for year in range(-2017, -2006):
@@ -243,6 +257,7 @@ if __name__ == "__main__":
     for year_from, year_to in years:
         url = "https://www.oddsportal.com/football/greece/super-league" + year_from + year_to + "/results/"
         print(str(year_from) + str(year_to) + " " + url)
+        browser = Browser()
         page = browser.get(url)
         browser.sleep_for_seconds_random(3)
         browser.accept_cookies("//button[text()='I Accept']")
