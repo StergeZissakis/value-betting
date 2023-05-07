@@ -21,7 +21,7 @@ done;
 echo "*** Connected to Italy."
 
 echo "Running Odds Portal Results..."
-time nice -10 python ./oddsportalOverUnder_results.py 2>&1 | tee ./logs/oddsportal_results.log  
+time nice -10 python -u ./oddsportalOverUnder_results.py 2>&1 | tee ./logs/oddsportal_results.log  
 echo "*** Odds Portal Results Finished."
 
 ./runCalculateOverUnderResults.bash

@@ -18,7 +18,7 @@ done;
 echo "*** Connected to Greece."
 
 echo "*** Running Odds Safari..."
-time nice -10 python ./oddssafariOverUnder.py 2>&1 | tee ./logs/oddssafari.log 
+time nice -10 python -u ./oddssafariOverUnder.py 2>&1 | tee ./logs/oddssafari.log 
 echo "*** Odds Safari Finished."
 
 kill `cat config/greece_vpn.pid`
