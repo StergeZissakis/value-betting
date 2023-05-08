@@ -3,7 +3,7 @@
 export DISPLAY=:0
 source ./env/bin/activate
 
-sudo ./kill__vpn.bash
+sudo ./kill_vpn.bash
 ./kill_chrome.bash
 
 echo "*** Connecting to Italy..."

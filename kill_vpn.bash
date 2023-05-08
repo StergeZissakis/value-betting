@@ -14,8 +14,8 @@ then
     rm -f config/greece_vpn.pid
 fi
 
-killall -r "connect_.*"
-killall -r ".*openvpn"
+killall connect_
+killall openvpn
 
 
 #ps -e | grep chrome | cut -d " " -f 4 | xargs kill -9

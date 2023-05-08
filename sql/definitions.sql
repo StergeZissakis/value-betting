@@ -5,7 +5,7 @@
 -- Dumped from database version 13.10 (Debian 13.10-0+deb11u1)
 -- Dumped by pg_dump version 13.10 (Debian 13.10-0+deb11u1)
 
--- Started on 2023-05-08 22:07:01 EEST
+-- Started on 2023-05-08 23:37:40 EEST
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -782,7 +782,7 @@ ALTER DEFAULT PRIVILEGES FOR ROLE postgres REVOKE ALL ON TABLES  FROM postgres;
 ALTER DEFAULT PRIVILEGES FOR ROLE postgres GRANT ALL ON TABLES  TO postgres WITH GRANT OPTION;
 
 
--- Completed on 2023-05-08 22:07:02 EEST
+-- Completed on 2023-05-08 23:37:40 EEST
 
 --
 -- PostgreSQL database dump complete

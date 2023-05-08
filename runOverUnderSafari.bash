@@ -3,7 +3,7 @@
 export DISPLAY=:0
 source ./env/bin/activate
 
-sudo ./kill__vpn.bash
+sudo ./kill_vpn.bash
 ./kill_chrome.bash
 
 echo "*** Connecting to Greece..."
@@ -23,5 +23,5 @@ echo "*** Odds Safari Finished."
 
 kill `cat config/greece_vpn.pid`
 rm -f config/greece_vpn.pid
-sudo ./kill__vpn.bash
+sudo ./kill_vpn.bash
 ./kill_chrome.bash
