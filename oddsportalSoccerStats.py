@@ -26,28 +26,34 @@ def date_to_datetime(date):
 
 def process_header(browser, page, data):
 
-    browser.wait_for_element_to_appear('.//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[1]/div[1]/div/div[1]/p')
+    try:
+        browser.wait_for_element_to_appear('.//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[1]/div[1]/div/div[1]/p')
 
-    browser.sleep_for_millis_random(400)
+        browser.sleep_for_millis_random(400)
 
-    data.set('home_team'   , page.find_element(By.XPATH, './/*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[1]/div[1]/div/div[1]/p').text)
-    data.set('guest_team'  , page.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[1]/div[3]/div[1]/p').text)
-    data.set('date_time'   , date_to_datetime(page.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[2]/div[1]/div[2]').text))
-    print(str(data.get('date_time')) + " " + str(data.get('home_team')) + " VS " + str(data.get('guest_team')))
-    data.set('goals_home'  , int(page.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[1]/div[1]/div/div[2]/div').text))
-    data.set('goals_guest' , int(page.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[1]/div[3]/div[2]/div').text))
+        data.set('home_team'   , page.find_element(By.XPATH, './/*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[1]/div[1]/div/div[1]/p').text)
+        data.set('guest_team'  , page.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[1]/div[3]/div[1]/p').text)
+        data.set('date_time'   , date_to_datetime(page.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[2]/div[1]/div[2]').text))
+        print(str(data.get('date_time')) + " " + str(data.get('home_team')) + " VS " + str(data.get('guest_team')))
+        data.set('goals_home'  , int(page.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[1]/div[1]/div/div[2]/div').text))
+        data.set('goals_guest' , int(page.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[1]/div[3]/div[2]/div').text))
 
-    browser.wait_for_element_to_appear('//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[2]/div[3]/div[2]')
-    half_goals = page.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[2]/div[3]/div[2]').text.split('\n')[2].strip()
-    first_half_goals, second_half_goals = half_goals.split(',')
-    frist_half_goals = first_half_goals[1:].strip()
-    second_half_goals = second_half_goals[1:-1].strip()
-    data.set('first_half_goals_home'   , int(first_half_goals.split(':')[0][1:]))
-    data.set('first_half_goals_guest'  , int(first_half_goals.split(':')[1]))
-    data.set('second_half_goals_home'  , int(second_half_goals.split(':')[0]))
-    data.set('second_half_goals_guest' , int(second_half_goals.split(':')[1]))
+        browser.wait_for_element_to_appear('//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[2]/div[3]/div[2]')
+        half_goals = page.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[2]/div[3]/div[2]').text.split('\n')[2].strip()
+        first_half_goals, second_half_goals = half_goals.split(',')
+        frist_half_goals = first_half_goals[1:].strip()
+        second_half_goals = second_half_goals[1:-1].strip()
+        data.set('first_half_goals_home'   , int(first_half_goals.split(':')[0][1:]))
+        data.set('first_half_goals_guest'  , int(first_half_goals.split(':')[1]))
+        data.set('second_half_goals_home'  , int(second_half_goals.split(':')[0]))
+        data.set('second_half_goals_guest' , int(second_half_goals.split(':')[1]))
 
-    data.set('url', browser.driver.current_url)
+        data.set('url', browser.driver.current_url)
+    except:
+        print("--- Invalid entry: " + str(data))
+        return False
+
+    return True
 
 def get_max_values_from_1x2_table(browser, page):
     table_root = page.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[4]/div[1]/div')
@@ -210,7 +216,9 @@ def process_Section(browser, page, section, kind):
     browser.move_to_element_and_middle_click(link)
     browser.switch_to_tab(1)
     tab_page = browser.page
-    process_header(browser, tab_page, data)
+    if not process_header(browser, tab_page, data):
+        browser.close_tab()
+        return None
     process_1x2(browser, tab_page, data)
     process_OverUnder(browser, tab_page, data)
     browser.close_tab()
@@ -244,6 +252,8 @@ def process_results_page(db, browser, page, start_date = None):
                 browser.sleep_for_millis_random(300)
 
                 row = process_Section(browser, page, section, kind)
+                if row is None: #invalid entry
+                    continue
                 db.insert_or_update_soccer_statistics(row)
 
         try:
