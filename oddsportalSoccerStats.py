@@ -56,6 +56,7 @@ def process_header(browser, page, data):
     return True
 
 def get_max_values_from_1x2_table(browser, page):
+    browser.sleep_for_millis_random(400)
     table_root = page.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[4]/div[1]/div')
     rows = table_root.find_elements(By.XPATH, './div[@class = "flex text-xs border-b h-9 border-l border-r"]')
     
@@ -302,13 +303,13 @@ if __name__ == "__main__":
     # Process all years to 1999
     tmp_years = []
     #for year in range(-2021, -2006):
-    for year in range(-2018, -2006):
+    for year in range(-2017, -2006):
         tmp_years.append(str(year))
     
     years = []
     i = 0
     #for year in range(-2022, -2007):
-    for year in range(-2019, -2007):
+    for year in range(-2018, -2007):
         years.append((tmp_years[i], str(year)))
         i += 1
 
