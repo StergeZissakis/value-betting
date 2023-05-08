@@ -99,30 +99,33 @@ def get_max_values_from_1x2_table(browser, page):
 
 
 def process_1x2(browser, page, data):
-    # 1x2 Full Time
-    one_odds, x_odds, two_odds = get_max_values_from_1x2_table(browser, page)
-    data.set('full_time_home_win_odds',  one_odds)
-    data.set('full_time_draw_odds',      x_odds)
-    data.set('full_time_guest_win_odds', two_odds)
+    try:
+        # 1x2 Full Time
+        one_odds, x_odds, two_odds = get_max_values_from_1x2_table(browser, page)
+        data.set('full_time_home_win_odds',  one_odds)
+        data.set('full_time_draw_odds',      x_odds)
+        data.set('full_time_guest_win_odds', two_odds)
 
-    # 1x2 1st Half
-    first_half_button = page.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[5]/div[2]')
-    browser.move_to_element_and_left_click(first_half_button, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[4]/div[1]/div/div[1]/div[1]/span/p')
+        # 1x2 1st Half
+        first_half_button = page.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[5]/div[2]')
+        browser.move_to_element_and_left_click(first_half_button, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[4]/div[1]/div/div[1]/div[1]/span/p')
 
-    one_odds, x_odds, two_odds = get_max_values_from_1x2_table(browser, page)
-    data.set('first_half_home_win_odds',  one_odds)
-    data.set('first_half_draw_odds',      x_odds)
-    data.set('first_half_guest_win_odds', two_odds)
+        one_odds, x_odds, two_odds = get_max_values_from_1x2_table(browser, page)
+        data.set('first_half_home_win_odds',  one_odds)
+        data.set('first_half_draw_odds',      x_odds)
+        data.set('first_half_guest_win_odds', two_odds)
 
     
-    # 1x2 2nd Half
-    second_half_button = page.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[5]/div[3]')
-    browser.move_to_element_and_left_click(second_half_button, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[4]/div[1]/div/div[1]/div[1]/span/p')
+        # 1x2 2nd Half
+        second_half_button = page.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[5]/div[3]')
+        browser.move_to_element_and_left_click(second_half_button, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[4]/div[1]/div/div[1]/div[1]/span/p')
 
-    one_odds, x_odds, two_odds = get_max_values_from_1x2_table(browser, page)
-    data.set('second_half_home_win_odds',  one_odds)
-    data.set('second_half_draw_odds',      x_odds)
-    data.set('second_half_guest_win_odds', two_odds)
+        one_odds, x_odds, two_odds = get_max_values_from_1x2_table(browser, page)
+        data.set('second_half_home_win_odds',  one_odds)
+        data.set('second_half_draw_odds',      x_odds)
+        data.set('second_half_guest_win_odds', two_odds)
+    except:
+        pass
 
 def get_values_from_overunder_table(browser, page):
     table_root = page.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[4]')
@@ -143,41 +146,44 @@ def get_values_from_overunder_table(browser, page):
 
 
 def process_OverUnder(browser, page, data):
-    # Over/Under Full Time
-    over_under_button = page.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[4]/div/div/div/ul/li[2]/span/div')
-    browser.move_to_element_and_left_click(over_under_button, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[4]/div[1]/div')
+    try:
+        # Over/Under Full Time
+        over_under_button = page.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[4]/div/div/div/ul/li[2]/span/div')
+        browser.move_to_element_and_left_click(over_under_button, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[4]/div[1]/div')
         
-    goals = []
-    over  = []
-    under = []
-    goals, over, under = get_values_from_overunder_table(browser, page)
-    data.set('full_time_over_under_goals',  goals)
-    data.set('full_time_over_odds',      over)
-    data.set('full_time_under_odds', under)
+        goals = []
+        over  = []
+        under = []
+        goals, over, under = get_values_from_overunder_table(browser, page)
+        data.set('full_time_over_under_goals',  goals)
+        data.set('full_time_over_odds',      over)
+        data.set('full_time_under_odds', under)
 
-    # Over/Under 1st Half
-    first_half_over_under_button = page.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[5]/div[2]')
-    browser.move_to_element_and_left_click(first_half_over_under_button, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[4]/div[1]/div')
+        # Over/Under 1st Half
+        first_half_over_under_button = page.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[5]/div[2]')
+        browser.move_to_element_and_left_click(first_half_over_under_button, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[4]/div[1]/div')
         
-    goals = []
-    over  = []
-    under = []
-    goals, over, under = get_values_from_overunder_table(browser, page)
-    data.set('first_half_over_under_goals',  goals)
-    data.set('first_half_over_odds',      over)
-    data.set('first_half_under_odds', under)
+        goals = []
+        over  = []
+        under = []
+        goals, over, under = get_values_from_overunder_table(browser, page)
+        data.set('first_half_over_under_goals',  goals)
+        data.set('first_half_over_odds',      over)
+        data.set('first_half_under_odds', under)
 
-    # Over/Under 2nd Half
-    seocnd_half_over_under_button = page.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[5]/div[3]')
-    browser.move_to_element_and_left_click(seocnd_half_over_under_button, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[4]/div[1]/div')
+        # Over/Under 2nd Half
+        seocnd_half_over_under_button = page.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[5]/div[3]')
+        browser.move_to_element_and_left_click(seocnd_half_over_under_button, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[4]/div[1]/div')
         
-    goals = []
-    over  = []
-    under = []
-    goals, over, under = get_values_from_overunder_table(browser, page)
-    data.set('second_half_over_under_goals',  goals)
-    data.set('second_half_over_odds',      over)
-    data.set('second_half_under_odds', under)
+        goals = []
+        over  = []
+        under = []
+        goals, over, under = get_values_from_overunder_table(browser, page)
+        data.set('second_half_over_under_goals',  goals)
+        data.set('second_half_over_odds',      over)
+        data.set('second_half_under_odds', under)
+    except:
+        pass
 
 def get_link_of_section(section, kind):
     link = None
