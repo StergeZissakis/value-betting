@@ -217,9 +217,8 @@ def process_Section(browser, page, section, kind):
 
     return data
 
-start_date = None
 
-def process_results_page(db, browser, page):
+def process_results_page(db, browser, page, start_date = None):
 
     page_number = 1
     next_page_button_xpath = '//*[@id="app"]/div/div[1]/div/main/div[2]/div[5]/div[4]/div/div[3]/a[1]/div/p'
@@ -240,6 +239,8 @@ def process_results_page(db, browser, page):
                     print(str(start_date) + " > " + str(dt))
                     if dt == None or start_date < dt:
                         continue
+                    else:
+                        start_date = None
                 browser.sleep_for_millis_random(300)
 
                 row = process_Section(browser, page, section, kind)
@@ -272,6 +273,8 @@ if __name__ == "__main__":
     if args.start_date:
         start_date = args.start_date
         print(start_date)
+    else:
+        start_date = None
 
     db = PGConnector("postgres", "localhost")
     if not db.is_connected():
@@ -289,13 +292,13 @@ if __name__ == "__main__":
     # Process all years to 1999
     tmp_years = []
     #for year in range(-2021, -2006):
-    for year in range(-2020, -2006):
+    for year in range(-2018, -2006):
         tmp_years.append(str(year))
     
     years = []
     i = 0
     #for year in range(-2022, -2007):
-    for year in range(-2021, -2007):
+    for year in range(-2019, -2007):
         years.append((tmp_years[i], str(year)))
         i += 1
 
@@ -306,7 +309,7 @@ if __name__ == "__main__":
         page = browser.get(url)
         browser.sleep_for_seconds_random(3)
         browser.accept_cookies("//button[text()='I Accept']")
-        process_results_page(db, browser, page)
+        process_results_page(db, browser, page, start_date)
 
     if browser.headless:
         browser.quit()
