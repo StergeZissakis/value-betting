@@ -1,4 +1,6 @@
 import time
+import argparse
+from dateutil.parser import parse, ParserError
 from datetime import datetime, date, timedelta
 from PGConnector import PGConnector
 from Browser import Browser
@@ -9,17 +11,8 @@ from selenium.webdriver.support import expected_conditions as ExpectedCondition
 from SoccerStatsRow import SoccerStatsRow
 from OddsPortal import get_section_kind, get_event_date, get_event_time
 
-
-def process_header(browser, page, data):
-
-    browser.wait_for_element_to_appear('.//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[1]/div[1]/div/div[1]/p')
-
-    browser.sleep_for_millis_random(800)
-
-    data.set('home_team'   , page.find_element(By.XPATH, './/*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[1]/div[1]/div/div[1]/p').text)
-    data.set('guest_team'  , page.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[1]/div[3]/div[1]/p').text)
-    data.set('date_time'   , page.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[2]/div[1]/div[2]').text)
-    dt = data.get('date_time')
+def date_to_datetime(date):
+    dt = date
     if str(dt).startswith('Yesterday'):
         yesterday = datetime.now() - timedelta(1)
         yesterday_day = yesterday.strftime('%A')
@@ -28,7 +21,18 @@ def process_header(browser, page, data):
         today = datetime.now()
         today_day = today.strftime('%A')
         dt = dt.replace('Today', today_day)
-    data.set('date_time'   , datetime.strptime(dt, "%A, %d %b %Y, %H:%M"))
+    return datetime.strptime(dt, "%A, %d %b %Y, %H:%M")
+
+
+def process_header(browser, page, data):
+
+    browser.wait_for_element_to_appear('.//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[1]/div[1]/div/div[1]/p')
+
+    browser.sleep_for_millis_random(400)
+
+    data.set('home_team'   , page.find_element(By.XPATH, './/*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[1]/div[1]/div/div[1]/p').text)
+    data.set('guest_team'  , page.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[1]/div[3]/div[1]/p').text)
+    data.set('date_time'   , date_to_datetime(page.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[2]/div[1]/div[2]').text))
     print(str(data.get('date_time')) + " " + str(data.get('home_team')) + " VS " + str(data.get('guest_team')))
     data.set('goals_home'  , int(page.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[1]/div[1]/div/div[2]/div').text))
     data.set('goals_guest' , int(page.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[1]/div[3]/div[2]/div').text))
@@ -168,9 +172,7 @@ def process_OverUnder(browser, page, data):
     data.set('second_half_over_odds',      over)
     data.set('second_half_under_odds', under)
 
-def process_Section(browser, page, section, kind):
-    data = SoccerStatsRow()
-
+def get_link_of_section(section, kind):
     link = None
 
     if kind == "Match":
@@ -179,6 +181,24 @@ def process_Section(browser, page, section, kind):
         link = section.find_element(By.XPATH,   './div[2]/div/a')
     elif kind == "TopHeader":
         link = section.find_element(By.XPATH,   './div[3]/div/a')
+
+    return link
+
+def get_date_of_section(section, kind):
+    browser.wait_for_element_to_appear('.//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[1]/div[1]/div/div[1]/p')
+
+    browser.sleep_for_millis_random(400)
+
+    data.set('home_team'   , page.find_element(By.XPATH, './/*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[1]/div[1]/div/div[1]/p').text)
+    data.set('guest_team'  , page.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[1]/div[3]/div[1]/p').text)
+    data.set('date_time'   , date_to_datetime(page.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[2]/div[1]/div[2]').text))
+    print(str(data.get('date_time')) + " " + str(data.get('home_team')) + " VS " + str(data.get('guest_team')))
+
+
+def process_Section(browser, page, section, kind):
+    data = SoccerStatsRow()
+
+    link = get_link_of_section(section, kind)
 
     browser.move_to_element_and_middle_click(link)
     browser.switch_to_tab(1)
@@ -189,6 +209,8 @@ def process_Section(browser, page, section, kind):
     browser.close_tab()
 
     return data
+
+start_date = None
 
 def process_results_page(db, browser, page):
 
@@ -206,7 +228,10 @@ def process_results_page(db, browser, page):
             browser.scroll_to_visible(section)
             kind = get_section_kind(section)
             if kind is not None:
+                if start_date and start_date > get_date_of_section(section, kind):
+                    continue
                 browser.sleep_for_millis_random(300)
+
                 row = process_Section(browser, page, section, kind)
                 db.insert_or_update_soccer_statistics(row)
 
@@ -228,29 +253,38 @@ def process_results_page(db, browser, page):
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--headed", help='Headed mode', action=argparse.BooleanOptionalAction, default=False)
+    date_lambda = lambda s: datetime.strptime(s, '%Y-%m-%d')
+    parser.add_argument("--afterDate", help='Start recording matches after this date', type=date_lambda, default=None, required=False)
+    args = parser.parse_args()
+
+    if args.afterDate:
+        start_date = args.afterDate
+
     db = PGConnector("postgres", "localhost")
     if not db.is_connected():
         print("Fialed to connect to DB")
         exit(-1)
 
     browser = Browser()
-    url = "https://www.oddsportal.com/football/greece/super-league/results/" # current year
-    page = browser.get(url)
+    ##url = "https://www.oddsportal.com/football/greece/super-league/results/" # current year
+    ##page = browser.get(url)
     # Click I Accept
-    browser.accept_cookies("//button[text()='I Accept']")
+    ##browser.accept_cookies("//button[text()='I Accept']")
     # Process the 1st page
-    process_results_page(db, browser, page)
+    ##process_results_page(db, browser, page)
 
     # Process all years to 1999
     tmp_years = []
-    #@for year in range(-2017, -2006):
-    for year in range(-2021, -2006):
+    #for year in range(-2021, -2006):
+    for year in range(-2020, -2006):
         tmp_years.append(str(year))
     
     years = []
     i = 0
-    #for year in range(-2018, -2007):
-    for year in range(-2022, -2007):
+    #for year in range(-2022, -2007):
+    for year in range(-2021, -2007):
         years.append((tmp_years[i], str(year)))
         i += 1
 

@@ -13,13 +13,14 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support import expected_conditions as ExpectedCondition
 
 class Browser:
+    headless = True
 
     def __init__(self):
         parser = argparse.ArgumentParser()
-        parser.add_argument("--headed", help='Headed mode', action=argparse.BooleanOptionalAction, default=False)
+        parser.add_argument("--headed", help='Headed mode', action=argparse.BooleanOptionalAction, default=False, required=False)
+        parser.add_argument("--afterDate", help='Start recording matches after this date', default=None, required=False)
         args = parser.parse_args()
 
-        self.headless = True
         if args.headed:
             self.headless = False
 
@@ -61,7 +62,6 @@ class Browser:
         #pickle.dump(self.driver.get_cookies(), open(self.cookies_file, "wb"))
         if self.headless:
             self.quit()
-        pass
 
     def quit(self):
         self.driver.quit()
