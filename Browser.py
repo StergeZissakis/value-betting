@@ -18,7 +18,7 @@ class Browser:
     def __init__(self):
         parser = argparse.ArgumentParser()
         parser.add_argument("--headed", help='Headed mode', action=argparse.BooleanOptionalAction, default=False, required=False)
-        parser.add_argument("--afterDate", help='Start recording matches after this date', default=None, required=False)
+        parser.add_argument("--start-date", help='Start recording matches after this date', default=None, required=False)
         args = parser.parse_args()
 
         if args.headed:

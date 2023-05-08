@@ -185,14 +185,21 @@ def get_link_of_section(section, kind):
     return link
 
 def get_date_of_section(section, kind):
-    browser.wait_for_element_to_appear('.//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[1]/div[1]/div/div[1]/p')
-
-    browser.sleep_for_millis_random(400)
-
-    data.set('home_team'   , page.find_element(By.XPATH, './/*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[1]/div[1]/div/div[1]/p').text)
-    data.set('guest_team'  , page.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[1]/div[3]/div[1]/p').text)
-    data.set('date_time'   , date_to_datetime(page.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[2]/div[1]/div[2]').text))
-    print(str(data.get('date_time')) + " " + str(data.get('home_team')) + " VS " + str(data.get('guest_team')))
+    if kind == "Match":
+        return None
+    elif kind == "DateRow":
+        try:
+            date = section.find_element(By.XPATH,   './div[1]/div[1]/div').text.split('-')[0].strip()
+            return datetime.strptime(date, '%d %b %Y')
+        except:
+            return None
+    elif kind == "TopHeader":
+        try:
+            date = section.find_element(By.XPATH,   './div[2]/div[1]/div').text.split('-')[0].strip()
+            return datetime.strptime(date, '%d %b %Y')
+        except:
+            return None
+    return None
 
 
 def process_Section(browser, page, section, kind):
@@ -228,8 +235,11 @@ def process_results_page(db, browser, page):
             browser.scroll_to_visible(section)
             kind = get_section_kind(section)
             if kind is not None:
-                if start_date and start_date > get_date_of_section(section, kind):
-                    continue
+                if start_date:
+                    dt = get_date_of_section(section, kind)
+                    print(str(start_date) + " > " + str(dt))
+                    if dt == None or start_date < dt:
+                        continue
                 browser.sleep_for_millis_random(300)
 
                 row = process_Section(browser, page, section, kind)
@@ -256,11 +266,12 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--headed", help='Headed mode', action=argparse.BooleanOptionalAction, default=False)
     date_lambda = lambda s: datetime.strptime(s, '%Y-%m-%d')
-    parser.add_argument("--afterDate", help='Start recording matches after this date', type=date_lambda, default=None, required=False)
+    parser.add_argument("--start-date", help='Start recording matches after this date', type=date_lambda, default=None, required=False)
     args = parser.parse_args()
 
-    if args.afterDate:
-        start_date = args.afterDate
+    if args.start_date:
+        start_date = args.start_date
+        print(start_date)
 
     db = PGConnector("postgres", "localhost")
     if not db.is_connected():
