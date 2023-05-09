@@ -50,7 +50,7 @@ def process_header(browser, page, data):
 
         data.set('url', browser.driver.current_url)
     except:
-        print("--- Invalid entry: " + str(data))
+        print("--- Invalid entry (headers): " + str(data))
         return False
 
     return True
@@ -125,6 +125,7 @@ def process_1x2(browser, page, data):
         data.set('second_half_draw_odds',      x_odds)
         data.set('second_half_guest_win_odds', two_odds)
     except:
+        print("--- Invalid entry (1x2): " + str(data))
         pass
 
 def get_values_from_overunder_table(browser, page):
@@ -183,6 +184,7 @@ def process_OverUnder(browser, page, data):
         data.set('second_half_over_odds',      over)
         data.set('second_half_under_odds', under)
     except:
+        print("--- Invalid entry (OverUnder): " + str(data))
         pass
 
 def get_link_of_section(section, kind):
