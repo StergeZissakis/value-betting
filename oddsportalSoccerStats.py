@@ -31,6 +31,7 @@ def process_header(browser, page, data):
 
         browser.sleep_for_millis_random(400)
 
+        data.set('url', browser.driver.current_url)
         data.set('home_team'   , page.find_element(By.XPATH, './/*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[1]/div[1]/div/div[1]/p').text)
         data.set('guest_team'  , page.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[1]/div[3]/div[1]/p').text)
         data.set('date_time'   , date_to_datetime(page.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/main/div[2]/div[3]/div[2]/div[1]/div[2]').text))
@@ -47,11 +48,9 @@ def process_header(browser, page, data):
         data.set('first_half_goals_guest'  , int(first_half_goals.split(':')[1]))
         data.set('second_half_goals_home'  , int(second_half_goals.split(':')[0]))
         data.set('second_half_goals_guest' , int(second_half_goals.split(':')[1]))
-
-        data.set('url', browser.driver.current_url)
     except:
         if data.get('home_team') is not None and data.get('guest_team') is not None and data.get('date_time') is not None and data.get('goals_home') is not None and data.get('goals_guest')is not None :
-            print("--- Incomplete entry (headers): " + str(data))
+            #print("--- Incomplete entry (headers): " + str(data))
             return True
         print("--- Invalid entry (headers): " + str(data))
         return False
@@ -128,7 +127,7 @@ def process_1x2(browser, page, data):
         data.set('second_half_draw_odds',      x_odds)
         data.set('second_half_guest_win_odds', two_odds)
     except:
-        print("--- Incomplete entry (1x2): " + str(data))
+        #print("--- Incomplete entry (1x2): " + str(data))
         pass
 
 def get_values_from_overunder_table(browser, page):
@@ -187,7 +186,7 @@ def process_OverUnder(browser, page, data):
         data.set('second_half_over_odds',      over)
         data.set('second_half_under_odds', under)
     except:
-        print("--- Incomplete entry (OverUnder): " + str(data))
+        #print("--- Incomplete entry (OverUnder): " + str(data))
         pass
 
 def get_link_of_section(section, kind):
@@ -314,13 +313,13 @@ if __name__ == "__main__":
     # Process all years to 1999
     tmp_years = []
     #for year in range(-2021, -2006):
-    for year in range(-2011, -2006):
+    for year in range(-2009, -2006):
         tmp_years.append(str(year))
     
     years = []
     i = 0
     #for year in range(-2022, -2007):
-    for year in range(-2012, -2007):
+    for year in range(-2010, -2007):
         years.append((tmp_years[i], str(year)))
         i += 1
 

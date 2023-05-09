@@ -5,7 +5,7 @@
 -- Dumped from database version 13.10 (Debian 13.10-0+deb11u1)
 -- Dumped by pg_dump version 13.10 (Debian 13.10-0+deb11u1)
 
--- Started on 2023-05-09 11:38:42 EEST
+-- Started on 2023-05-09 15:49:02 EEST
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -393,10 +393,10 @@ CREATE TABLE public.soccer_statistics (
     full_time_guest_win_odds smallint,
     first_half_home_win_odds numeric,
     first_half_draw_odds numeric,
-    second_half_goals_guest smallint NOT NULL,
-    second_half_goals_home smallint NOT NULL,
-    first_half_goals_guest smallint NOT NULL,
-    first_half_goals_home smallint NOT NULL,
+    second_half_goals_guest smallint,
+    second_half_goals_home smallint,
+    first_half_goals_guest smallint,
+    first_half_goals_home smallint,
     first_half_guest_win_odds numeric,
     second_half_home_win_odds numeric,
     second_half_draw_odds numeric,
@@ -782,7 +782,7 @@ ALTER DEFAULT PRIVILEGES FOR ROLE postgres REVOKE ALL ON TABLES  FROM postgres;
 ALTER DEFAULT PRIVILEGES FOR ROLE postgres GRANT ALL ON TABLES  TO postgres WITH GRANT OPTION;
 
 
--- Completed on 2023-05-09 11:38:43 EEST
+-- Completed on 2023-05-09 15:49:02 EEST
 
 --
 -- PostgreSQL database dump complete
