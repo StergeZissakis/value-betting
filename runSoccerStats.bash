@@ -18,7 +18,7 @@ done;
 echo "*** Connected to Italy."
 
 echo "*** Running Soccer Stats..."
-python -u ./oddsportalSoccerStats.py 2>&1 | tee -a logs/soccerStats.log 
+python -u ./oddsportalSoccerStats.py $* 2>&1 | tee -a logs/soccerStats.log 
 echo "*** Soccer Starts Finished."
 
 kill `cat config/italy_vpn.pid`

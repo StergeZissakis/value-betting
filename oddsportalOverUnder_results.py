@@ -6,7 +6,7 @@ from selenium.webdriver.common.by import By
 from datetime import datetime, date, timedelta
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as ExpectedCondition
-from OddsPortal import get_section_kind, get_event_date, get_event_time
+from Utils import get_section_kind, get_event_date, get_event_time
 
 def click_and_collect_over_under_details(browser, section, kind):
     if kind == "Match":

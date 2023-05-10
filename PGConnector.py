@@ -1,6 +1,6 @@
 import psycopg2
 import sqlparse
-import SoccerStatsRow
+from SoccerStatsRow import SoccerStatsRow
 
 class PGBase:
 
@@ -176,9 +176,8 @@ class PGConnector(PGBase):
         cursor.close()
 
     def insert_or_update_soccer_statistics(self, soccerStatsRow):
-        table_name = "soccer_statistics"
 
-        sql = soccerStatsRow.generate_sql_insert_into_values(table_name) + ' ON CONFLICT ON CONSTRAINT ' + table_name + '_unique DO UPDATE SET ' + soccerStatsRow.generate_do_update_set();
+        sql = soccerStatsRow.generate_sql_insert_into_values() + ' ON CONFLICT ON CONSTRAINT ' + soccerStatsRow.table_name + '_unique DO UPDATE SET ' + soccerStatsRow.generate_do_update_set();
         #print(sql)
         values = soccerStatsRow.generate_sql_insert_values()
         #print(values)
@@ -187,3 +186,15 @@ class PGConnector(PGBase):
         self.pg.commit()
         cursor.close()
 
+    def getLatestRecordDateTimeOfSoccerStats(self):
+        ssr = SoccerStatsRow()
+        sql = "SELECT max(date_time) as max_date_time from public." + ssr.table_name + ";"
+
+        cursor = self.pg.cursor()
+        cursor.execute( sql )
+        res = cursor.fetchone()
+        if res is not None:
+            res = res[0]
+
+        cursor.close()
+        return res

@@ -9,7 +9,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as ExpectedCondition
 from SoccerStatsRow import SoccerStatsRow
-from OddsPortal import get_section_kind, get_event_date, get_event_time
+from Utils import get_section_kind, get_event_date, get_event_time
 
 def date_to_datetime(date):
     dt = date
@@ -237,7 +237,11 @@ def process_Section(browser, page, section, kind):
     return data
 
 
-def process_results_page(db, browser, page, start_date = None):
+def process_results_page(db, browser, page, start_date = None, update_run = False):
+
+    date_time_limit = None
+    if update_run:
+        date_time_limit = db.getLatestRecordDateTimeOfSoccerStats()
 
     page_number = 1
     next_page_button_xpath = '//*[@id="app"]/div/div[1]/div/main/div[2]/div[5]/div[4]/div/div[3]/a[1]/div/p'
@@ -260,8 +264,13 @@ def process_results_page(db, browser, page, start_date = None):
                         continue
                     else:
                         start_date = None
+                
+                if date_time_limit:
+                    dt = get_date_of_section(section, kind)
+                    if dt.replace(tzinfo=None) <= date_time_limit.replace(tzinfo=None):
+                        print("Update complete")
+                        return
                 browser.sleep_for_millis_random(300)
-
                 row = process_Section(browser, page, section, kind)
                 if row is None: #invalid entry
                     continue
@@ -287,15 +296,17 @@ def process_results_page(db, browser, page, start_date = None):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--headed", help='Headed mode', action=argparse.BooleanOptionalAction, default=False)
+    parser.add_argument("--update", help='Update with new matches only and stop', action=argparse.BooleanOptionalAction, default=False)
     date_lambda = lambda s: datetime.strptime(s, '%Y-%m-%d')
     parser.add_argument("--start-date", help='Start recording matches after this date', type=date_lambda, default=None, required=False)
     args = parser.parse_args()
 
+    start_date = None
     if args.start_date:
         start_date = args.start_date
         print(start_date)
-    else:
-        start_date = None
+
+    update_run = args.update
 
     db = PGConnector("postgres", "localhost")
     if not db.is_connected():
@@ -303,34 +314,35 @@ if __name__ == "__main__":
         exit(-1)
 
     browser = Browser()
-    ##url = "https://www.oddsportal.com/football/greece/super-league/results/" # current year
-    ##page = browser.get(url)
+    url = "https://www.oddsportal.com/football/greece/super-league/results/" # current year
+    page = browser.get(url)
     # Click I Accept
-    ##browser.accept_cookies("//button[text()='I Accept']")
+    browser.accept_cookies("//button[text()='I Accept']")
     # Process the 1st page
-    ##process_results_page(db, browser, page)
+    process_results_page(db, browser, page, None, update_run)
 
-    # Process all years to 1999
-    tmp_years = []
-    #for year in range(-2021, -2006):
-    for year in range(-2009, -2006):
-        tmp_years.append(str(year))
+    if not update_run:
+        # Process all years to 1999
+        tmp_years = []
+        #for year in range(-2009, -2006):
+        for year in range(-2021, -2006):
+            tmp_years.append(str(year))
     
-    years = []
-    i = 0
-    #for year in range(-2022, -2007):
-    for year in range(-2010, -2007):
-        years.append((tmp_years[i], str(year)))
-        i += 1
+        years = []
+        i = 0
+        #for year in range(-2010, -2007):
+        for year in range(-2022, -2007):
+            years.append((tmp_years[i], str(year)))
+            i += 1
 
-    for year_from, year_to in years:
-        url = "https://www.oddsportal.com/football/greece/super-league" + year_from + year_to + "/results/"
-        print(str(year_from) + str(year_to) + " " + url)
-        browser = Browser()
-        page = browser.get(url)
-        browser.sleep_for_seconds_random(3)
-        browser.accept_cookies("//button[text()='I Accept']")
-        process_results_page(db, browser, page, start_date)
+        for year_from, year_to in years:
+            url = "https://www.oddsportal.com/football/greece/super-league" + year_from + year_to + "/results/"
+            print(str(year_from) + str(year_to) + " " + url)
+            ##browser = Browser()
+            page = browser.get(url)
+            browser.sleep_for_seconds_random(3)
+            browser.accept_cookies("//button[text()='I Accept']")
+            process_results_page(db, browser, page, start_date, update_run)
 
     if browser.headless:
         browser.quit()
