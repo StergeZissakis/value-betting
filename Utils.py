@@ -51,5 +51,3 @@ def get_event_time(section_div, kind):
         return None
 
     return div.text
-
-
